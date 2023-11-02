@@ -301,7 +301,8 @@ class Partners extends CI_Controller
             // licence details
             $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
             $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|required|xss_clean');
-            // $this->form_validation->set_rules('licence_proof', 'Licence Proof', 'trim|xss_clean');
+
+            $this->form_validation->set_rules('company_registration_verified', 'Company registration verified', 'trim|xss_clean'); // // Company registration number verified status
 
             if (!$this->form_validation->run()) {
 
@@ -595,12 +596,13 @@ class Partners extends CI_Controller
                         'user_id' => $this->input->post('edit_restro', true),
                         'edit_restro_data_id' => $this->input->post('edit_restro_data_id', true),
                         'address_proof' => (!empty($proof_doc)) ? $proof_doc : $this->input->post('old_address_proof', true),
-                        // 'id_passport_number' => $this->input->post('id_passport_number', true),
+                        'id_passport_number' => $this->input->post('id_passport_number', true),
                         'profile' => (!empty($profile_doc)) ? $profile_doc : $this->input->post('old_profile', true),
                         'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
                         'partner_name' => $this->input->post('partner_name', true),
                         'licence_name' => $this->input->post('licence_name', true), // Company name
-                        // 'licence_code' => $this->input->post('licence_code', true), // Comapany registration number
+                        'licence_code' => $this->input->post('licence_code', true), // // Company registration number
+                        'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number verified status
                         'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : $this->input->post('old_licence_proof[]', true),
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
@@ -699,8 +701,9 @@ class Partners extends CI_Controller
                             'profile' => (!empty($profile_doc)) ? $profile_doc : null,
                             'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
                             'partner_name' => $this->input->post('partner_name', true),
-                            'licence_name' => $this->input->post('licence_name', true),
-                            'licence_code' => $this->input->post('licence_code', true),
+                            'licence_name' => $this->input->post('licence_name', true), // Company name
+                            'licence_code' => $this->input->post('licence_code', true), // Company registration number
+                            'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number status
                             'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                             'description' => $this->input->post('description', true),
                             'address' => $this->input->post('address', true),
@@ -762,12 +765,15 @@ class Partners extends CI_Controller
             print_r(json_encode($this->response));
             return false;
         }
+        $company_registration_no = $this->input->post('company_registration_no', true);
+        $company_registration_no  = explode('/',$company_registration_no);
 
 
-        $fcmFields = array(
+        $postFields = array(
             'api_key' => '$2y$10$B56N8F5h3CwsTwLuOYzMouLhPEZxPWChTAxMsi',
-            'id_number' => $this->input->post('company_registration_no', true),
-            'enquiry_reason' => 'Verification for business site'
+            'reg_1' => $company_registration_no[0],
+            'reg_2' => $company_registration_no[1],
+            'reg_3' => $company_registration_no[2]
         );
 
         $headers = array(
@@ -775,23 +781,25 @@ class Partners extends CI_Controller
         );
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://www.verifyid.co.za/webservice/cipc_director_search');
+        curl_setopt($ch, CURLOPT_URL, 'https://www.verifyid.co.za/webservice/cipc_company_match');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fcmFields));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
         $result = curl_exec($ch);
         $result = json_decode($result, true);
 
-        $status = $result['Status'];
-        $error = $result['Error'];
-
-        if ($status == 'Failure') {
+        if (!isset($result['Status']) || $result['Status'] != 'Success') {
+            $this->response['error'] = true;
+            $this->response['message'] = isset($result['NotFound']) ? $result['NotFound'] : 'Verification failed.';
+        } else {
             $this->response['error'] = false;
-            $this->response['message'] = $error;
+            $this->response['message'] = 'Company verified successfully.';
         }
-        print_r(json_encode($this->response));        
+        $this->response['csrfName'] = $this->security->get_csrf_token_name();
+        $this->response['csrfHash'] = $this->security->get_csrf_hash();
+        print_r(json_encode($this->response));
         curl_close($ch);
     }
 }

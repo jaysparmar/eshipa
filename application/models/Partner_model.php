@@ -38,6 +38,7 @@ class Partner_model extends CI_Model
             'licence_proof' => (isset($data['licence_proof']) && !empty($data['licence_proof']) && $data['licence_proof'] != "") ? json_encode($data['licence_proof']) : "",
             'licence_status' => (isset($data['licence_status']) && $data['licence_status'] != "") ? $data['licence_status'] : 0,
             'bank_code' => $data['bank_code'],
+            'licence_code_status' => $data['licence_code_status'],
             'bank_name' => $data['bank_name'],
             'cooking_time' => $data['cooking_time'],
             'pan_number' => $data['pan_number'],

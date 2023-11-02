@@ -229,18 +229,20 @@
                                         <hr>
                                         <h4>Company Registration </h4>
                                         <div class="form-group">
+                                            <input type="hidden" id="company_registration_verified" name="company_registration_verified" value="<?= (isset($fetched_data[0]['licence_code_status'])) ? output_escaping($fetched_data[0]['licence_code_status']) : 0 ?>">
                                             <label for="licence_name" class="col-sm-12 col-form-label">Company Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name" value="<?= (isset($fetched_data[0]['licence_name']) && !empty($fetched_data[0]['licence_name'])) ? output_escaping($fetched_data[0]['licence_name']) : "" ?>">
                                             </div>
                                             <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
-                                                        <span class="badge bg-success company-verified <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? '' : 'd-none' ?>">Verified</span>
-                                                    
-                                                        <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 0 ? '' : 'd-none' ?>">Not Verified</span> <a href="javascript:void(0);" class="btn btn-info btn-sm" data-id="<?= isset($fetched_data[0]['id']) && !empty($fetched_data[0]['id']) ? $fetched_data[0]['id'] : '' ?>" id="verify_company_registration_no">Verify now</a>
-                                                
+                                                <span class="badge bg-success company-verified <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
+
+                                                <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? ' d-none' : '' ?>" data-id="<?= isset($fetched_data[0]['id']) && !empty($fetched_data[0]['id']) ? $fetched_data[0]['id'] : '' ?>" id="verify_company_registration_no">Verify now</a>
+
                                             </label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="company_registration_no" placeholder="Registration number" name="licence_code" value="<?= (isset($fetched_data[0]['licence_code']) && !empty($fetched_data[0]['licence_code'])) ? output_escaping($fetched_data[0]['licence_code']) : "" ?>" <?= isset($fetched_data[0]['id']) && !empty($fetched_data[0]['id']) ? 'readonly' : '' ?>>
+                                                <input type="text" class="form-control" id="company_registration_no" placeholder="Ex. XXXX/XXXXXX/XX" name="licence_code" value="<?= (isset($fetched_data[0]['licence_code']) && !empty($fetched_data[0]['licence_code'])) ? output_escaping($fetched_data[0]['licence_code']) : "" ?>">
                                             </div>
                                             <div class="col-sm-10 d-none">
                                                 <label for="licence_proof" class="col-sm-3 col-form-label">Licence Proof</label>

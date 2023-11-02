@@ -81,10 +81,21 @@ class Order_model extends CI_Model
                             send_notifications("", "rider", $title, $body, "order", $row['city_id']);
                         }
                     }
-                    $commission = 0;
-                    /* give commission to the Rider if the order is delivered */
                     if ($current_status == 'delivered') {
-                        $order = fetch_details($where, 'orders', 'rider_id,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
+                        $order = fetch_details($where, 'orders', 'user_id,rider_id,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
+                        $settings = get_settings('system_settings', true);
+                        /* Customer ePoints earning if the order is delivered */
+                        if (isset($settings['epoint_percentage']) && !empty($settings['epoint_percentage']) && $settings['epoint_percentage'] > 0) {
+                            $user_id = $order[0]['user_id'];
+                            $user = fetch_details("id = $user_id", 'users', 'epoints');
+                            $order_total = $order[0]['total'];
+                            $earned_epoints = ($settings['epoint_percentage'] / 100) * $order_total;
+                            $epoints = (isset($user[0]['epoints']) && !empty($user[0]['epoints']) && $user[0]['epoints'] > 0) ? $user[0]['epoints'] : 0;
+                            $epoints += intval($earned_epoints);
+                            update_details(['epoints' => $epoints], ['id' => $user_id], 'users');
+                        }
+                        /* give commission to the Rider if the order is delivered */
+                        $commission = 0;
                         if (!empty($order)) {
                             $rider_id = $order[0]['rider_id'];
                             if ($rider_id > 0) {

@@ -6764,6 +6764,13 @@ function sales_inventory_report_query_params(p) {
         search: p.search
     };
 }
+$('#company_registration_no').on('change',function(e){
+    e.preventDefault();
+    $('#verify_company_registration_no').removeClass('d-none');
+    $('.company-verified').addClass('d-none');
+    $('.company-not-verified').removeClass('d-none');
+
+})
 $(document).on("click", "#verify_company_registration_no", function (e) {
     e.preventDefault();
     var company_registration_no = $('#company_registration_no').val();
@@ -6786,14 +6793,19 @@ $(document).on("click", "#verify_company_registration_no", function (e) {
             if (result["error"] == true) {
                 submit_btn.html('Verify now');
                 submit_btn.attr("disabled", false);
+                $('.company-verified').addClass(' d-none');
+                $('.company-not-verified').removeClass('d-none');
+                $('#company_registration_verified').val(0);
                 iziToast.error({
                     message: result["message"]
                 });
             } else {
                 submit_btn.html('Verify now');
                 submit_btn.attr("disabled", false);
+                submit_btn.addClass('d-none');
                 $('.company-verified').removeClass('d-none');
-                $('.company-not-verified').addClass('d-none');
+                $('.company-not-verified').addClass(' d-none');
+                $('#company_registration_verified').val(1);
                 iziToast.success({
                     message: result["message"]
                 });
