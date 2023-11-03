@@ -20,7 +20,7 @@
     <section class="content">
         <div class="container-fluid">
             <form class="form-horizontal form-submit-event" action="<?= base_url('admin/partners/add_partner'); ?>" method="POST" id="add_restro_form">
-
+                <input type="hidden" name="reload">
                 <?php if (isset($fetched_data[0]['id'])) { ?>
                     <input type="hidden" name="edit_restro" value="<?= $fetched_data[0]['user_id'] ?>">
                     <input type="hidden" name="edit_restro_data_id" value="<?= $fetched_data[0]['id'] ?>">
@@ -238,7 +238,7 @@
                                                 <span class="badge bg-success company-verified <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
 
                                                 <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
-                                                <a href="javascript:void(0);" class="btn btn-info btn-sm <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? ' d-none' : '' ?>" data-id="<?= isset($fetched_data[0]['id']) && !empty($fetched_data[0]['id']) ? $fetched_data[0]['id'] : '' ?>" id="verify_company_registration_no">Verify now</a>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? ' d-none' : '' ?>" id="verify_company_registration_no">Verify now</a>
 
                                             </label>
                                             <div class="col-sm-10">
@@ -365,10 +365,48 @@
                                         }
                                         ?>
 
+                                        <!-- Modal -->
+                                        <div class="modal fade edit-modal-lg" id="view_id_passport_number_verification_result_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">ID/Password verification details</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <?php if (isset($fetched_data[0]['id_passport_number_verification_result']) && !empty($fetched_data[0]['id_passport_number_verification_result'])) {
+                                                        echo $fetched_data[0]['id_passport_number_verification_result'];
+                                                        $result = json_decode($fetched_data[0]['id_passport_number_verification_result'], true);
+                                                        print_r($result);
+                                                    } ?>
+                                                    <div class="modal-body">
+                                                        <p>First Name: <span id="id_password_ver_res_first_name"><?= isset($result['Firstnames']) && !empty($result['Firstnames']) ? $result['Firstnames'] : '' ?></span></p>
+                                                        <p>Last Name: <span id="id_password_ver_res_last_name"><?= isset($result['Lastname']) && !empty($result['Lastname']) ? $result['Lastname'] : '' ?></span></p>
+                                                        <p>DOB: <span id="id_password_ver_res_dob"><?= isset($result['Dob']) && !empty($result['Dob']) ? $result['Dob'] : '' ?></span></p>
+                                                        <p>Age: <span id="id_password_ver_res_age"><?= isset($result['Age']) && !empty($result['Age']) ? $result['Age'] : '' ?></span></p>
+                                                        <p>Gender: <span id="id_password_ver_res_gender"><?= isset($result['Gender']) && !empty($result['Gender']) ? $result['Gender'] : '' ?></span></p>
+                                                        <p>Citizenship: <span id="id_password_ver_res_citizenship"><?= isset($result['Citizenship']) && !empty($result['Citizenship']) ? $result['Citizenship'] : '' ?></span></p>
+                                                        <p>DateIssued: <span id="id_password_ver_res_date_issued"><?= isset($result['DateIssued']) && !empty($result['DateIssued']) ? $result['DateIssued'] : '' ?></span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                         <div class="form-group ">
-                                            <label for="national_identity_card" class="col-sm-6 col-form-label">ID/Passport Number <span class='text-danger text-sm'>*</span></label>
+                                            <input type="hidden" id="id_passport_verified" name="id_passport_verified" value="<?= (isset($fetched_data[0]['id_passport_number_status'])) ? output_escaping($fetched_data[0]['id_passport_number_status']) : 0 ?>">
+                                            <input type="hidden" id="id_passport_number_verification_result" name="id_passport_number_verification_result" value="<?= (isset($fetched_data[0]['id_passport_number_verification_result'])) ? output_escaping($fetched_data[0]['id_passport_number_verification_result']) : '' ?>">
+                                            <label for="national_identity_card" class="col-sm-12 col-form-label">ID/Passport Number <span class='text-danger text-sm'>*</span>
+                                                <span class="badge bg-success id-passport-verified <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
+
+                                                <span class="badge bg-danger id-passport-not-verified<?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
+                                                <a href="javascript:void(0);" class="btn btn-info btn-sm <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? ' d-none' : '' ?>" id="verify_id_passport">Verify now</a>
+                                                <a href='javascript:void(0)' data-toggle='modal' id="view_id_passport_number_verification_result" data-target='#view_id_passport_number_verification_result_modal' class='btn btn-primary btn-xs mr-1 mb-1 <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? '' : 'd-none' ?>' id="view_id_passport_number_verification_result" title='View Verified Details' data-toggle="modal" data-target="view_id_passport_number_verification_result_modal"><i class="fa fa-eye"></i></a>
+                                            </label>
+
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" placeholder="ID/Passport Number" name="id_passport_number" value="<?= @$fetched_data[0]['id_passport_number'] ?>">
+                                                <input type="text" class="form-control" placeholder="ID/Passport Number" id="id_passport_number" name="id_passport_number" value="<?= @$fetched_data[0]['id_passport_number'] ?>">
                                             </div>
                                         </div>
                                         <div class="form-group ">

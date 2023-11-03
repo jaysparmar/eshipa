@@ -36,8 +36,8 @@ class Partners extends CI_Controller
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
             $this->data['main_page'] = FORMS . 'partner';
             $settings = get_settings('system_settings', true);
-            $this->data['title'] = 'Add Partner | ' . $settings['app_name'];
-            $this->data['meta_description'] = 'Add Partner | ' . $settings['app_name'];
+            $this->data['title'] = 'Add Spaza | ' . $settings['app_name'];
+            $this->data['meta_description'] = 'Add Spaza | ' . $settings['app_name'];
             $this->data['categories'] = $this->category_model->get_categories();
             $this->data['cities'] = fetch_details("", 'cities');
             $this->data['google_map_api_key'] = $settings['google_map_javascript_api_key'];
@@ -247,10 +247,10 @@ class Partners extends CI_Controller
 
     public function add_partner()
     {
-        // print_R($_POST);
+        print_R($_POST);
         // $old_licence = fetch_details(['user_id' => $_POST['edit_restro']], 'partner_data', 'licence_proof');
         // print_R($old_licence[0]["licence_proof"]);
-        //return;
+        return false;
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
 
             if (isset($_POST['edit_restro'])) {
@@ -302,7 +302,8 @@ class Partners extends CI_Controller
             $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
             $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|required|xss_clean');
 
-            $this->form_validation->set_rules('company_registration_verified', 'Company registration verified', 'trim|xss_clean'); // // Company registration number verified status
+            $this->form_validation->set_rules('company_registration_verified', 'Company registration verified', 'trim|xss_clean'); // Company registration number verified status
+            $this->form_validation->set_rules('id_passport_verified', 'ID/Passport verified', 'trim|xss_clean');
 
             if (!$this->form_validation->run()) {
 
@@ -603,6 +604,8 @@ class Partners extends CI_Controller
                         'licence_name' => $this->input->post('licence_name', true), // Company name
                         'licence_code' => $this->input->post('licence_code', true), // // Company registration number
                         'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number verified status
+                        'id_passport_number_status' => $this->input->post('id_passport_verified', true),
+                        'id_passport_number_verification_result' => $_POST['id_passport_number_verification_result'],
                         'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : $this->input->post('old_licence_proof[]', true),
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
@@ -704,6 +707,8 @@ class Partners extends CI_Controller
                             'licence_name' => $this->input->post('licence_name', true), // Company name
                             'licence_code' => $this->input->post('licence_code', true), // Company registration number
                             'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number status
+                            'id_passport_number_status' => $this->input->post('id_passport_verified', true),
+                            'id_passport_number_verification_result' => $_POST['id_passport_number_verification_result'],
                             'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                             'description' => $this->input->post('description', true),
                             'address' => $this->input->post('address', true),
@@ -756,7 +761,6 @@ class Partners extends CI_Controller
     public function verify_company_registration_no()
     {
         $this->form_validation->set_rules('company_registration_no', 'Company registration number', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('seller_id', 'Seller', 'trim|xss_clean');
         if (!$this->form_validation->run()) {
             $this->response['error'] = true;
             $this->response['csrfName'] = $this->security->get_csrf_token_name();
@@ -766,7 +770,7 @@ class Partners extends CI_Controller
             return false;
         }
         $company_registration_no = $this->input->post('company_registration_no', true);
-        $company_registration_no  = explode('/',$company_registration_no);
+        $company_registration_no  = explode('/', $company_registration_no);
 
 
         $postFields = array(
@@ -796,6 +800,57 @@ class Partners extends CI_Controller
         } else {
             $this->response['error'] = false;
             $this->response['message'] = 'Company verified successfully.';
+        }
+        $this->response['csrfName'] = $this->security->get_csrf_token_name();
+        $this->response['csrfHash'] = $this->security->get_csrf_hash();
+        print_r(json_encode($this->response));
+        curl_close($ch);
+    }
+
+    public function verify_id_passport_number()
+    {
+        // $this->response['error'] = false;
+        // $this->response['message'] = 'Test';
+        // $this->response['csrfName'] = $this->security->get_csrf_token_name();
+        // $this->response['csrfHash'] = $this->security->get_csrf_hash();
+        // print_r(json_encode($this->response));
+        // return false;
+        $this->form_validation->set_rules('id_passport_number', 'ID/Passport number', 'trim|required|xss_clean|exact_length[13]');
+        if (!$this->form_validation->run()) {
+            $this->response['error'] = true;
+            $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            $this->response['message'] = validation_errors();
+            print_r(json_encode($this->response));
+            return false;
+        }
+        $id_passport_number = $this->input->post('id_passport_number', true);
+
+        $postFields = array(
+            'api_key' => '$2y$10$B56N8F5h3CwsTwLuOYzMouLhPEZxPWChTAxMsi',
+            'id_number' => $id_passport_number
+        );
+
+        $headers = array(
+            'Content-Type: application/json'
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://www.verifyid.co.za/webservice/said_verification');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
+        $result = curl_exec($ch);        
+        $result = json_decode($result, true);        
+        if (!isset($result['Status']) || $result['Status'] != 'ID Number Valid') {
+            $this->response['error'] = true;
+            $this->response['message'] = isset($result['Error']) ? $result['Error'] : 'Verification failed.';
+        } else {
+            $this->response['error'] = false;
+            $this->response['message'] = 'ID/Passport verified successfully.';
+            $this->response['data'] = json_encode($result['Verification']);
         }
         $this->response['csrfName'] = $this->security->get_csrf_token_name();
         $this->response['csrfHash'] = $this->security->get_csrf_hash();

@@ -1678,6 +1678,11 @@ $(document).on("submit", ".container-fluid .form-submit-event", function (e) {
                         location.reload();
                     }, 600);
                 }
+                if ($('.form-submit-event').find('input[name="reload"]').length > 0) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 600);
+                }
             }
         }
     });
@@ -6764,60 +6769,153 @@ function sales_inventory_report_query_params(p) {
         search: p.search
     };
 }
-$('#company_registration_no').on('change',function(e){
+$('#company_registration_no').on('change', function (e) {
     e.preventDefault();
     $('#verify_company_registration_no').removeClass('d-none');
     $('.company-verified').addClass('d-none');
     $('.company-not-verified').removeClass('d-none');
+    $('#company_registration_verified').val(0);
 
-})
+});
+
 $(document).on("click", "#verify_company_registration_no", function (e) {
     e.preventDefault();
     var company_registration_no = $('#company_registration_no').val();
     var submit_btn = $('#verify_company_registration_no');
-    if(company_registration_no != ''){
-    var seller_id = $(this).data("id");
-    $.ajax({
-        type: "POST",
-        url: base_url + "admin/partners/verify_company_registration_no",
-        data: { csrfName: csrfHash, seller_id: seller_id, company_registration_no: company_registration_no },
-        beforeSend: function () {
-            submit_btn.html("Please Wait..");
-            submit_btn.attr("disabled", true);
-        },
-        dataType: "json",
-        success: function (result) {
-            csrfName = result["csrfName"];
-            csrfHash = result["csrfHash"];
+    if (company_registration_no != '') {
+        $.ajax({
+            type: "POST",
+            url: base_url + "admin/partners/verify_company_registration_no",
+            data: { csrfName: csrfHash, company_registration_no: company_registration_no },
+            beforeSend: function () {
+                submit_btn.html("Please Wait..");
+                submit_btn.attr("disabled", true);
+            },
+            dataType: "json",
+            success: function (result) {
+                csrfName = result["csrfName"];
+                csrfHash = result["csrfHash"];
 
-            if (result["error"] == true) {
-                submit_btn.html('Verify now');
-                submit_btn.attr("disabled", false);
-                $('.company-verified').addClass(' d-none');
-                $('.company-not-verified').removeClass('d-none');
-                $('#company_registration_verified').val(0);
-                iziToast.error({
-                    message: result["message"]
-                });
-            } else {
-                submit_btn.html('Verify now');
-                submit_btn.attr("disabled", false);
-                submit_btn.addClass('d-none');
-                $('.company-verified').removeClass('d-none');
-                $('.company-not-verified').addClass(' d-none');
-                $('#company_registration_verified').val(1);
-                iziToast.success({
-                    message: result["message"]
-                });
+                if (result["error"] == true) {
+                    submit_btn.html('Verify now');
+                    submit_btn.attr("disabled", false);
+                    $('.company-verified').addClass(' d-none');
+                    $('.company-not-verified').removeClass('d-none');
+                    $('#company_registration_verified').val(0);
+                    iziToast.error({
+                        message: result["message"]
+                    });
+                } else {
+                    submit_btn.html('Verify now');
+                    submit_btn.attr("disabled", false);
+                    submit_btn.addClass('d-none');
+                    $('.company-verified').removeClass('d-none');
+                    $('.company-not-verified').addClass(' d-none');
+                    $('#company_registration_verified').val(1);
+                    iziToast.success({
+                        message: result["message"]
+                    });
+                }
             }
-        }
-    });
-    }else{
+        });
+    } else {
         submit_btn.html('Verify now');
-                submit_btn.attr("disabled", false);
-                iziToast.error({
-                    message: 'Please enter company registration number.'
-                });
+        submit_btn.attr("disabled", false);
+        iziToast.error({
+            message: 'Please enter company registration number.'
+        });
+    }
+
+});
+
+$('#id_passport_number').on('change', function (e) {
+    e.preventDefault();
+    $('#verify_id_passport').removeClass('d-none');
+    $('.id-passport-verified').addClass('d-none');
+    $('.id-passport-not-verified').removeClass('d-none');
+    $('#id_passport_verified').val(0);
+    $('#id_passport_number_verification_result').val('');
+
+    $('#id_password_ver_res_first_name').text('');
+    $('#id_password_ver_res_last_name').text('');
+    $('#id_password_ver_res_dob').text('');
+    $('#id_password_ver_res_age').text('');
+    $('#id_password_ver_res_gender').text('');
+    $('#id_password_ver_res_citizenship').text('');
+    $('#id_password_ver_res_date_issued').text('');
+
+    $('#view_id_passport_number_verification_result').addClass('d-none');
+
+
+});
+
+$(document).on("click", "#verify_id_passport", function (e) {
+    e.preventDefault();
+    var id_passport_number = $('#id_passport_number').val();
+    var submit_btn = $('#verify_id_passport');
+    if (id_passport_number != '') {
+        $.ajax({
+            type: "POST",
+            url: base_url + "admin/partners/verify_id_passport_number",
+            data: { csrfName: csrfHash, id_passport_number: id_passport_number },
+            beforeSend: function () {
+                submit_btn.html("Please Wait..");
+                submit_btn.attr("disabled", true);
+            },
+            dataType: "json",
+            success: function (result) {
+                csrfName = result["csrfName"];
+                csrfHash = result["csrfHash"];
+
+                if (result["error"] == true) {
+                    submit_btn.html('Verify now');
+                    submit_btn.attr("disabled", false);
+                    $('.id-passport-verified').addClass(' d-none');
+                    $('.id-passport-not-verified').removeClass('d-none');
+                    $('#view_id_passport_number_verification_result').addClass('d-none');
+                    $('#id_passport_verified').val(0);
+                    $('#id_passport_number_verification_result').val('');
+
+                    $('#id_password_ver_res_first_name').text('');
+                    $('#id_password_ver_res_last_name').text('');
+                    $('#id_password_ver_res_dob').text('');
+                    $('#id_password_ver_res_age').text('');
+                    $('#id_password_ver_res_gender').text('');
+                    $('#id_password_ver_res_citizenship').text('');
+                    $('#id_password_ver_res_date_issued').text('');
+
+                    iziToast.error({
+                        message: result["message"]
+                    });
+                } else {
+                    submit_btn.html('Verify now');
+                    submit_btn.attr("disabled", false);
+                    submit_btn.addClass('d-none');
+                    var verification = $.parseJSON(result['data']);
+                    $('.id-passport-verified').removeClass('d-none');
+                    $('#view_id_passport_number_verification_result').removeClass('d-none');
+                    $('.id-passport-not-verified').addClass(' d-none');
+                    $('#id_passport_verified').val(1);
+                    $('#id_passport_number_verification_result').val(result['data']);
+                    $('#id_password_ver_res_first_name').text(verification.Firstnames);
+                    $('#id_password_ver_res_last_name').text(verification.Lastname);
+                    $('#id_password_ver_res_dob').text(verification.Dob);
+                    $('#id_password_ver_res_age').text(verification.Age);
+                    $('#id_password_ver_res_gender').text(verification.Gender);
+                    $('#id_password_ver_res_citizenship').text(verification.Citizenship);
+                    $('#id_password_ver_res_date_issued').text(verification.DateIssued);
+                    iziToast.success({
+                        message: result["message"]
+                    });
+                }
+            }
+        });
+    } else {
+        submit_btn.html('Verify now');
+        submit_btn.attr("disabled", false);
+        iziToast.error({
+            message: 'Please enter ID/Passport number.'
+        });
     }
 
 });
