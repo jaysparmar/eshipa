@@ -77,9 +77,9 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="zipcode" class="col-form-label">Filter By partner</label>
+                                    <label for="zipcode" class="col-form-label">Filter By spaza</label>
                                     <select class='form-control' name='partner_id' id="restro_filter">
-                                        <option value="">Select partner </option>
+                                        <option value="">Select spaza </option>
                                         <?php foreach ($partners as $partner) { ?>
                                             <option value="<?= $partner['partner_id'] ?>" <?= (isset($product_details[0]['partner_id']) && $product_details[0]['partner_id'] == $partner['partner_id']) ? 'selected' : "" ?>><?= output_escaping($partner['partner_name']) ?></option>
                                         <?php } ?>

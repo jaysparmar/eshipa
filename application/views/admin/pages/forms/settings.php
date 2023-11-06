@@ -182,13 +182,27 @@
                                         <label for=""> Customer ePoints percentage
                                         </label>
                                         <div class="card-body">
-                                        <input type="text" class="form-control" name="epoints_percentage" value="<?= (isset($settings['epoints_percentage'])) ? $settings['epoints_percentage'] : '' ?>" placeholder='ePonints Percentage ' />
+                                            <input type="text" class="form-control" name="epoints_percentage" value="<?= (isset($settings['epoints_percentage'])) ? $settings['epoints_percentage'] : '' ?>" placeholder='ePonints Percentage ' />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="card card-info">
+                            <div class="card-body">
+                                <h4>VerifyID Key Settings</h4><small class='text-muted'>(Important for company registration and ID/Passport number verification to be work)</small>
+                                <hr>
+                                <div class="form-group col-md-12">
+                                    <label for="google_map_javascript_api_key">VerifyID API KEY (<a href="https://www.verifyid.co.za/api-key" target="_blank">Click to find</a>)</label>
+                                    
+
+                                    <input type="text" class="form-control" name="verify_id_api_key" value="<?= (isset($settings['verify_id_api_key']) ? $settings['verify_id_api_key'] : '') ?>" placeholder="Enter your VerifyID API KEY" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
                 <div class="row">
                     <div class="col-md-6">

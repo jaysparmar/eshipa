@@ -315,9 +315,9 @@ class Product_model extends CI_Model
         foreach ($product_count as $row) {
             $total = $row['total'];
         }
-        $search_res = $this->db->select('product_variants.id AS id,sd.partner_name, p.id as pid ,p.rating,p.no_of_ratings,p.name, p.type, p.image, p.status,product_variants.price , product_variants.special_price, product_variants.stock ')
-            ->join(" categories c", "p.category_id=c.id ")
-            ->join(" partner_data sd", "sd.user_id=p.partner_id ")
+        $search_res = $this->db->select('product_variants.id AS id, sd.partner_name, p.id as pid, p.rating, p.no_of_ratings, p.name, p.type, p.image, p.status, product_variants.price, product_variants.special_price, product_variants.stock ')
+            ->join("categories c", "p.category_id = c.id")
+            ->join("partner_data sd", "sd.user_id = p.partner_id", 'left')
             ->join('product_variants', 'product_variants.product_id = p.id');
 
         if (isset($multipleWhere) && !empty($multipleWhere)) {
@@ -389,7 +389,10 @@ class Product_model extends CI_Model
             $attr_values  =  get_variants_values_by_pid($row['pid']);
             $tempRow['id'] = $row['pid'];
             $tempRow['varaint_id'] = $row['id'];
-            $tempRow['name'] = $row['name'] . '<br><small>' . ucwords(str_replace('_', ' ', $row['type'])) . '</small><br><small> By </small><b>' . $row['partner_name'] . '</b>';
+            $tempRow['name'] = $row['name'] . '<br><small>' . ucwords(str_replace('_', ' ', $row['type'])) . '</small>';
+            if (isset($row['partner_name']) && !empty($row['partner_name'])) {
+                $tempRow['name'] .= '<br><small> By </small><b>' . $row['partner_name'] . '</b>';
+            }
             $tempRow['type'] = $row['type'];
             $tempRow['price'] =  ($row['special_price'] == null || $row['special_price'] == '0') ? $currency . $row['price'] : $currency . $row['special_price'];
             $tempRow['stock'] = $row['stock'];

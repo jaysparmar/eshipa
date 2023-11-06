@@ -38,10 +38,10 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="partners" class="col-sm-4 col-form-label">Partner <span class='text-danger text-sm'>*</span></label>
+                                            <label for="partners" class="col-sm-4 col-form-label">Spaza</label>
                                             <div class="col-sm-12">
                                                 <select class='form-control' name='partner_id' id="partner_id">
-                                                    <option value="">Select Partner </option>
+                                                    <option value="">Select Spaza </option>
                                                     <?php foreach ($partners as $partner) { ?>
                                                         <option value="<?= $partner['partner_id'] ?>" <?= (isset($product_details[0]['partner_id']) && $product_details[0]['partner_id'] == $partner['partner_id']) ? 'selected' : "" ?>><?= output_escaping($partner['partner_name']) ?></option>
                                                     <?php } ?>

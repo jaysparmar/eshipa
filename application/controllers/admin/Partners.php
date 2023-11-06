@@ -247,10 +247,6 @@ class Partners extends CI_Controller
 
     public function add_partner()
     {
-        print_R($_POST);
-        // $old_licence = fetch_details(['user_id' => $_POST['edit_restro']], 'partner_data', 'licence_proof');
-        // print_R($old_licence[0]["licence_proof"]);
-        return false;
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
 
             if (isset($_POST['edit_restro'])) {
@@ -304,6 +300,9 @@ class Partners extends CI_Controller
 
             $this->form_validation->set_rules('company_registration_verified', 'Company registration verified', 'trim|xss_clean'); // Company registration number verified status
             $this->form_validation->set_rules('id_passport_verified', 'ID/Passport verified', 'trim|xss_clean');
+
+            $this->form_validation->set_rules('company_registration_number_verification_result', 'Company registration number verification result', 'trim|xss_clean');
+            $this->form_validation->set_rules('id_passport_number_verification_result', 'ID/Password number verification result', 'trim|xss_clean');
 
             if (!$this->form_validation->run()) {
 
@@ -605,7 +604,8 @@ class Partners extends CI_Controller
                         'licence_code' => $this->input->post('licence_code', true), // // Company registration number
                         'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number verified status
                         'id_passport_number_status' => $this->input->post('id_passport_verified', true),
-                        'id_passport_number_verification_result' => $_POST['id_passport_number_verification_result'],
+                        'id_passport_number_verification_result' => $this->input->post('id_passport_number_verification_result', true),
+                        'company_registration_number_verification_result' => $this->input->post('company_registration_number_verification_result', true),
                         'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : $this->input->post('old_licence_proof[]', true),
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
@@ -708,7 +708,8 @@ class Partners extends CI_Controller
                             'licence_code' => $this->input->post('licence_code', true), // Company registration number
                             'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number status
                             'id_passport_number_status' => $this->input->post('id_passport_verified', true),
-                            'id_passport_number_verification_result' => $_POST['id_passport_number_verification_result'],
+                            'id_passport_number_verification_result' => $this->input->post('id_passport_number_verification_result', true),
+                            'company_registration_number_verification_result' => $this->input->post('company_registration_number_verification_result', true),
                             'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                             'description' => $this->input->post('description', true),
                             'address' => $this->input->post('address', true),
@@ -771,10 +772,10 @@ class Partners extends CI_Controller
         }
         $company_registration_no = $this->input->post('company_registration_no', true);
         $company_registration_no  = explode('/', $company_registration_no);
-
+        $settings = get_settings('system_settings', true);
 
         $postFields = array(
-            'api_key' => '$2y$10$B56N8F5h3CwsTwLuOYzMouLhPEZxPWChTAxMsi',
+            'api_key' => isset($settings['verify_id_api_key']) ? $settings['verify_id_api_key'] : '',
             'reg_1' => $company_registration_no[0],
             'reg_2' => $company_registration_no[1],
             'reg_3' => $company_registration_no[2]
@@ -792,14 +793,16 @@ class Partners extends CI_Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
         $result = curl_exec($ch);
-        $result = json_decode($result, true);
+        $result = json_decode($result, true);        
 
         if (!isset($result['Status']) || $result['Status'] != 'Success') {
             $this->response['error'] = true;
-            $this->response['message'] = isset($result['NotFound']) ? $result['NotFound'] : 'Verification failed.';
+            $message = isset($result['NotFound']) ? $result['NotFound'] : (isset($result['Error']) ? $result['Error'] : 'Verification has failed, for passed company registration number.');
+            $this->response['message'] = $message;
         } else {
             $this->response['error'] = false;
-            $this->response['message'] = 'Company verified successfully.';
+            $this->response['message'] = 'Company registration number verified successfully.';
+            $this->response['data'] = json_encode($result['CompanyMatches']);
         }
         $this->response['csrfName'] = $this->security->get_csrf_token_name();
         $this->response['csrfHash'] = $this->security->get_csrf_hash();
@@ -809,12 +812,6 @@ class Partners extends CI_Controller
 
     public function verify_id_passport_number()
     {
-        // $this->response['error'] = false;
-        // $this->response['message'] = 'Test';
-        // $this->response['csrfName'] = $this->security->get_csrf_token_name();
-        // $this->response['csrfHash'] = $this->security->get_csrf_hash();
-        // print_r(json_encode($this->response));
-        // return false;
         $this->form_validation->set_rules('id_passport_number', 'ID/Passport number', 'trim|required|xss_clean|exact_length[13]');
         if (!$this->form_validation->run()) {
             $this->response['error'] = true;
@@ -825,9 +822,9 @@ class Partners extends CI_Controller
             return false;
         }
         $id_passport_number = $this->input->post('id_passport_number', true);
-
+        $settings = get_settings('system_settings', true);
         $postFields = array(
-            'api_key' => '$2y$10$B56N8F5h3CwsTwLuOYzMouLhPEZxPWChTAxMsi',
+            'api_key' => isset($settings['verify_id_api_key']) ? $settings['verify_id_api_key'] : '',
             'id_number' => $id_passport_number
         );
 
@@ -842,11 +839,11 @@ class Partners extends CI_Controller
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
-        $result = curl_exec($ch);        
-        $result = json_decode($result, true);        
+        $result = curl_exec($ch);
+        $result = json_decode($result, true);
         if (!isset($result['Status']) || $result['Status'] != 'ID Number Valid') {
             $this->response['error'] = true;
-            $this->response['message'] = isset($result['Error']) ? $result['Error'] : 'Verification failed.';
+            $this->response['message'] = isset($result['Error']) ? $result['Error'] : 'Verification has failed, for passed ID/Passport number.';
         } else {
             $this->response['error'] = false;
             $this->response['message'] = 'ID/Passport verified successfully.';

@@ -33,7 +33,7 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-danger"> <i class="fas fa-hamburger"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Partners</span>
+                            <span class="info-box-text">Spazas</span>
                             <span class="info-box-number"><?= number_format($partner_counter) ?></span>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                     <div class="info-box bg-success">
                         <span class="info-box-icon"> <i class="ion-cash display-4"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Partner Earnings <?= "(" . $curreny . ")" ?></span>
+                            <span class="info-box-text">Spaza Earnings <?= "(" . $curreny . ")" ?></span>
                             <span class="info-box-number"><?= number_format($partner_total_earnings)  ?></span>
                         </div>
                     </div>
@@ -224,7 +224,7 @@
                                     <tr>
                                         <th data-field="id" data-sortable='true' data-footer-formatter="totalFormatter">Order ID</th>
                                         <th data-field="user_id" data-sortable='true' data-visible="false">User ID</th>
-                                        <th data-field="partner" data-sortable='true'>Partner</th>
+                                        <th data-field="partner" data-sortable='true'>Spaza</th>
                                         <th data-field="qty" data-sortable='true' data-visible="false">Qty</th>
                                         <th data-field="name" data-sortable='true'>User Name</th>
                                         <th data-field="commission_credited" data-sortable='true' data-visible="false">Commission</th>

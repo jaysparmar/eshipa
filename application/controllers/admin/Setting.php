@@ -112,6 +112,7 @@ class Setting extends CI_Controller
             $this->form_validation->set_rules('favicon', 'Favicon', 'trim|required|xss_clean', array('required' => 'Favicon is required'));
             $this->form_validation->set_rules('supported_locals', 'Supported Locals', 'trim|xss_clean');
             $this->form_validation->set_rules('epoints_percentage', 'ePoints percentage', 'trim|xss_clean');
+            $this->form_validation->set_rules('verify_id_api_key', 'VerifyID API Key', 'trim|xss_clean');
 
             if (isset($_POST['is_refer_earn_on']) && $_POST['is_refer_earn_on']) {
                 $this->form_validation->set_rules('min_refer_earn_order_amount', 'Minimum Refer & Earn Order Amount', 'trim|required|numeric|xss_clean');

@@ -9,7 +9,7 @@ class Order_model extends CI_Model
     {
         $set = $reason = escape_array($set);
         if ($isjson == true) {
-
+            
             $field = array_keys($set); // active_status
             $current_status = $set[$field[0]]; //processed
             $res = fetch_details($where, $table, '*');
@@ -82,14 +82,14 @@ class Order_model extends CI_Model
                         }
                     }
                     if ($current_status == 'delivered') {
-                        $order = fetch_details($where, 'orders', 'user_id,rider_id,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
+                        $order = fetch_details($where, 'orders', 'user_id,rider_id,total,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
                         $settings = get_settings('system_settings', true);
                         /* Customer ePoints earning if the order is delivered */
-                        if (isset($settings['epoint_percentage']) && !empty($settings['epoint_percentage']) && $settings['epoint_percentage'] > 0) {
+                        if (isset($settings['epoints_percentage']) && !empty($settings['epoints_percentage']) && $settings['epoints_percentage'] > 0) {
                             $user_id = $order[0]['user_id'];
                             $user = fetch_details("id = $user_id", 'users', 'epoints');
                             $order_total = $order[0]['total'];
-                            $earned_epoints = ($settings['epoint_percentage'] / 100) * $order_total;
+                            $earned_epoints = ($settings['epoints_percentage'] / 100) * $order_total;
                             $epoints = (isset($user[0]['epoints']) && !empty($user[0]['epoints']) && $user[0]['epoints'] > 0) ? $user[0]['epoints'] : 0;
                             $epoints += intval($earned_epoints);
                             update_details(['epoints' => $epoints], ['id' => $user_id], 'users');

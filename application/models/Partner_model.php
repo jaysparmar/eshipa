@@ -41,6 +41,7 @@ class Partner_model extends CI_Model
             'licence_code_status' => $data['licence_code_status'],
             'id_passport_number_status' => $data['id_passport_number_status'],
             'id_passport_number_verification_result' => $data['id_passport_number_verification_result'],
+            'company_registration_number_verification_result' => $data['company_registration_number_verification_result'],
             'bank_name' => $data['bank_name'],
             'cooking_time' => $data['cooking_time'],
             'pan_number' => $data['pan_number'],

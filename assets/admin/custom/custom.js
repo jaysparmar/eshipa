@@ -6775,6 +6775,15 @@ $('#company_registration_no').on('change', function (e) {
     $('.company-verified').addClass('d-none');
     $('.company-not-verified').removeClass('d-none');
     $('#company_registration_verified').val(0);
+    $('#company_registration_number_verification_result').val('');
+
+    $('#company_registration_number_ver_res_commercial_id').text('');
+    $('#company_registration_number_ver_res_reg_no').text('');
+    $('#company_registration_number_ver_res_business_name').text('');
+    $('#company_registration_number_ver_res_enquiry_id').text('');
+    $('#company_registration_number_ver_res_enquiry_result_id').text('');
+
+    $('#view_company_registration_number_verification_result').addClass('d-none');
 
 });
 
@@ -6802,6 +6811,14 @@ $(document).on("click", "#verify_company_registration_no", function (e) {
                     $('.company-verified').addClass(' d-none');
                     $('.company-not-verified').removeClass('d-none');
                     $('#company_registration_verified').val(0);
+                    $('#view_company_registration_number_verification_result').addClass('d-none');
+                    $('#company_registration_number_verification_result').val('');
+
+                    $('#company_registration_number_ver_res_commercial_id').text('');
+                    $('#company_registration_number_ver_res_reg_no').text('');
+                    $('#company_registration_number_ver_res_business_name').text('');
+                    $('#company_registration_number_ver_res_enquiry_id').text('');
+                    $('#company_registration_number_ver_res_enquiry_result_id').text('');
                     iziToast.error({
                         message: result["message"]
                     });
@@ -6809,9 +6826,18 @@ $(document).on("click", "#verify_company_registration_no", function (e) {
                     submit_btn.html('Verify now');
                     submit_btn.attr("disabled", false);
                     submit_btn.addClass('d-none');
+                    var verification = $.parseJSON(result['data']);
                     $('.company-verified').removeClass('d-none');
                     $('.company-not-verified').addClass(' d-none');
                     $('#company_registration_verified').val(1);
+                    $('#view_company_registration_number_verification_result').removeClass('d-none');
+                    $('#company_registration_number_verification_result').val(result['data']);
+                    $('#company_registration_number_ver_res_commercial_id').text(verification.CommercialID);
+                    $('#company_registration_number_ver_res_reg_no').text(verification.RegistrationNo);
+                    $('#company_registration_number_ver_res_business_name').text(verification.Businessname);
+                    $('#company_registration_number_ver_res_enquiry_id').text(verification.EnquiryID);
+                    $('#company_registration_number_ver_res_enquiry_result_id').text(verification.EnquiryResultID);
+
                     iziToast.success({
                         message: result["message"]
                     });

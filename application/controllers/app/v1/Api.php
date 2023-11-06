@@ -353,7 +353,7 @@ class Api extends CI_Controller
             unset($data[0]['apikey']);
 
             if (empty($data[0]['image']) || file_exists(FCPATH . USER_IMG_PATH . $data[0]['image']) == FALSE) {
-                $data[0]['image'] = base_url() . NO_PROFILE_IMAGE;
+                $data[0]['image'] = base_url() . NO_IMAGE;
             } else {
                 $data[0]['image'] = base_url() . USER_IMG_PATH . $data[0]['image'];
             }

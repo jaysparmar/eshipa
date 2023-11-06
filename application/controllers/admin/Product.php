@@ -282,7 +282,7 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('pro_input_tax', 'Tax', 'trim|xss_clean');
             $this->form_validation->set_rules('pro_input_image', 'Image', 'trim|required|xss_clean', array('required' => 'Image is required'));
             $this->form_validation->set_rules('product_type', 'Product type', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('partner_id', 'Partner', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('partner_id', 'Partner', 'trim|xss_clean');
             $this->form_validation->set_rules('tags[]', 'tags', 'trim|required|xss_clean');
             $this->form_validation->set_rules('total_allowed_quantity', 'Total Allowed Quantity', 'trim|xss_clean');
             $this->form_validation->set_rules('calories', 'calories', 'trim|xss_clean|numeric');
