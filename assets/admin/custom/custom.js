@@ -6946,6 +6946,60 @@ $(document).on("click", "#verify_id_passport", function (e) {
 
 });
 
+$(document).on('change', '#deliverable_type', function () {
+    var type = $(this).val();
+    if (type == "1" || type == "0") {
+        $('#deliverable_zipcodes').prop('disabled', 'disabled');
+    } else {
+        $('#deliverable_zipcodes').prop('disabled', false);
+    }
+});
+
+function searchable_zipcodes() {
+    var search_zipcodes = $(".search_zipcode").select2({
+        ajax: {
+            url: base_url + from + '/area/get_zipcodes',
+            // url: base_url + from + '/area/get_zipcodes',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    search: params.term, // search term
+                    page: params.page
+                };
+            },
+            processResults: function (response, params) {
+                // parse the results into the format expected by Select2
+                // since we are using custom formatting functions we do not need to
+                // alter the remote JSON data, except to indicate that infinite
+                // scrolling can be used
+                params.page = params.page || 1;
+
+                return {
+                    results: response.data,
+                    pagination: {
+                        more: (params.page * 30) < response.total
+                    }
+                };
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) {
+            return markup;
+        },
+        escapeMarkup: function (markup) {
+            return markup;
+        },
+        minimumInputLength: 1,
+        templateResult: formatRepo1,
+        templateSelection: formatRepoSelection1,
+        theme: 'bootstrap4',
+        placeholder: 'Search for zipcodes',
+        allowClear: Boolean($(this).data('allow-clear')),
+    });
+    return search_zipcodes;
+}
+
 // google translate
 function googleTranslateElementInit() {
     new google.translate.TranslateElement(

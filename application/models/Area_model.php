@@ -92,7 +92,7 @@ class Area_model extends CI_Model
 
         foreach ($tax_search_res as $row) {
             $row = output_escaping($row);
-            $amount = 0 ;
+            $amount = 0;
             if (!$this->ion_auth->is_partner()) {
                 $operate = ' <a href="javascript:void(0)" class="edit-city btn btn-success btn-xs mr-1 mb-1"  title="Edit" data-id="' . $row['id'] . '" data-url="admin/area/manage_cities"><i class="fa fa-pen"></i></a>';
                 $operate .= ' <a  href="javascript:void(0)" class="btn btn-danger btn-xs mr-1 mb-1"  title="Delete" id="delete-location" data-table="cities" data-id="' . $row['id'] . '" ><i class="fa fa-trash"></i></a>';
@@ -105,19 +105,19 @@ class Area_model extends CI_Model
             $tempRow['radius'] = $row['radius'];
             $tempRow['boundary_points'] = $row['boundary_points'];
             $tempRow['bordering_city_ids'] = $row['bordering_city_ids'];
-            $ids = explode(",",$row['bordering_city_ids']);
-            $city_names = fetch_details([],'cities','name,id',"","","","","id",$ids);
+            $ids = explode(",", $row['bordering_city_ids']);
+            $city_names = fetch_details([], 'cities', 'name,id', "", "", "", "", "id", $ids);
             $tempRow['city_names'] = $city_names;
             $tempRow['time_to_travel'] = $row['time_to_travel'];
             $tempRow['max_deliverable_distance'] = $row['max_deliverable_distance'];
             $tempRow['delivery_charge_method'] = $row['delivery_charge_method'];
-            if($row['delivery_charge_method'] == "fixed_charge"){
+            if ($row['delivery_charge_method'] == "fixed_charge") {
                 $amount = $row['fixed_charge'];
             }
-            if($row['delivery_charge_method'] == "per_km_charge"){
+            if ($row['delivery_charge_method'] == "per_km_charge") {
                 $amount = $row['per_km_charge'];
             }
-            if($row['delivery_charge_method'] == "range_wise_charges"){
+            if ($row['delivery_charge_method'] == "range_wise_charges") {
                 $amount = $row['range_wise_charges'];
             }
             $tempRow['delivery_charge_amount'] = $amount;
@@ -179,6 +179,60 @@ class Area_model extends CI_Model
             }
         }
         $bulkData['data'] = (empty($cities_data)) ? [] : $cities_data;
+        return $bulkData;
+    }
+
+    function get_zipcodes($search = '', $limit = NULL, $offset = NULL)
+    {
+        $multipleWhere = '';
+        $where = array();
+        if (!empty($search)) {
+            $multipleWhere = [
+                '`zipcode`' => $search
+            ];
+        }
+
+        $count_res = $this->db->select(' COUNT(id) as `total`');
+
+        if (isset($multipleWhere) && !empty($multipleWhere)) {
+            $count_res->group_start();
+            $count_res->or_like($multipleWhere);
+            $count_res->group_end();
+        }
+
+
+        $cat_count = $count_res->get('zipcodes')->result_array();
+        foreach ($cat_count as $row) {
+            $total = $row['total'];
+        }
+
+        $search_res = $this->db->select('*');
+        if (isset($multipleWhere) && !empty($multipleWhere)) {
+            $search_res->group_start();
+            $search_res->or_like($multipleWhere);
+            $search_res->group_end();
+        }
+        if (isset($where) && !empty($where)) {
+            $search_res->where($where);
+        }
+
+        $cat_search_res = $search_res->limit($limit, $offset)->get('zipcodes')->result_array();
+        $rows = $tempRow = $bulkData = array();
+        $bulkData['error'] = (empty($cat_search_res)) ? true : false;
+        $bulkData['message'] = (empty($cat_search_res)) ? 'Pincodes(s) does not exist' : 'Pincodes retrieved successfully';
+        $bulkData['total'] = (empty($cat_search_res)) ? 0 : $total;
+        if (!empty($cat_search_res)) {
+            foreach ($cat_search_res as $row) {
+                $row = output_escaping($row);
+                $tempRow['id'] = $row['id'];
+                $tempRow['zipcode'] = $row['zipcode'];
+                $tempRow['date_created'] = $row['date_created'];
+                $rows[] = $tempRow;
+            }
+            $bulkData['data'] = $rows;
+        } else {
+            $bulkData['data'] = [];
+        }
         return $bulkData;
     }
 }

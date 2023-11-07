@@ -472,4 +472,34 @@ class Setting_model extends CI_Model
             $this->db->set('value', $system_data)->where('variable', 'web_settings')->update('settings');
         }
     }
+
+    public function update_shipping_method($post)
+    {
+        $post = escape_array($post);
+        $shipping_data = array();
+
+        $shipping_data['shiprocket_shipping_method'] = isset($post['shiprocket_shipping_method']) ? '1' : '0';
+        $shipping_data['email'] = isset($post['email']) && !empty($post['email']) ? $post['email'] : '';
+        $shipping_data['password'] = isset($post['password']) && !empty($post['password']) ? $post['password'] : '';
+        $shipping_data['webhook_token'] = isset($post['webhook_token']) && !empty($post['webhook_token']) ? $post['webhook_token'] : '';
+        $shipping_data['local_shipping_method'] = isset($post['local_shipping_method']) ? '1' : '0';
+        $shipping_data['standard_shipping_free_delivery'] = isset($post['standard_shipping_free_delivery']) ? '1' : '0';
+        $shipping_data['minimum_free_delivery_order_amount'] = isset($post['minimum_free_delivery_order_amount']) && !empty($post['minimum_free_delivery_order_amount']) ? $post['minimum_free_delivery_order_amount'] : '';
+
+        $shipping_data = json_encode($shipping_data);
+
+        $query = $this->db->get_where('settings', array(
+            'variable' => 'shipping_method'
+        ));
+        $count = $query->num_rows();
+        if ($count === 0) {
+            $data = array(
+                'variable' => 'shipping_method',
+                'value' => $shipping_data
+            );
+            $this->db->insert('settings', $data);
+        } else {
+            $this->db->set('value', $shipping_data)->where('variable', 'shipping_method')->update('settings');
+        }
+    }
 }

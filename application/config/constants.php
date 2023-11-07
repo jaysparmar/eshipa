@@ -125,3 +125,8 @@ define('OPENED', '2');
 define('RESOLVED', '3');
 define('CLOSED', '4');
 define('REOPEN', '5');
+
+define('NONE', '0');
+define('ALL', '1');
+define('INCLUDED', '2');
+define('EXCLUDED', '3');

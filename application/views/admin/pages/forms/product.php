@@ -133,6 +133,47 @@
                                                 <?php } ?>
                                             </div>
                                         </div>
+                                        <div class="col-md-12 d-none">
+                                            <div class="form-group ">
+                                                <!-- <label for="is_cod_allowed" class="col-12 col-form-label">Is COD allowed?</label> -->
+                                                <div class="col-md-12">
+                                                    <label for="zipcode" class="col-form-label">Deliverable Type</label>
+                                                    <select class='form-control' name='deliverable_type' id="deliverable_type">
+                                                        <option value=<?= NONE ?> <?= (isset($product_details[0]['deliverable_type']) &&  $product_details[0]['deliverable_type'] == NONE) ? 'selected' : ''; ?>>None</option>
+                                                        <?php if (!isset($product_details)) { ?>
+                                                            <option value=<?= ALL ?> selected>All</option>
+                                                        <?php } else { ?>
+                                                            <option value=<?= ALL ?> <?= (isset($product_details[0]['deliverable_type']) &&  $product_details[0]['deliverable_type'] == ALL) ? 'selected' : ''; ?>>All</option>
+                                                        <?php } ?>
+                                                        <option value=<?= INCLUDED ?> <?= (isset($product_details[0]['deliverable_type']) &&  $product_details[0]['deliverable_type'] == INCLUDED) ? 'selected' : ''; ?>>Included</option>
+                                                        <option value=<?= EXCLUDED ?> <?= (isset($product_details[0]['deliverable_type']) &&  $product_details[0]['deliverable_type'] == EXCLUDED) ? 'selected' : ''; ?>>Excluded</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <?php
+                                            $zipcodes = (isset($product_details[0]['deliverable_zipcodes']) &&  $product_details[0]['deliverable_zipcodes'] != NULL) ? explode(",", $product_details[0]['deliverable_zipcodes']) : "";
+                                            ?>
+                                            <div class="form-group ">
+                                                <!-- <label for="is_cancelable" class="col-12 col-form-label">Is Cancelable ?</label> -->
+                                                <div class="col-md-12">
+                                                    <label for="zipcodes" class="col-form-label">Deliverable Zipcodes</label>
+                                                    <select name="deliverable_zipcodes[]" class="search_zipcode form-control w-100" multiple onload="multiselect()" id="deliverable_zipcodes" <?= (isset($product_details[0]['deliverable_type']) &&  ($product_details[0]['deliverable_type'] == INCLUDED || $product_details[0]['deliverable_type'] == EXCLUDED))  ? "" : "disabled" ?>>
+                                                        <?php if (isset($product_details[0]['deliverable_type']) &&  ($product_details[0]['deliverable_type'] == INCLUDED || $product_details[0]['deliverable_type'] == EXCLUDED)) {
+                                                            $zipcodes_name =  fetch_details('zipcodes', "",  'zipcode,id', "", "", "", "", "id", $zipcodes);
+                                                            foreach ($zipcodes_name as $row) {
+                                                        ?>
+                                                                <option value=<?= $row['id'] ?> <?= (in_array($row['id'], $zipcodes)) ? 'selected' : ''; ?>> <?= $row['zipcode'] ?></option>
+                                                        <?php }
+                                                        } ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+
+
                                     </div>
                                 </div>
                             </div>

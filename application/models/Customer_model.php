@@ -206,4 +206,78 @@ class Customer_model extends CI_Model
         }
         print_r(json_encode($bulkData));
     }
+
+    function get_epoints_list($user_id = '')
+    {
+        $offset = 0;
+        $limit = 10;
+        $sort = 'id';
+        $order = 'ASC';
+        $multipleWhere = $where = '';
+
+
+        if (isset($_GET['offset']))
+            $offset = $_GET['offset'];
+        if (isset($_GET['limit']))
+            $limit = $_GET['limit'];
+
+        if (isset($_GET['sort']))
+            if ($_GET['sort'] == 'id') {
+                $sort = "id";
+            } else {
+                $sort = $_GET['sort'];
+            }
+        if (isset($_GET['order']))
+            $order = $_GET['order'];
+
+        if (isset($_GET['search']) and $_GET['search'] != '') {
+            $search = $_GET['search'];
+            $multipleWhere = ['fund_transfers.`id`' => $search, 'users.`username`' => $search, 'mobile' => $search, 'message' => $search, 'fund_transfers.opening_balance' => $search, 'fund_transfers.closing_balance' => $search, 'fund_transfers.status' => $search, 'fund_transfers.amount' => $search];
+        }
+        if ($user_id != '' && is_numeric($user_id)) {
+            $where = array('fund_transfers.rider_id' => trim($user_id));
+        }
+        $count_res = $this->db->select('COUNT(transactions.id) as `total`');
+
+        if (isset($multipleWhere) && !empty($multipleWhere)) {
+            $count_res->or_like($multipleWhere);
+        }
+        if (isset($where) && !empty($where)) {
+            $count_res->where($where);
+        }
+        $count_res->join('users', 'transactions.user_id = users.id');
+        $count_res->where('transactions.transaction_type', 'epoints');
+        $transfers_count = $count_res->get('transactions')->result_array();
+        foreach ($transfers_count as $row) {
+            $total = $row['total'];
+        }
+
+        $search_res = $this->db->select(' transactions.*,users.username as name ');
+        if (isset($multipleWhere) && !empty($multipleWhere)) {
+            $search_res->or_like($multipleWhere);
+        }
+        if (isset($where) && !empty($where)) {
+            $search_res->where($where);
+        }
+        $search_res->join('users', 'transactions.user_id = users.id', 'left');
+        $transfers_res = $search_res->order_by($sort, "desc")->limit($limit, $offset)->get('transactions')->result_array();
+
+        $bulkData = array();
+        $bulkData['total'] = $total;
+        $rows = array();
+        $tempRow = array();
+
+        foreach ($transfers_res as $row) {
+            $row = output_escaping($row);
+            $tempRow['id'] = $row['id'];
+            $tempRow['user'] = $row['name'];
+            $tempRow['amount'] = $row['amount'];
+            $tempRow['status'] = $row['status'];
+            $tempRow['message'] = $row['message'];
+            $tempRow['date'] = $row['date_created'];
+            $rows[] = $tempRow;
+        }
+        $bulkData['rows'] = $rows;
+        print_r(json_encode($bulkData));
+    }
 }

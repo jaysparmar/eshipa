@@ -7,6 +7,7 @@ class Order_model extends CI_Model
 
     public function update_order($set, $where, $isjson = false, $table = 'orders')
     {
+        $this->load->model("transaction_model");
         $set = $reason = escape_array($set);
         if ($isjson == true) {
             
@@ -82,7 +83,7 @@ class Order_model extends CI_Model
                         }
                     }
                     if ($current_status == 'delivered') {
-                        $order = fetch_details($where, 'orders', 'user_id,rider_id,total,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
+                        $order = fetch_details($where, 'orders', 'id,user_id,rider_id,total,final_total,payment_method,total_payable,delivery_tip,delivery_charge');
                         $settings = get_settings('system_settings', true);
                         /* Customer ePoints earning if the order is delivered */
                         if (isset($settings['epoints_percentage']) && !empty($settings['epoints_percentage']) && $settings['epoints_percentage'] > 0) {
@@ -93,6 +94,18 @@ class Order_model extends CI_Model
                             $epoints = (isset($user[0]['epoints']) && !empty($user[0]['epoints']) && $user[0]['epoints'] > 0) ? $user[0]['epoints'] : 0;
                             $epoints += intval($earned_epoints);
                             update_details(['epoints' => $epoints], ['id' => $user_id], 'users');
+
+                            $transaction_data = [
+                                'transaction_type' => "epoints",
+                                'user_id' => $user_id,
+                                'order_id' => $order[0]['id'],
+                                'type' => "credit",
+                                'txn_id' => "",
+                                'amount' => $earned_epoints,
+                                'status' => "success",
+                                'message' => "ePoints earned against order delivery, order ID: #" . $order[0]['id']
+                            ];                            
+                            $this->transaction_model->add_transaction($transaction_data);
                         }
                         /* give commission to the Rider if the order is delivered */
                         $commission = 0;
@@ -120,7 +133,6 @@ class Order_model extends CI_Model
                                 }
                                 /* commission must be greater then zero to be credited into the account */
                                 if ($commission > 0) {
-                                    $this->load->model("transaction_model");
                                     $msg = ($order[0]['delivery_tip'] > 0) ? "Order delivery bonus for order ID: #" . $row['id'] . " with Delivery Tip: " . $order[0]['delivery_tip'] : "Order delivery bonus for order ID: #" . $row['id'];
 
                                     $transaction_data = [

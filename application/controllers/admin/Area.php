@@ -80,7 +80,7 @@ class Area extends CI_Controller
                 if (print_msg(!has_permissions('delete', 'city'), PERMISSION_ERROR_MSG, 'city')) {
                     return false;
                 }
-            } 
+            }
             if (delete_details(['id' => $_GET['id']], $_GET['table'])) {
                 $response['error'] = false;
                 $response['message'] = 'Deleted Successfully';
@@ -155,15 +155,15 @@ class Area extends CI_Controller
                         return false;
                     }
                 }
-                $delivery_charge_method = $this->input->post('delivery_charge_method',true);
-                if($delivery_charge_method == 'fixed_charge'){
-                    $_POST['charges'] = $this->input->post('fixed_charge',true);
+                $delivery_charge_method = $this->input->post('delivery_charge_method', true);
+                if ($delivery_charge_method == 'fixed_charge') {
+                    $_POST['charges'] = $this->input->post('fixed_charge', true);
                 }
-                if($delivery_charge_method == 'per_km_charge'){
-                    $_POST['charges'] = $this->input->post('per_km_charge',true);
+                if ($delivery_charge_method == 'per_km_charge') {
+                    $_POST['charges'] = $this->input->post('per_km_charge', true);
                 }
-                if($delivery_charge_method == 'range_wise_charges'){
-                    $_POST['charges'] = $this->input->post('range_wise_charges',true);
+                if ($delivery_charge_method == 'range_wise_charges') {
+                    $_POST['charges'] = $this->input->post('range_wise_charges', true);
                 }
                 if (!empty($_POST['bordering_city_ids'])) {
                     $_POST['bordering_city_ids'] = implode(",", $_POST['bordering_city_ids']);
@@ -202,7 +202,7 @@ class Area extends CI_Controller
     public function update_delivery_charge_method()
     {
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
-            if (print_msg(!has_permissions('update', 'city'), PERMISSION_ERROR_MSG, 'city')) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+            if (print_msg(!has_permissions('update', 'city'), PERMISSION_ERROR_MSG, 'city')) {
                 return false;
             }
             if (!isset($_GET['delivery_charge_method']) || empty($_GET['delivery_charge_method']) || $_GET['delivery_charge_method'] == "") {
@@ -240,6 +240,48 @@ class Area extends CI_Controller
                 print_r(json_encode($this->response));
                 return false;
             }
+        } else {
+            redirect('admin/login', 'refresh');
+        }
+    }
+
+    public function manage_zipcodes()
+    {
+        if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
+
+            if (!has_permissions('read', 'zipcodes')) {
+                $this->session->set_flashdata('authorize_flag', PERMISSION_ERROR_MSG);
+                redirect('admin/home', 'refresh');
+            }
+
+            $this->data['main_page'] = TABLES . 'manage-zipcodes';
+            $settings = get_settings('system_settings', true);
+            // $default_zipcode_detail = get_settings('default_zipcode_detail', true);
+            $this->data['title'] = 'Zipcodes Management | ' . $settings['app_name'];
+            $this->data['meta_description'] = ' Zipcode Management  | ' . $settings['app_name'];
+            if (isset($_GET['edit_id'])) {
+                $this->data['fetched_data'] = fetch_details('zipcodes', ['id' => $_GET['edit_id']]);
+            }
+            $this->data['city'] = fetch_details('cities', '');
+            // $this->data['default_zipcode_detail'] = $default_zipcode_detail;
+            $this->load->view('admin/template', $this->data);
+        } else {
+            redirect('admin/login', 'refresh');
+        }
+    }
+
+    public function get_zipcodes()
+    {
+        if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
+
+            $limit = (isset($_GET['limit'])) ? $this->input->post('limit', true) : 25;
+            $offset = (isset($_GET['offset'])) ? $this->input->post('offset', true) : 0;
+            $search =  (isset($_GET['search'])) ? $_GET['search'] : null;
+            $zipcodes = $this->Area_model->get_zipcodes($search, $limit, $offset);
+            $this->response['data'] = $zipcodes['data'];
+            $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            print_r(json_encode($this->response));
         } else {
             redirect('admin/login', 'refresh');
         }

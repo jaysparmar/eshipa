@@ -243,6 +243,14 @@
                         </a>
                     </li>
                 <?php } ?>
+                <li class="nav-item">
+                        <a href="<?= base_url('admin/epoints') ?>" class="nav-link">
+                            <i class="nav-icon fa fa-star text-success"></i>
+                            <p>
+                                ePoints
+                            </p>
+                        </a>
+                    </li>
                 <?php if (has_permissions('read', 'featured_section')) { ?>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link menu-open">
@@ -398,6 +406,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="<?= base_url('admin/shipping-settings') ?>" class="nav-link">
+                                    <i class="fas fa-rocket nav-icon "></i>
+                                    <p>Shipping Methods</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="<?= base_url('admin/notification-settings') ?>" class="nav-link">
                                     <i class="fa fa-bell nav-icon "></i>
                                     <p>Notification Settings</p>
@@ -479,7 +493,7 @@
                 <?php } ?>
                 <?php if (has_permissions('read', 'city')) { ?>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <a href="#" class="nav-link d-none">
                             <i class="nav-icon fas fa-map-marked-alt text-danger"></i>
                             <p>
                                 Location
@@ -487,6 +501,14 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
+                            <?php if (has_permissions('read', 'zipcodes')) { ?>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('admin/area/manage-zipcodes') ?>" class="nav-link">
+                                        <i class="fa fa-map-pin nav-icon "></i>
+                                        <p>Zipcodes</p>
+                                    </a>
+                                </li>
+                            <?php } ?>
                             <?php if (has_permissions('read', 'city')) { ?>
                                 <li class="nav-item">
                                     <a href="<?= base_url('admin/area/manage-cities') ?>" class="nav-link">
