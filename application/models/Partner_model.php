@@ -40,8 +40,6 @@ class Partner_model extends CI_Model
             'bank_code' => $data['bank_code'],
             'licence_code_status' => $data['licence_code_status'],
             'id_passport_number_status' => $data['id_passport_number_status'],
-            'id_passport_number_verification_result' => $data['id_passport_number_verification_result'],
-            'company_registration_number_verification_result' => $data['company_registration_number_verification_result'],
             'bank_name' => $data['bank_name'],
             'cooking_time' => $data['cooking_time'],
             'pan_number' => $data['pan_number'],
@@ -50,6 +48,21 @@ class Partner_model extends CI_Model
             'permissions' => (isset($data['permissions']) && $data['permissions'] != "") ? json_encode($data['permissions']) : null,
             'slug' => $data['slug']
         ];
+        if (!empty($data['id_passport_number_verification_result'])) {
+            $partner_data['id_passport_number_verification_result'] =  $data['id_passport_number_verification_result'];
+        } else {
+            if ($partner_data['id_passport_number_status'] == 0) {
+                $partner_data['id_passport_number_verification_result'] =  '';
+            }
+        }
+
+        if (!empty($data['company_registration_number_verification_result'])) {
+            $partner_data['company_registration_number_verification_result'] =  $data['company_registration_number_verification_result'];
+        } else {
+            if ($partner_data['licence_code_status'] == 0) {
+                $partner_data['company_registration_number_verification_result'] =  '';
+            }
+        }
         if (isset($data['permissions']) && $data['permissions'] == "restro_profile") {
             unset($partner_data['permissions']);
         }

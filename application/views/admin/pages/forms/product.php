@@ -37,7 +37,7 @@
                                                 <input type="text" class="form-control" id="pro_input_text" placeholder="Product Name" name="pro_input_name" value="<?= @$product_details[0]['name'] ?>">
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group d-none">
                                             <label for="partners" class="col-sm-4 col-form-label">Spaza</label>
                                             <div class="col-sm-12">
                                                 <select class='form-control' name='partner_id' id="partner_id">
@@ -62,7 +62,19 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="pro_short_description" class="col-sm-4 col-form-label">Short Description <span class='text-danger text-sm'>*</span></label>
+                                            <label for="" class="col-sm-3 col-form-label">Barcode</label>
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" placeholder="Product Barcode" name="barcode" value="<?= @$product_details[0]['barcode'] ?>">
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="" class="col-sm-3 col-form-label">SKU ID</label>
+                                            <div class="col-sm-12">
+                                                <input type="text" class="form-control" placeholder="Product SKU ID" name="sku" value="<?= @$product_details[0]['sku'] ?>">
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="pro_short_description" class="col-sm-6 col-form-label">Short Description <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
                                                 <textarea type="text" class="form-control" id="short_description" placeholder="Product Short Description" name="short_description"><?= isset($product_details[0]['short_description']) ? output_escaping(str_replace('\r\n', '&#13;&#10;', $product_details[0]['short_description'])) : ""; ?></textarea>
                                             </div>
@@ -212,7 +224,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="calories" class="col-sm-6 col-form-label">Calories <small>(1 kilocalorie (kcal) = 1000 calories (cal))</small></label>
+                                            <label for="calories" class="col-sm-12 col-form-label">Calories <small>(1 kilocalorie (kcal) = 1000 calories (cal))</small></label>
                                             <div class="col-sm-12">
                                                 <input type="number" class="form-control" min="0" id="calories" placeholder="Enter calories in cal unit" name="calories" value="<?= @$product_details[0]['calories'] ?>">
                                             </div>

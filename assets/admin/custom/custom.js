@@ -6946,6 +6946,7 @@ $(document).on("click", "#verify_id_passport", function (e) {
 
 });
 
+
 $(document).on('change', '#deliverable_type', function () {
     var type = $(this).val();
     if (type == "1" || type == "0") {

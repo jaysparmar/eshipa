@@ -78,7 +78,7 @@ class Login extends CI_Controller
                 $this->form_validation->set_rules('address_proof', 'Address Proof', 'trim|xss_clean');
             }
             $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean');
-            $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|required|xss_clean|numeric');
+            $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|xss_clean|numeric');
             $this->form_validation->set_rules('restro_tags[]', 'Restro Tags', 'trim|xss_clean');
 
             // validate restro details
@@ -88,7 +88,7 @@ class Login extends CI_Controller
             $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
             $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
             $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
             $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|required|xss_clean');
             $this->form_validation->set_rules('self_pickup', 'Self Pickup', 'trim|xss_clean');
             $this->form_validation->set_rules('delivery_orders', 'Delivery Orders', 'trim|xss_clean');

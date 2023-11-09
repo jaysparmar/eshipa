@@ -227,8 +227,7 @@
                                             $permit = json_decode($fetched_data[0]['permissions'], true);
                                         } ?>
                                         <hr>
-
-                                        <input type="hidden" id="company_registration_number_verification_result" name="company_registration_number_verification_result" value="<?= (isset($fetched_data[0]['licence_code_status']) && !empty($fetched_data[0]['licence_code_status'])) ? $fetched_data[0]['licence_code_status'] : '' ?>">
+                                        <input type="hidden" id="company_registration_number_verification_result" name="company_registration_number_verification_result" value="">
                                         <!-- Modal -->
                                         <div class="modal fade edit-modal-lg" id="view_company_registration_number_verification_result_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">
@@ -392,8 +391,8 @@
                                             </div>
                                         <?php
                                         }
-                                        ?>
-                                        <input type="hidden" id="id_passport_number_verification_result" name="id_passport_number_verification_result" value="<?= (isset($fetched_data[0]['id_passport_number_verification_result']) && !empty($fetched_data[0]['id_passport_number_verification_result'])) ? $fetched_data[0]['id_passport_number_verification_result'] : '' ?>">
+                                        ?>                                        
+                                        <input type="hidden" id="id_passport_number_verification_result" name="id_passport_number_verification_result" value="">
                                         <!-- Modal -->
                                         <div class="modal fade edit-modal-lg" id="view_id_passport_number_verification_result_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">

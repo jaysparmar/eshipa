@@ -287,6 +287,8 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('total_allowed_quantity', 'Total Allowed Quantity', 'trim|xss_clean');
             $this->form_validation->set_rules('calories', 'calories', 'trim|xss_clean|numeric');
             $this->form_validation->set_rules('minimum_order_quantity', 'Minimum Order Quantity', 'trim|xss_clean');
+            $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
+            $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
             if (isset($_POST['highlights']) && $_POST['highlights'] != '') {
                 $_POST['highlights'] = json_decode($_POST['highlights'], 1);
@@ -443,9 +445,9 @@ class Product extends CI_Controller
                 $settings = get_settings('system_settings', true);
                 $this->data['title'] = 'View Product | ' . $settings['app_name'];
                 $this->data['meta_description'] = 'View Product | ' . $settings['app_name'];
-                $res = fetch_product($user_id = NULL, $filter = NULL, $this->input->get('edit_id', true));
+                $res = fetch_product($user_id = NULL, $filter = NULL, $this->input->get('edit_id', true));                
                 if (empty($res['product'])) {
-                    redirect(base_url('admin/product'));
+                    redirect(base_url('admin/product/'));
                 }
                 $this->data['product_details'] = $res['product'];
                 $this->data['product_attributes'] = get_attribute_values_by_pid($_GET['edit_id']);
@@ -456,10 +458,10 @@ class Product extends CI_Controller
                 if (!empty($res['product'])) {
                     $this->load->view('admin/template', $this->data);
                 } else {
-                    redirect('admin/product', 'refresh');
+                    redirect('admin/product/', 'refresh');
                 }
             } else {
-                redirect('admin/product', 'refresh');
+                redirect('admin/product/', 'refresh');
             }
         } else {
             redirect('admin/login', 'refresh');

@@ -102,7 +102,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="profile" class="col-sm-4 col-form-label">Partner Profile<span class='text-danger text-sm'>*</span></label>
+                                            <label for="profile" class="col-sm-4 col-form-label">Profile Picture<span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <?php if (isset($fetched_data[0]['profile']) && !empty($fetched_data[0]['profile'])) { ?>
                                                     <span class="text-danger">*Leave blank if there is no change</span>
@@ -139,7 +139,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group d-none">
                                             <label for="cooking_time" class="col-sm-8 col-form-label">Cooking Time <span class='text-danger text-sm'>*</span> <small>(Enter in Minutes)</small> </label>
                                             <div class="col-sm-10">
                                                 <input type="number" class="form-control" name="cooking_time" id="cooking_time" value="<?= @$fetched_data[0]['cooking_time'] ?>" placeholder="Food Preparation Time in Minutes" min="0">
@@ -151,7 +151,7 @@
                                                 <textarea type="text" class="form-control" id="address" placeholder="Enter Address" name="address"><?= @$fetched_data[0]['address'] ?></textarea>
                                             </div>
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="address_proof" class="col-sm-3 col-form-label">Address Proof <span class='text-danger text-sm'>*</span> </label>
                                             <div class="col-sm-10">
                                                 <?php if (isset($fetched_data[0]['address_proof']) && !empty($fetched_data[0]['address_proof'])) { ?>
@@ -188,13 +188,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="latitude">Latitude <span class='text-danger text-sm'>*</span></label>
-                                                    <input type="number" min="0" step="0.000000000000000001"  readonly class="form-control"  name="latitude" id="city_lat" value="<?= @$fetched_data[0]['latitude'] ?>" autocomplete="off">
+                                                    <input type="number" min="0" step="0.000000000000000001" readonly class="form-control" name="latitude" id="city_lat" value="<?= @$fetched_data[0]['latitude'] ?>" autocomplete="off">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label for="longitude">Longitude <span class='text-danger text-sm'>*</span></label>
-                                                    <input type="number" min="0" step="0.000000000000000001"  readonly class="form-control"  name="longitude" id="city_long" value="<?= @$fetched_data[0]['longitude'] ?>" autocomplete="off">
+                                                    <input type="number" min="0" step="0.000000000000000001" readonly class="form-control" name="longitude" id="city_long" value="<?= @$fetched_data[0]['longitude'] ?>" autocomplete="off">
                                                 </div>
                                             </div>
                                         </div>
@@ -276,6 +276,46 @@
                                                 <?= $timing ?>
                                             </div>
                                         </div>
+                                        <hr>
+                                        <div class="modal fade edit-modal-lg" id="view_company_registration_number_verification_result_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">Company registration number verification details</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <?php if (isset($fetched_data[0]['company_registration_number_verification_result']) && !empty($fetched_data[0]['company_registration_number_verification_result'])) {
+                                                        $fetched_data[0]['company_registration_number_verification_result'] = str_replace('\\', '', $fetched_data[0]['company_registration_number_verification_result']);
+                                                        $result = json_decode($fetched_data[0]['company_registration_number_verification_result'], true);
+                                                    } ?>
+                                                    <div class="modal-body">
+                                                        <p>Commercial ID: <span id="company_registration_number_ver_res_commercial_id"><?= isset($result['CommercialID']) && !empty($result['CommercialID']) ? $result['CommercialID'] : '' ?></span></p>
+                                                        <p>Registration No: <span id="company_registration_number_ver_res_reg_no"><?= isset($result['RegistrationNo']) && !empty($result['RegistrationNo']) ? $result['RegistrationNo'] : '' ?></span></p>
+                                                        <p>Business Name: <span id="company_registration_number_ver_res_business_name"><?= isset($result['Businessname']) && !empty($result['Businessname']) ? $result['Businessname'] : '' ?></span></p>
+                                                        <p class="d-none">Enquiry ID: <span id="company_registration_number_ver_res_enquiry_id"><?= isset($result['EnquiryID']) && !empty($result['EnquiryID']) ? $result['EnquiryID'] : '' ?></span></p>
+                                                        <p class="d-none">Enquiry Result ID: <span id="company_registration_number_ver_res_enquiry_result_id"><?= isset($result['EnquiryResultID']) && !empty($result['EnquiryResultID']) ? $result['EnquiryResultID'] : '' ?></span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <h4>Company Registration </h4>
+                                            <label for="licence_name" class="col-sm-12 col-form-label">Company Name <span class='text-danger text-sm'>*</span></label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name" value="<?= (isset($fetched_data[0]['licence_name']) && !empty($fetched_data[0]['licence_name'])) ? output_escaping($fetched_data[0]['licence_name']) : "" ?>">
+                                            </div>
+                                            <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
+                                                <span class="badge bg-success company-verified <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
+
+                                                <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
+                                                <a href='javascript:void(0)' data-toggle='modal' id="view_company_registration_number_verification_result" data-target='#view_company_registration_number_verification_result_modal' class='btn btn-primary btn-xs mr-1 mb-1 <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : 'd-none' ?>' title='View Verified Details'><i class="fa fa-eye"></i></a>
+                                            </label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="company_registration_no" placeholder="Ex. XXXX/XXXXXX/XX" name="licence_code" value="<?= (isset($fetched_data[0]['licence_code']) && !empty($fetched_data[0]['licence_code'])) ? output_escaping($fetched_data[0]['licence_code']) : "" ?>" readonly>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -326,20 +366,43 @@
                                                 <input type="password" class="form-control" id="new_confirm" placeholder="Type Confirm Password here" name="new_confirm">
                                             </div>
                                         </div>
-                                        <div class="form-group ">
-                                            <label for="national_identity_card" class="col-sm-6 col-form-label">National Identity Card <span class='text-danger text-sm'>*</span></label>
-                                            <div class="col-sm-10">
-                                                <?php if (isset($fetched_data[0]['national_identity_card']) && !empty($fetched_data[0]['national_identity_card'])) { ?>
-                                                    <span class="text-danger">*Leave blank if there is no change</span>
-                                                <?php } ?>
-                                                <input type="file" class="form-control" name="national_identity_card" id="national_identity_card" accept="image/*" />
+                                        <div class="modal fade edit-modal-lg" id="view_id_passport_number_verification_result_modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLongTitle">ID/Password verification details</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <?php if (isset($fetched_data[0]['id_passport_number_verification_result']) && !empty($fetched_data[0]['id_passport_number_verification_result'])) {
+                                                        $fetched_data[0]['id_passport_number_verification_result'] = str_replace('\\', '', $fetched_data[0]['id_passport_number_verification_result']);
+                                                        $result = json_decode($fetched_data[0]['id_passport_number_verification_result'], true);
+                                                    } ?>
+                                                    <div class="modal-body">
+                                                        <p>First Name: <span id="id_password_ver_res_first_name"><?= isset($result['Firstnames']) && !empty($result['Firstnames']) ? $result['Firstnames'] : '' ?></span></p>
+                                                        <p>Last Name: <span id="id_password_ver_res_last_name"><?= isset($result['Lastname']) && !empty($result['Lastname']) ? $result['Lastname'] : '' ?></span></p>
+                                                        <p>DOB: <span id="id_password_ver_res_dob"><?= isset($result['Dob']) && !empty($result['Dob']) ? $result['Dob'] : '' ?></span></p>
+                                                        <p>Age: <span id="id_password_ver_res_age"><?= isset($result['Age']) && !empty($result['Age']) ? $result['Age'] : '' ?></span></p>
+                                                        <p>Gender: <span id="id_password_ver_res_gender"><?= isset($result['Gender']) && !empty($result['Gender']) ? $result['Gender'] : '' ?></span></p>
+                                                        <p>Citizenship: <span id="id_password_ver_res_citizenship"><?= isset($result['Citizenship']) && !empty($result['Citizenship']) ? $result['Citizenship'] : '' ?></span></p>
+                                                        <p>DateIssued: <span id="id_password_ver_res_date_issued"><?= isset($result['DateIssued']) && !empty($result['DateIssued']) ? $result['DateIssued'] : '' ?></span></p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <?php if (isset($fetched_data[0]['national_identity_card']) && !empty($fetched_data[0]['national_identity_card'])) { ?>
-                                            <div class="form-group ">
-                                                <div class="mx-auto product-image"><a href="<?= base_url($fetched_data[0]['national_identity_card']); ?>" data-toggle="lightbox" data-gallery="gallery_seller"><img src="<?= base_url($fetched_data[0]['national_identity_card']); ?>" class="img-fluid rounded"></a></div>
+                                        <div class="form-group ">
+                                            <label for="national_identity_card" class="col-sm-12 col-form-label">ID/Passport Number <span class='text-danger text-sm'>*</span>
+                                                <span class="badge bg-success id-passport-verified <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
+
+                                                <span class="badge bg-danger id-passport-not-verified<?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
+                                                <a href='javascript:void(0)' data-toggle='modal' id="view_id_passport_number_verification_result" data-target='#view_id_passport_number_verification_result_modal' class='btn btn-primary btn-xs mr-1 mb-1 <?= isset($fetched_data[0]['id_passport_number_status']) && $fetched_data[0]['id_passport_number_status'] == 1 ? '' : 'd-none' ?>' title='View Verified Details'><i class="fa fa-eye"></i></a>
+                                            </label>
+
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" placeholder="ID/Passport Number" id="id_passport_number" name="id_passport_number" value="<?= @$fetched_data[0]['id_passport_number'] ?>" readonly>
                                             </div>
-                                        <?php } ?>
+                                        </div>
                                         <hr>
                                         <div class="form-group">
                                             <button type="reset" class="btn btn-warning">Reset</button>
@@ -357,7 +420,7 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="tax_name" class="col-sm-4 col-form-label">Tax Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="tax_name" placeholder="Tax Name" name="tax_name" value="<?= @$fetched_data[0]['tax_name'] ?>">

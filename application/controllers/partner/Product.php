@@ -20,6 +20,8 @@ class Product extends CI_Controller
             $this->data['title'] = 'Product Management | ' . $settings['app_name'];
             $this->data['meta_description'] = 'Product Management |' . $settings['app_name'];
             $this->data['categories'] = $this->category_model->get_categories();
+            $safety_stock = fetch_details(['user_id' => $this->session->userdata('user_id')], 'partner_data', 'safety_stock');
+            $this->data['safety_stock'] = isset($safety_stock[0]['safety_stock']) ? $safety_stock[0]['safety_stock'] : '';
             $this->load->view('partner/template', $this->data);
         } else {
             redirect('partner/login', 'refresh');
@@ -199,6 +201,8 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('total_allowed_quantity', 'Total Allowed Quantity', 'trim|xss_clean');
             $this->form_validation->set_rules('calories', 'calories', 'trim|xss_clean|numeric');
             $this->form_validation->set_rules('minimum_order_quantity', 'Minimum Order Quantity', 'trim|xss_clean');
+            $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
+            $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
             if (isset($_POST['highlights']) && $_POST['highlights'] != '') {
                 $_POST['highlights'] = json_decode($_POST['highlights'], 1);
@@ -453,10 +457,10 @@ class Product extends CI_Controller
 
                     $this->load->view('partner/template', $this->data);
                 } else {
-                    redirect('partner/product', 'refresh');
+                    redirect('partner/product/', 'refresh');
                 }
             } else {
-                redirect('partner/product', 'refresh');
+                redirect('partner/product/', 'refresh');
             }
         } else {
             redirect('partner/login', 'refresh');
@@ -1112,11 +1116,11 @@ class Product extends CI_Controller
                 $data = array(
                     'safety_stock' => $this->input->post('safety_stock', true)
                 );
-                if (update_details($data, ['id' => $partner_id], 'partner_data') == TRUE) {
+                if (update_details($data, ['user_id' => $partner_id], 'partner_data') == TRUE) {
                     $this->response['error'] = false;
                     $this->response['csrfName'] = $this->security->get_csrf_token_name();
                     $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                    $this->response['message'] = "Safety Stock Update Successfuly.";
+                    $this->response['message'] = "Safety Stock Updated Successfuly.";
                 } else {
                     $this->response['error'] = true;
                     $this->response['csrfName'] = $this->security->get_csrf_token_name();

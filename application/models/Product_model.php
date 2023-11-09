@@ -32,6 +32,8 @@ class Product_model extends CI_Model
         $minimum_order_quantity = (isset($data['minimum_order_quantity']) && !empty($data['minimum_order_quantity'])) ? $data['minimum_order_quantity'] : 1;
         // $tax = (isset($data['pro_input_tax']) && $data['pro_input_tax'] != 0 && !empty($data['pro_input_tax'])) ? $data['pro_input_tax'] : 0;
         $calories = (isset($data['calories']) && !empty($data['calories'])) ? $data['calories'] : 0;
+        $barcode = (isset($data['barcode']) && !empty($data['barcode'])) ? $data['barcode'] : NULL;
+        $sku = (isset($data['sku']) && !empty($data['sku'])) ? $data['sku'] : NULL;
 
         $pro_data = [
             'name' => $data['pro_input_name'],
@@ -46,6 +48,8 @@ class Product_model extends CI_Model
             'minimum_order_quantity' => $minimum_order_quantity,
             'highlights' => $highlights,
             'calories' => $calories,
+            'barcode' => $barcode,
+            'sku' => $sku,
             'start_time' => isset($start_time) && !empty($start_time) ? $start_time : '00:00:00',
             'end_time' => isset($end_time) && !empty($end_time) ? $end_time : '00:00:00',
         ];
@@ -111,6 +115,7 @@ class Product_model extends CI_Model
             } else {
                 $pro_data['cod_allowed'] = '0';
             }
+            // print_r($pro_data);
 
             $this->db->set($pro_data)->where('id', $data['edit_product_id'])->update('products');
         } else {

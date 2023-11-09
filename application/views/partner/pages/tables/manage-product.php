@@ -59,9 +59,9 @@
                         <div class="card-innr">
                             <form class="form-horizontal form-submit-event" action="<?= base_url('partner/product/set_safety_stock'); ?>" method="POST" enctype="multipart/form-data">
                                 <div class="row mb-4">
-                                    <div class="col-md-3">
+                                    <div class="col-md-5">
                                         <label for="" class="col-form-label">Safety stock</label>
-                                        <input type="number" name="safety_stock" class="form-control" value="" placeholder="Please enter safety stock">
+                                        <input type="number" name="safety_stock" class="form-control" value="<?= $safety_stock ?>" placeholder="Please enter safety stock">
                                     </div>
                                     <div class="col-md-3 align-self-end">
                                         <button type="submit" class="btn btn-info" id="submit_btn">Save</button>
