@@ -298,6 +298,12 @@
                                                     <td><?php $total -= $order_detls[0]['wallet_balance'];
                                                         echo  '- ' . number_format($order_detls[0]['wallet_balance'], 2); ?> </td>
                                                 </tr>
+                                                <tr>
+                                                    <th>ePoints Used (
+                                                        <?= $settings['currency'] ?>)</th>
+                                                    <td><?php $total -= $order_detls[0]['epoints'];
+                                                        echo  '- ' . number_format($order_detls[0]['epoints'], 2); ?> </td>
+                                                </tr>
                                                 <?php
                                                 if (isset($order_detls[0]['discount']) && $order_detls[0]['discount'] > 0 && $order_detls[0]['discount'] != NULL) { ?>
                                                     <tr>

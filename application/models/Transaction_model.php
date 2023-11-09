@@ -76,7 +76,7 @@ class Transaction_model extends CI_Model
         }
         $count_res = $this->db->select(' COUNT(transactions.id) as `total` ')
             ->join('users', ' transactions.user_id = users.id', 'left')
-            ->join('users_groups ug', 'ug.user_id = users.id', "left");
+            ->join('users_groups ug', 'ug.user_id = users.id', "left");            
 
         if (isset($multipleWhere) && !empty($multipleWhere)) {
             $this->db->group_Start();
@@ -99,6 +99,8 @@ class Transaction_model extends CI_Model
         if (isset($user_where) && !empty($user_where)) {
             $count_res->where($user_where);
         }
+
+        $count_res->where(['transactions.transaction_type !=' => 'epoints']);
 
         $txn_count = $count_res->get('transactions')->result_array();
 
@@ -127,7 +129,8 @@ class Transaction_model extends CI_Model
         if (isset($user_where) && !empty($user_where)) {
             $search_res->where($user_where);
         }
-        $search_res->join('users', ' transactions.user_id = users.id', 'left')->join('users_groups ug', 'ug.user_id = users.id', "left");
+        $search_res->where(['transactions.transaction_type !=' => 'epoints']);
+        $search_res->join('users', ' transactions.user_id = users.id', 'left')->join('users_groups ug', 'ug.user_id = users.id', "left")->where('transactions.transaction_type != epoints');
         if (isset($_GET['user_type']) && !empty($_GET['user_type'])) {
             if ($_GET['user_type'] == "partner") {
                 $search_res->join('partner_data rd', "rd.user_id = users.id");

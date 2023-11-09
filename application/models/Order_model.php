@@ -10,7 +10,7 @@ class Order_model extends CI_Model
         $this->load->model("transaction_model");
         $set = $reason = escape_array($set);
         if ($isjson == true) {
-            
+
             $field = array_keys($set); // active_status
             $current_status = $set[$field[0]]; //processed
             $res = fetch_details($where, $table, '*');
@@ -103,8 +103,8 @@ class Order_model extends CI_Model
                                 'txn_id' => "",
                                 'amount' => $earned_epoints,
                                 'status' => "success",
-                                'message' => "ePoints earned against order delivery, order ID: #" . $order[0]['id']
-                            ];                            
+                                'message' => "ePoints earned against purchase"
+                            ];
                             $this->transaction_model->add_transaction($transaction_data);
                         }
                         /* give commission to the Rider if the order is delivered */
@@ -319,6 +319,29 @@ class Order_model extends CI_Model
                 }
             }
 
+
+            if ($data['is_epoints_used'] == '1' && $data['epoints_used'] <= $final_total) {
+
+                $epoints = update_epoints('debit', $data['user_id'], $data['epoints_used'], "ePoints used against purchase");
+                if ($epoints['error'] == false) {
+                    $total_payable -= $data['epoints_used'];
+                    $epoints_used = true;
+                    $transaction_id = $epoints['data']['transaction_id'];
+                } else {
+                    $response['error'] = true;
+                    $response['message'] = $epoints['message'];
+                    return $response;
+                }
+            } else {
+                if ($data['is_epoints_used'] == 1) {
+                    $response['error'] = true;
+                    $response['message'] = 'ePoints should not exceed the total amount';
+                    return $response;
+                }
+            }
+
+
+
             $status = (isset($data['active_status'])) ? $data['active_status'] : 'pending';
             $order_data = [
                 'user_id' => $data['user_id'],
@@ -331,6 +354,7 @@ class Order_model extends CI_Model
                 'delivery_charge' => $delivery_charge,
                 'is_delivery_charge_returnable' => $data['is_delivery_charge_returnable'],
                 'wallet_balance' => (isset($Wallet_used) && $Wallet_used == true) ? $data['wallet_balance_used'] : '0',
+                'epoints' => (isset($epoints_used) && $epoints_used == true) ? $data['epoints_used'] : '0',
                 'final_total' => $final_total,
                 'discount' => '0',
                 'payment_method' => $data['payment_method'],
@@ -384,6 +408,8 @@ class Order_model extends CI_Model
 
             $last_order_id = $this->db->insert_id();
 
+            update_details(['order_id' => $last_order_id], ['id' => $transaction_id], 'transactions');
+
             for ($i = 0; $i < count($product_variant); $i++) {
                 $add_ons = get_cart_add_ons($product_variant[$i]['id'], $product_variant[$i]['product_id'], $data['user_id']);
                 if ($add_ons == false) {
@@ -436,7 +462,7 @@ class Order_model extends CI_Model
     public function get_order_details($where = NULL, $status = false)
     {
         $res = $this->db->select('o.city_id as user_city,o.latitude as user_lat,o.reason,o.cancel_by,o.longitude 
-        as user_lng,o.otp as item_otp,a.name as user_name,u.balance as user_balance,oi.id as order_item_id,p.*
+        as user_lng,o.otp as item_otp,a.name as user_name,u.balance as user_balance,u.epoints as user_epoints,oi.id as order_item_id,p.*
         ,v.product_id,o.*,oi.*,o.id as order_id,o.total as order_total,o.wallet_balance,o.active_status ,u.email
         ,u.username as uname,o.status as order_status,p.name as pname,p.type,p.image as product_image,p.
         is_prices_inclusive_tax,(SELECT username FROM users db where db.id=o.rider_id ) as rider ')
@@ -677,6 +703,7 @@ class Order_model extends CI_Model
                 $tempRow['total'] = $currency_symbol . ' ' . $row['total'];
                 $tota_amount += intval($row['total']);
                 $tempRow['wallet_balance'] = $currency_symbol . ' ' . $row['wallet_balance'];
+                $tempRow['epoints'] = $currency_symbol . ' ' . $row['epoints'];
                 $tempRow['discount'] = $currency_symbol . ' ' . $discount_in_rupees . '(' . $row['items'][0]['discount'] . '%)';
                 $tempRow['promo_discount'] = $currency_symbol . ' ' . $row['promo_discount'];
                 $tempRow['promo_code'] = $row['promo_code'];

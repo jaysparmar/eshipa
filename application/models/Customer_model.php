@@ -232,7 +232,7 @@ class Customer_model extends CI_Model
 
         if (isset($_GET['search']) and $_GET['search'] != '') {
             $search = $_GET['search'];
-            $multipleWhere = ['fund_transfers.`id`' => $search, 'users.`username`' => $search, 'mobile' => $search, 'message' => $search, 'fund_transfers.opening_balance' => $search, 'fund_transfers.closing_balance' => $search, 'fund_transfers.status' => $search, 'fund_transfers.amount' => $search];
+            $multipleWhere = ['users.`username`' => $search, 'message' => $search,  'transactions.status' => $search, 'transactions.amount' => $search];
         }
         if ($user_id != '' && is_numeric($user_id)) {
             $where = array('fund_transfers.rider_id' => trim($user_id));
@@ -252,7 +252,7 @@ class Customer_model extends CI_Model
             $total = $row['total'];
         }
 
-        $search_res = $this->db->select(' transactions.*,users.username as name ');
+        $search_res = $this->db->select(' transactions.*,users.username as name,users.epoints as balance ');
         if (isset($multipleWhere) && !empty($multipleWhere)) {
             $search_res->or_like($multipleWhere);
         }
@@ -270,11 +270,14 @@ class Customer_model extends CI_Model
         foreach ($transfers_res as $row) {
             $row = output_escaping($row);
             $tempRow['id'] = $row['id'];
+            $tempRow['order_id'] = $row['order_id'];
             $tempRow['user'] = $row['name'];
+            $tempRow['type'] = ucfirst($row['type']);
             $tempRow['amount'] = $row['amount'];
+            $tempRow['balance'] = $row['balance'];
             $tempRow['status'] = $row['status'];
-            $tempRow['message'] = $row['message'];
-            $tempRow['date'] = $row['date_created'];
+            $tempRow['message'] = $row['message'].", order ID: #" . $row['order_id'];
+            $tempRow['date_created'] = $row['date_created'];
             $rows[] = $tempRow;
         }
         $bulkData['rows'] = $rows;

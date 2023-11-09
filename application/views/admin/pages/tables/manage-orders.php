@@ -160,6 +160,7 @@
                                         <th data-field="total" data-sortable='true' data-visible="true">Total(<?= $curreny ?>)</th>
                                         <th data-field="delivery_charge" data-sortable='true' data-footer-formatter="delivery_chargeFormatter">D.Charge</th>
                                         <th data-field="wallet_balance" data-sortable='true' data-visible="true">Wallet Used(<?= $curreny ?>)</th>
+                                        <th data-field="epoints" data-sortable='true' data-visible="true">ePoints(<?= $curreny ?>)</th>
                                         <th data-field="promo_code" data-sortable='true' data-visible="false">Promo Code</th>
                                         <th data-field="deliver_by" data-sortable='true' data-visible='false'>Deliver By</th>
                                         <th data-field="promo_discount" data-sortable='true' data-visible="true">Promo disc.(<?= $curreny ?>)</th>

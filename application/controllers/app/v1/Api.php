@@ -1589,6 +1589,8 @@ class Api extends CI_Controller
             address_id:17
             is_wallet_used:1 {By default 0}
             wallet_balance_used:1
+            is_epoints_used:1 {By default 0}
+            epoints_used:10
             active_status:awaiting {optional}
             order_note:text      //{optional}
             delivery_tip:text      //{optional}
@@ -1617,6 +1619,10 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('is_wallet_used', ' Wallet Balance Used', 'trim|required|numeric|xss_clean');
         if (isset($_POST['is_wallet_used']) && $_POST['is_wallet_used'] == '1') {
             $this->form_validation->set_rules('wallet_balance_used', ' Wallet Balance ', 'trim|required|numeric|xss_clean');
+        }
+        $this->form_validation->set_rules('is_epoints_used', 'is ePoints used', 'trim|required|numeric|xss_clean');
+        if (isset($_POST['is_epoints_used']) && $_POST['is_epoints_used'] == '1') {
+            $this->form_validation->set_rules('epoints_used', ' ePoints used ', 'trim|required|numeric|xss_clean');
         }
         $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|numeric|xss_clean');
         $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|numeric|xss_clean');

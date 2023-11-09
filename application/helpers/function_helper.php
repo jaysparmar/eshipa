@@ -1274,6 +1274,59 @@ function update_wallet_balance($operation, $user_id, $amount, $message = "Balanc
     return $response;
 }
 
+
+//update_epoints
+function update_epoints($operation, $user_id, $amount, $message = "ePoints Debited")
+{
+
+    $t = &get_instance();
+    $user_epoints = $t->db->select('epoints')->where(['id' => $user_id])->get('users')->result_array();
+    if (!empty($user_epoints)) {
+
+        if ($operation == 'debit' && $amount > $user_epoints[0]['epoints']) {
+            $response['error'] = true;
+            $response['message'] = "Debited ePoints can't exceeds the user ePoints !";
+            $response['data'] = array();
+            return $response;
+        }
+
+        if ($user_epoints[0]['epoints'] >= 0) {
+            $t = &get_instance();
+            $data = [
+                'transaction_type' => 'epoints',
+                'user_id' => $user_id,
+                'type' => $operation,
+                'amount' => $amount,
+                'message' => $message,
+            ];
+            if ($operation == 'debit') {
+                $data['message'] = $message;
+                $data['type'] = 'debit';
+                $t->db->set('epoints', '`epoints` - ' . $amount, false)->where('id', $user_id)->update('users');
+            } else {
+                $data['message'] = $message;
+                $data['type'] = 'credit';
+                $t->db->set('epoints', '`epoints` + ' . $amount, false)->where('id', $user_id)->update('users');
+            }
+            $data = escape_array($data);
+            $t->db->insert('transactions', $data);
+            $lastInsertedId = $t->db->insert_id();
+            $response['error'] = false;
+            $response['message'] = "ePoints Update Successfully";
+            $response['data'] = array('transaction_id' => $lastInsertedId);
+        } else {
+            $response['error'] = true;
+            $response['message'] = ($user_epoints[0]['epoints'] != 0) ? "User's ePoints less than " . $user_epoints[0]['epoints'] . " can be used only" : "Doesn't have sufficient ePoints to proceed further.";
+            $response['data'] = array();
+        }
+    } else {
+        $response['error'] = true;
+        $response['message'] = "User does not exist";
+        $response['data'] = array();
+    }
+    return $response;
+}
+
 function send_notification($fcmMsg, $registrationIDs_chunks)
 {
     $fcmFields = [];

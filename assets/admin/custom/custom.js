@@ -1667,7 +1667,7 @@ $(document).on("submit", ".container-fluid .form-submit-event", function (e) {
                 iziToast.success({
                     message: result["message"]
                 });
-                $(".form-submit-event")[0].reset();
+                // $(".form-submit-event")[0].reset();
                 if (window.location.href.indexOf("login") > -1) {
                     setTimeout(function () {
                         location.reload();

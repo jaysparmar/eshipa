@@ -204,6 +204,10 @@
                                                             </a>
                                                         </li>
                                                         <li class="nav-item">
+                                                            <a href="javascript:void(0)" class="nav-link text-info">User ePoints(<?= $settings['currency'] ?>)<span class="float-right text-info"><?= number_format($order_detls[0]['user_epoints'], 2); ?></span>
+                                                            </a>
+                                                        </li>
+                                                        <li class="nav-item">
                                                             <a href="javascript:void(0)" class="nav-link text-info">Order Date<span class="float-right text-info"> <?= date('d-M-Y, g:i A - D', strtotime($order_detls[0]['date_added'])); ?></span></a>
                                                         </li>
                                                         <li class="nav-item">
@@ -250,6 +254,10 @@
                                                         <li class="nav-item">
                                                             <a href="javascript:void(0)" class="nav-link text-info">Wallet Balance(<?= $settings['currency'] ?>) <span class="float-right text-info"><?php echo  '- ' . $order_detls[0]['wallet_balance'];
                                                                                                                                                                                                         $total = $total - $order_detls[0]['wallet_balance'];  ?></span></a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a href="javascript:void(0)" class="nav-link text-info">ePoints(<?= $settings['currency'] ?>) <span class="float-right text-info"><?php echo  '- ' . $order_detls[0]['epoints'];
+                                                                                                                                                                                                        $total = $total - $order_detls[0]['epoints'];  ?></span></a>
                                                         </li>
                                                         <li class="nav-item">
                                                             <a href="javascript:void(0)" class="nav-link text-info">Promo Code Discount (<?= $settings['currency'] ?>)<span class="float-right text-info">

@@ -1096,4 +1096,37 @@ class Product extends CI_Controller
             redirect('admin/login', 'refresh');
         }
     }
+
+    public function set_safety_stock()
+    {
+        if ($this->ion_auth->logged_in() && $this->ion_auth->is_partner() && ($this->ion_auth->partner_status() == 1 || $this->ion_auth->partner_status() == 0)) {
+            $this->form_validation->set_rules('safety_stock', 'Safety stock', 'trim|required|xss_clean');
+            if (!$this->form_validation->run()) {
+                $this->response['error'] = true;
+                $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                $this->response['message'] = validation_errors();
+                print_r(json_encode($this->response));
+            } else {
+                $partner_id = $this->session->userdata('user_id');
+                $data = array(
+                    'safety_stock' => $this->input->post('safety_stock', true)
+                );
+                if (update_details($data, ['id' => $partner_id], 'partner_data') == TRUE) {
+                    $this->response['error'] = false;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = "Safety Stock Update Successfuly.";
+                } else {
+                    $this->response['error'] = true;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = "Not Updated. Try again later.";
+                }
+                print_r(json_encode($this->response));
+            }
+        } else {
+            redirect('partner/login', 'refresh');
+        }
+    }
 }

@@ -55,7 +55,22 @@
                                 <a href="<?= base_url() . 'partner/product/create_product' ?>" class="btn btn-block btn-outline-info btn-sm">Add Product</a>
                             </div>
                         </div>
+
                         <div class="card-innr">
+                            <form class="form-horizontal form-submit-event" action="<?= base_url('partner/product/set_safety_stock'); ?>" method="POST" enctype="multipart/form-data">
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <label for="" class="col-form-label">Safety stock</label>
+                                        <input type="number" name="safety_stock" class="form-control" value="" placeholder="Please enter safety stock">
+                                    </div>
+                                    <div class="col-md-3 align-self-end">
+                                        <button type="submit" class="btn btn-info" id="submit_btn">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+
+
+
                             <div class="row">
                                 <div class="col-md-3">
                                     <label for="zipcode" class="col-form-label">Filter By Product Category</label>
