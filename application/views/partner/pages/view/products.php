@@ -65,10 +65,12 @@
                                                 <th>Row Id</th>
                                                 <th>Variants</th>
                                                 <th>Price</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
+
                                             $i = 1;
                                             $flag = 0;
                                             //   foreach ($product_details[0]['variants'] as $row) {
@@ -83,9 +85,12 @@
                                                 }
                                             ?>
                                                 <tr class='<?= ($row['status'] == 7) ? "table-danger" : (($row['status'] == 0) ? "table-warning" : ""); ?>'>
-                                                    <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?= ($row['status'] == 7) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Restore variant'>Restore</a>" : (($row['status'] == 0) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Activate variant'>Activate</a>" : "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/0/' . $product_details[0]['id']) . "' title='Deactivate variant'>Deactivate</a> | <a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/7/' . $product_details[0]['id']) . "' title='Move variant to Trash'>Trash</a>") ?> </td>
+                                                    <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                                                                                                                                                                    echo '';
+                                                                                                                                                                                } else { ?><?= ($row['status'] == 7) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Restore variant'>Restore</a>" : (($row['status'] == 0) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Activate variant'>Activate</a>" : "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/0/' . $product_details[0]['id']) . "' title='Deactivate variant'>Deactivate</a> | <a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/7/' . $product_details[0]['id']) . "' title='Move variant to Trash'>Trash</a>") ?><?php } ?> </td>
                                                     <td><?= str_replace(',', ' | ', $row['variant_values']) ?></td>
                                                     <td><?= (($flag == 1 && isset($strike_off_price) && !empty($strike_off_price)) ? $currency . $price . ' <sup class="text-danger"><s>' . $currency . $strike_off_price . '</s></sup>' : $currency . $price)  ?></td>
+                                                    <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') { ?><td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm" data-id="<?= $row['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td><?php } ?>
                                                 </tr>
                                             <?php
                                                 $i++;
@@ -142,7 +147,7 @@
                         <?php
                         if (!empty($product_rating['product_rating'])) {
                         ?>
-                            <input type="hidden" name="product_id" id="product_id" value="<?= (isset($product_details[0]['id']) && !empty($product_details[0]['id'])) ? $product_details[0]['id'] : 'null' ?>"/>
+                            <input type="hidden" name="product_id" id="product_id" value="<?= (isset($product_details[0]['id']) && !empty($product_details[0]['id'])) ? $product_details[0]['id'] : 'null' ?>" />
                             <div class="tab-pane <?= $rating_active ?>" id="product-rating" role="tabpanel" aria-labelledby="product-rating-tab">
                                 <table class='table-striped' id='product-rating-table' data-toggle="table" data-url="<?= base_url('partner/product/get_rating_list') ?>" data-click-to-select="true" data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-show-columns="true" data-show-refresh="true" data-trim-on-search="false" data-sort-name="id" data-sort-order="desc" data-mobile-responsive="true" data-toolbar="" data-show-export="true" data-maintain-selected="true" data-query-params="product_rating_query_params">
                                     <thead>

@@ -1243,6 +1243,7 @@ function product_query_params(p) {
         category_id: $("#category_parent").val(),
         partner_id: $("#restro_filter").val(),
         status: $("#status_filter").val(),
+        buy_stock: $("#buy_stock").val(),
         limit: p.limit,
         sort: p.sort,
         order: p.order,
@@ -1250,6 +1251,7 @@ function product_query_params(p) {
         search: p.search
     };
 }
+
 function payment_request_queryParams(p) {
     return {
         user_filter: $("#user_filter").val(),
@@ -6945,6 +6947,42 @@ $(document).on("click", "#verify_id_passport", function (e) {
     }
 
 });
+
+$('.add-to-cart').on('click', function (e) {
+    e.preventDefault()
+    var product_variant_id = $(this).data('id')
+    var btn = $(this)
+    var btn_html = $(this).html()
+    // var qty = $(this).parent().siblings('.item-quantity').find('.itemQty').val()
+    
+    $.ajax({
+        url: base_url + 'app/v1/api/manage_cart',
+        type: 'POST',
+        data: {
+            product_variant_id: product_variant_id,
+            qty: 1,
+            [csrfName]: csrfHash
+        },
+        beforeSend: function () {
+            btn.html('Please Wait').text('Please Wait').attr('disabled', true)
+        },
+        dataType: 'json',
+        success: function (result) {
+            csrfName = result.csrfName
+            csrfHash = result.csrfHash
+            btn.html(btn_html).attr('disabled', false)
+            if (result.error == false) {
+                iziToast.success({
+                    message: result.message
+                });
+            } else {
+                iziToast.error({
+                    message: result.message
+                });
+            }
+        }
+    })
+})
 
 
 $(document).on('change', '#deliverable_type', function () {

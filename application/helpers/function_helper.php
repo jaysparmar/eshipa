@@ -376,7 +376,7 @@ function fetch_details($where = NULL, $table = "", $fields = '*', $limit = '', $
     return $res;
 }
 
-function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id")
+function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id", $buy_stock = NULL)
 {
     $settings = get_settings('system_settings', true);
     $near_by_distance = 5;
@@ -414,8 +414,8 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
 
     $t->db->select($discount_filter_data . ' (select count(id)  from products where products.category_id=c.id ) as total,count(p.id) as sales, p.stock_type,p.calories,p.status ,p.is_prices_inclusive_tax,p.tax as tax_id, p.type ,GROUP_CONCAT(DISTINCT(pa.attribute_value_ids)) as attr_value_ids, p.partner_id,p.id,p.stock,p.name,p.category_id,p.short_description,p.slug,p.total_allowed_quantity,p.minimum_order_quantity,p.cod_allowed,p.row_order,p.rating,p.no_of_ratings,p.image,p.is_cancelable,p.cancelable_till,p.indicator, p.highlights,p.availability,c.name as category_name,c.slug as category_slug,p.available_time,p.start_time,p.end_time,tax.percentage as tax_percentage ')
         ->join(" categories c", "p.category_id=c.id ", 'LEFT')
-        ->join(" partner_data sd", "p.partner_id=sd.user_id ", $t->ion_auth->is_admin() ? 'LEFT' : '')
-        ->join(" users u", "p.partner_id=u.id", $t->ion_auth->is_admin() ? 'LEFT' : '')
+        ->join(" partner_data sd", "p.partner_id=sd.user_id ", $t->ion_auth->is_admin() || $buy_stock ? 'LEFT' : '')
+        ->join(" users u", "p.partner_id=u.id", $t->ion_auth->is_admin() || $buy_stock ? 'LEFT' : '')
         ->join('`product_variants` pv', 'p.id = pv.product_id', 'LEFT')
         ->join('`taxes` tax', 'tax.id = p.tax', 'LEFT')
         ->join('`cities` ct', 'ct.id = u.city', 'LEFT')
@@ -676,9 +676,9 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     $discount_filter = (isset($filter['discount']) && !empty($filter['discount'])) ? ' , GROUP_CONCAT( IF( ( IF( pv.special_price > 0, ((pv.price - pv.special_price) / pv.price) * 100, 0 ) ) > ' . $filter['discount'] . ', ( IF( pv.special_price > 0, ((pv.price - pv.special_price) / pv.price) * 100, 0 ) ), 0 ) ) AS cal_discount_percentage ' : '';
     $product_count = $t->db->select('count(DISTINCT(' . $sort_by . ')) as total , GROUP_CONCAT(pa.attribute_value_ids) as attr_value_ids' . $discount_filter)
         ->join(" categories c", "p.category_id=c.id ", 'LEFT')
-        ->join(" partner_data sd", "p.partner_id=sd.user_id ", $t->ion_auth->is_admin() ? 'LEFT' : '')
+        ->join(" partner_data sd", "p.partner_id=sd.user_id ", $t->ion_auth->is_admin() || $buy_stock ? 'LEFT' : '')
         ->join('`product_variants` pv', 'p.id = pv.product_id', 'LEFT')
-        ->join(" users u", "p.partner_id=u.id", $t->ion_auth->is_admin() ? 'LEFT' : '')
+        ->join(" users u", "p.partner_id=u.id", $t->ion_auth->is_admin() || $buy_stock ? 'LEFT' : '')
         ->join('`taxes` tax', 'tax.id = p.tax', 'LEFT')
         ->join('`cities` ct', 'ct.id = u.city', 'LEFT')
         ->join('`product_attributes` pa', ' pa.product_id = p.id ', 'LEFT');
@@ -1964,6 +1964,7 @@ function get_cart_total($user_id, $product_variant_id = false, $is_saved_for_lat
     $t->db->where(['p.status' => '1', 'pv.status' => 1, 'sd.status' => 1]);
     $t->db->group_by('c.id')->order_by('c.id', "DESC");
     $data = $t->db->get('cart c')->result_array();
+    echo $t->db->last_query(); return false;
     $total = $variant_id =  $quantity = $percentage = $amount = array();
     $cart_add_on_total = 0;
 
@@ -3663,14 +3664,18 @@ function is_variant_available_in_cart($product_variant_id, $user_id)
         return false;
     }
 }
-function get_user_balance($user_id)
+function get_user_balance($user_id, $field)
 {
     $ci = &get_instance();
     $ci->db->where('id', $user_id);
-    $ci->db->select('balance');
+    if ($field === 'balance') {
+        $ci->db->select('balance');
+    } elseif ($field === 'epoints') {
+        $ci->db->select('epoints');
+    }
     $res = $ci->db->get('users')->result_array();
-    if (!empty($res[0]['balance'])) {
-        return $res[0]['balance'];
+    if (!empty($res)) {
+        return !empty($res[0][$field]) ? $res[0][$field] : "0";
     } else {
         return "0";
     }

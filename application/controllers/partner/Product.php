@@ -382,12 +382,13 @@ class Product extends CI_Controller
     public function get_product_data()
     {
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_partner() && ($this->ion_auth->partner_status() == 1 || $this->ion_auth->partner_status() == 0)) {
-            $partner_id =  (isset($_GET['partner_id']) && !empty($_GET['partner_id'])) ? $this->input->get('partner_id', true) : $this->session->userdata('user_id');
+            $partner_id =  (isset($_GET['partner_id']) && $_GET['partner_id'] != '') ? $this->input->get('partner_id', true) : $this->session->userdata('user_id');
             $status =  (isset($_GET['status']) && $_GET['status'] != "") ? $this->input->get('status', true) : NULL;
+            $buy_stock =  (isset($_GET['buy_stock']) && $_GET['buy_stock'] == 1) ? 1 : NULL;
             if (isset($_GET['flag']) && !empty($_GET['flag'])) {
-                return $this->product_model->get_product_details($_GET['flag'], $partner_id, $status);
+                return $this->product_model->get_product_details($_GET['flag'], $partner_id, $status, $buy_stock);
             }
-            return $this->product_model->get_product_details(null, $partner_id, $status);
+            return $this->product_model->get_product_details(null, $partner_id, $status, $buy_stock);
         } else {
             redirect('partner/login', 'refresh');
         }
@@ -446,7 +447,8 @@ class Product extends CI_Controller
                 $settings = get_settings('system_settings', true);
                 $this->data['title'] = 'View Product | ' . $settings['app_name'];
                 $this->data['meta_description'] = 'View Product | ' . $settings['app_name'];
-                $res = fetch_product(NULL, NULL, $this->input->get('edit_id', true));
+                $buy_stock = $this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock' ? 1 : 0;
+                $res = fetch_product(NULL, NULL, $this->input->get('edit_id', true), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'sd.user_id', $buy_stock);
                 if (!empty($res['product'])) {
                     $this->data['product_details'] = $res['product'];
                     $this->data['product_attributes'] = get_attribute_values_by_pid($_GET['edit_id']);

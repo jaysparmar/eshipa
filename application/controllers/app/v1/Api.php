@@ -130,7 +130,7 @@ class Api extends CI_Controller
         // "app/v1/api/delete_address",
         // "app/v1/api/update_user",
         "app/v1/api/validate_refer_code",
-        // "app/v1/api/manage_cart",
+        "app/v1/api/manage_cart",
         // "app/v1/api/get_user_cart",
         // "app/v1/api/add_ticket",
         // "app/v1/api/edit_ticket",
@@ -2177,9 +2177,11 @@ class Api extends CI_Controller
         add_on_id:1           {optional}
         add_on_qty:1          {required when passing add on id}
         */
-        if (!verify_tokens()) {
-            return false;
-        }
+        // if (!verify_tokens()) {
+        //     return false;
+        // }
+        $_POST['qty'] = isset($_POST['qty']) && $_POST['qty'] != '' ? $_POST['qty'] : 1;
+        $_POST['user_id'] = isset($_POST['user_id']) && $_POST['user_id'] != '' ? $_POST['user_id'] : ($this->ion_auth->logged_in() ? $this->session->userdata('user_id') : '');
         $this->form_validation->set_rules('user_id', 'User', 'trim|numeric|required|xss_clean');
         $this->form_validation->set_rules('product_variant_id', 'Product Variant', 'trim|required|xss_clean');
         $this->form_validation->set_rules('qty', 'Quantity', 'trim|required|xss_clean');
@@ -2897,7 +2899,7 @@ class Api extends CI_Controller
         /*
             user_id:73 
             id: 1001                // { optional}
-            transaction_type:transaction / wallet // { default - transaction } optional
+            transaction_type:transaction / wallet / epoints { default - transaction } optional
             type : COD / stripe / razorpay / paypal / paystack / flutterwave - for transaction | credit / debit - for wallet // { optional }
             search : Search keyword // { optional }
             limit:25                // { default - 25 } optional
@@ -2932,10 +2934,11 @@ class Api extends CI_Controller
             $order = (isset($_POST['order']) && !empty(trim($_POST['order']))) ? $_POST['order'] : 'DESC';
             $sort = (isset($_POST['sort']) && !empty(trim($_POST['sort']))) ? $_POST['sort'] : 'id';
             $res = $this->Transaction_model->get_transactions($id, $user_id, $transaction_type, $type, $search, $offset, $limit, $sort, $order);
+            $field = $transaction_type == 'epoints' ? 'epoints' : 'balance';
             $this->response['error'] = false;
             $this->response['message'] = 'Transactions Retrieved Successfully';
             $this->response['total'] = $res['total'];
-            $this->response['balance'] = get_user_balance($user_id);
+            $this->response['balance'] = get_user_balance($user_id, $field);
             $this->response['data'] = $res['data'];
         }
 

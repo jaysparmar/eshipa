@@ -233,7 +233,7 @@ class Product_model extends CI_Model
         }
     }
 
-    public function get_product_details($flag = NULL, $partner_id = NULL, $p_status = NULL)
+    public function get_product_details($flag = NULL, $partner_id = NULL, $p_status = NULL, $buy_stock = NULL)
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
@@ -380,16 +380,18 @@ class Product_model extends CI_Model
             $row = output_escaping($row);
 
             $operate = "<a href='view-product?edit_id=" . $row['pid'] . "'  class='btn btn-primary btn-xs mr-1 mb-1' title='View'><i class='fa fa-eye'></i></a>";
-            $operate .= " <a href='create-product?edit_id=" . $row['pid'] . "' data-id=" . $row['pid'] . " class='btn btn-success btn-xs mr-1 mb-1' title='Edit' ><i class='fa fa-pen'></i></a>";
-            if ($row['status'] == '1') {
-                $tempRow['status'] = '<a class="badge badge-success text-white" >Active</a>';
-                $operate .= '<a class="btn btn-warning btn-xs update_active_status mr-1 mb-1" data-table="products" title="Deactivate" href="javascript:void(0)" data-id="' . $row['pid'] . '" data-status="' . $row['status'] . '" ><i class="fa fa-toggle-on"></i></a>';
-            } else  if ($row['status'] == '0') {
-                $tempRow['status'] = '<a class="badge badge-danger text-white" >Inactive</a>';
-                $operate .= '<a class="btn btn-secondary mr-1 mb-1 btn-xs update_active_status" data-table="products" href="javascript:void(0)" title="Active" data-id="' . $row['pid'] . '" data-status="' . $row['status'] . '" ><i class="fa fa-toggle-off"></i></a>';
+            if (!$buy_stock) {
+                $operate .= " <a href='create-product?edit_id=" . $row['pid'] . "' data-id=" . $row['pid'] . " class='btn btn-success btn-xs mr-1 mb-1' title='Edit' ><i class='fa fa-pen'></i></a>";
+                if ($row['status'] == '1') {
+                    $tempRow['status'] = '<a class="badge badge-success text-white" >Active</a>';
+                    $operate .= '<a class="btn btn-warning btn-xs update_active_status mr-1 mb-1" data-table="products" title="Deactivate" href="javascript:void(0)" data-id="' . $row['pid'] . '" data-status="' . $row['status'] . '" ><i class="fa fa-toggle-on"></i></a>';
+                } else  if ($row['status'] == '0') {
+                    $tempRow['status'] = '<a class="badge badge-danger text-white" >Inactive</a>';
+                    $operate .= '<a class="btn btn-secondary mr-1 mb-1 btn-xs update_active_status" data-table="products" href="javascript:void(0)" title="Active" data-id="' . $row['pid'] . '" data-status="' . $row['status'] . '" ><i class="fa fa-toggle-off"></i></a>';
+                }
+                $operate .= ' <a href="javascript:void(0)" id="delete-product" data-id=' . $row['pid'] . ' class="btn btn-danger mr-1 mb-1 btn-xs"><i class="fa fa-trash"></i></a>';
+                $operate .= " <a href='javascript:void(0)' data-id=" . $row['pid'] . " data-toggle='modal' data-target='#product-rating-modal' class='btn btn-success btn-xs mr-1 mb-1' title='View Ratings' ><i class='fa fa-star'></i></a>";
             }
-            $operate .= ' <a href="javascript:void(0)" id="delete-product" data-id=' . $row['pid'] . ' class="btn btn-danger mr-1 mb-1 btn-xs"><i class="fa fa-trash"></i></a>';
-            $operate .= " <a href='javascript:void(0)' data-id=" . $row['pid'] . " data-toggle='modal' data-target='#product-rating-modal' class='btn btn-success btn-xs mr-1 mb-1' title='View Ratings' ><i class='fa fa-star'></i></a>";
 
             $attr_values  =  get_variants_values_by_pid($row['pid']);
             $tempRow['id'] = $row['pid'];
