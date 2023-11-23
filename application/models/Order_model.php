@@ -443,7 +443,7 @@ class Order_model extends CI_Model
             $user_balance = fetch_details(['id' => $data['user_id']], 'users', 'balance');
 
             $response['error'] = false;
-            $response['message'] = 'Order Placed Successfully. It will confirm when partner will accept order. Please, Wait for it!';
+            $response['message'] = 'Order Placed Successfully. It will confirm once accepted. Please, Wait for it!';
             $response['order_id'] = $last_order_id;
             $response['order_item_data'] = $product_variant_data;
             $response['balance'] = $user_balance;

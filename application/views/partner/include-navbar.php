@@ -17,6 +17,28 @@ $current_status = $this->ion_auth->partner_status(); ?>
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <div id="google_translate_element"></div>
+        <li class="nav-item dropdown mx-2">
+            <a href="<?= base_url('partner/cart') ?>" class="nav-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="badge bg-danger navbar-badge"><?= (count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) != 0 ? count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) : ''); ?></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-2">
+
+                <a class="dropdown-item" href="#">
+                    <div class="d-flex">
+
+                    </div>
+                </a>
+
+                <a class="dropdown-item">
+                    <i class="fas fa-user-circle mr-2 fa-lg"></i> Profile
+                </a>
+                <a href="http://localhost/infinitie/eshop/admin/home/logout" class="dropdown-item">
+                    <i class="fa fa-sign-out-alt mr-2 fa-lg"></i> Log Out
+                </a>
+
+            </div>
+        </li>
 
         <li class="nav-item">
             <a class="nav-link" id="panel_dark_mode" data-slide="true" href="#" role="button">

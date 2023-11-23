@@ -147,7 +147,7 @@ class Api extends CI_Controller
         // "app/v1/api/add_transaction",
         // "app/v1/api/update_order_status",
         // "app/v1/api/transactions",
-        // "app/v1/api/place_order",
+        "app/v1/api/place_order",
         "app/v1/api/sign_up",
         "app/v1/api/get_cities",
         "app/v1/api/get_faqs",
@@ -1597,9 +1597,9 @@ class Api extends CI_Controller
             is_self_pick_up:0|1    //{default will be zero}{required when its self pickup}
         */
 
-        if (!verify_tokens()) {
-            return false;
-        }
+        // if (!verify_tokens()) {
+        //     return false;
+        // }
 
         $this->form_validation->set_rules('user_id', 'User Id', 'trim|required|xss_clean');
         $this->form_validation->set_rules('mobile', 'Mobile Id', 'trim|required|numeric|xss_clean');
@@ -1624,8 +1624,8 @@ class Api extends CI_Controller
         if (isset($_POST['is_epoints_used']) && $_POST['is_epoints_used'] == '1') {
             $this->form_validation->set_rules('epoints_used', ' ePoints used ', 'trim|required|numeric|xss_clean');
         }
-        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|numeric|xss_clean');
-        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|numeric|xss_clean');
+        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|numeric|xss_clean');
+        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('payment_method', 'Payment Method', 'trim|required|xss_clean');
         $this->form_validation->set_rules('address_id', 'Address id', 'trim|numeric|xss_clean');
 
@@ -2244,41 +2244,42 @@ class Api extends CI_Controller
                     return;
                 }
             }
+            
 
             if (!$this->cart_model->add_to_cart($_POST, $check_status)) {
                 $response = get_cart_total($_POST['user_id'], false); // we will calculate add ons in this function
                 $cart_user_data = $this->cart_model->get_user_cart($_POST['user_id'], 0);
                 $tmp_cart_user_data = $cart_user_data;
-                if (!empty($tmp_cart_user_data)) {
-                    for ($i = 0; $i < count($tmp_cart_user_data); $i++) {
-                        $product_data = fetch_details(['id' => $tmp_cart_user_data[$i]['product_variant_id']], 'product_variants', 'product_id,availability');
-                        if (!empty($product_data[0]['product_id'])) {
-                            $pro_details = fetch_product($_POST['user_id'], null, $product_data[0]['product_id']);
-                            if (!empty($pro_details['product'])) {
-                                if (trim($pro_details['product'][0]['availability']) == 0 && $pro_details['product'][0]['availability'] != null) {
-                                    update_details(['is_saved_for_later' => '1'], $cart_user_data[$i]['id'], 'cart');
-                                    unset($cart_user_data[$i]);
-                                }
+                // if (!empty($tmp_cart_user_data)) {
+                //     for ($i = 0; $i < count($tmp_cart_user_data); $i++) {
+                //         $product_data = fetch_details(['id' => $tmp_cart_user_data[$i]['product_variant_id']], 'product_variants', 'product_id,availability');
+                //         if (!empty($product_data[0]['product_id'])) {
+                //             $pro_details = fetch_product($_POST['user_id'], null, $product_data[0]['product_id']);
+                //             if (!empty($pro_details['product'])) {
+                //                 if (trim($pro_details['product'][0]['availability']) == 0 && $pro_details['product'][0]['availability'] != null) {
+                //                     update_details(['is_saved_for_later' => '1'], $cart_user_data[$i]['id'], 'cart');
+                //                     unset($cart_user_data[$i]);
+                //                 }
 
-                                if (!empty($pro_details['product'])) {
-                                    $cart_user_data[$i]['product_details'] = $pro_details['product'];
-                                } else {
-                                    delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
-                                    unset($cart_user_data[$i]);
-                                    continue;
-                                }
-                            } else {
-                                delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
-                                unset($cart_user_data[$i]);
-                                continue;
-                            }
-                        } else {
-                            delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
-                            unset($cart_user_data[$i]);
-                            continue;
-                        }
-                    }
-                }
+                //                 if (!empty($pro_details['product'])) {
+                //                     $cart_user_data[$i]['product_details'] = $pro_details['product'];
+                //                 } else {
+                //                     delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
+                //                     unset($cart_user_data[$i]);
+                //                     continue;
+                //                 }
+                //             } else {
+                //                 delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
+                //                 unset($cart_user_data[$i]);
+                //                 continue;
+                //             }
+                //         } else {
+                //             delete_details(['id' => $cart_user_data[$i]['id']], 'cart');
+                //             unset($cart_user_data[$i]);
+                //             continue;
+                //         }
+                //     }
+                // }
 
                 $this->response['error'] = false;
                 $this->response['message'] = 'Cart Updated !';

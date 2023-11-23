@@ -1942,7 +1942,7 @@ function get_subcategory_option_html($subcategories, $selected_vals)
 function get_cart_total($user_id, $product_variant_id = false, $is_saved_for_later = '0', $address_id = '')
 {
     $t = &get_instance();
-    $t->db->select('(select sum(c.qty)  from cart c join product_variants pv on c.product_variant_id=pv.id join products p on p.id=pv.product_id join partner_data sd on sd.user_id=p.partner_id  where c.user_id="' . $user_id . '" and qty!=0  and  is_saved_for_later = "' . $is_saved_for_later . '" and p.status=1 AND pv.status=1 AND sd.status=1) as total_items,(select count(c.id) from cart c join product_variants pv on c.product_variant_id=pv.id join products p on p.id=pv.product_id join partner_data sd on sd.user_id=p.partner_id where c.user_id="' . $user_id . '" and qty!=0 and  is_saved_for_later = "' . $is_saved_for_later . '" and p.status=1 AND pv.status=1 AND sd.status=1) as cart_count,`c`.qty,p.is_prices_inclusive_tax,p.cod_allowed,p.minimum_order_quantity,p.slug,p.total_allowed_quantity, p.name, p.image,p.short_description,`c`.user_id,pv.*,tax.percentage as tax_percentage,tax.title as tax_title');
+    $t->db->select('(select sum(c.qty)  from cart c join product_variants pv on c.product_variant_id=pv.id join products p on p.id=pv.product_id left join partner_data sd on sd.user_id=p.partner_id  where c.user_id="' . $user_id . '" and qty!=0  and  is_saved_for_later = "' . $is_saved_for_later . '" and p.status=1 AND pv.status=1) as total_items,(select count(c.id) from cart c join product_variants pv on c.product_variant_id=pv.id join products p on p.id=pv.product_id left join partner_data sd on sd.user_id=p.partner_id where c.user_id="' . $user_id . '" and qty!=0 and  is_saved_for_later = "' . $is_saved_for_later . '" and p.status=1 AND pv.status=1) as cart_count,`c`.qty,p.is_prices_inclusive_tax,p.cod_allowed,p.minimum_order_quantity,p.slug,p.total_allowed_quantity, p.name, p.image,p.short_description,`c`.user_id,pv.*,tax.percentage as tax_percentage,tax.title as tax_title');
 
     if ($product_variant_id == true) {
         $t->db->where(['c.product_variant_id' => $product_variant_id, 'c.user_id' => $user_id, 'c.qty !=' => '0']);
@@ -1958,13 +1958,13 @@ function get_cart_total($user_id, $product_variant_id = false, $is_saved_for_lat
 
     $t->db->join('product_variants pv', 'pv.id=c.product_variant_id');
     $t->db->join('products p ', 'pv.product_id=p.id');
-    $t->db->join('partner_data sd ', 'sd.user_id=p.partner_id');
+    $t->db->join('partner_data sd ', 'sd.user_id=p.partner_id', 'left');
     $t->db->join('`taxes` tax', 'tax.id = p.tax', 'LEFT');
     $t->db->join('categories ctg', 'p.category_id = ctg.id', 'left');
-    $t->db->where(['p.status' => '1', 'pv.status' => 1, 'sd.status' => 1]);
+    $t->db->where(['p.status' => '1', 'pv.status' => 1]);
     $t->db->group_by('c.id')->order_by('c.id', "DESC");
     $data = $t->db->get('cart c')->result_array();
-    echo $t->db->last_query(); return false;
+    // echo $t->db->last_query(); return false;
     $total = $variant_id =  $quantity = $percentage = $amount = array();
     $cart_add_on_total = 0;
 
@@ -4182,8 +4182,9 @@ function is_single_seller($product_variant_id, $user_id)
         $new_data = $t->db->select('p.partner_id')
             ->join('products p ', 'pv.product_id=p.id')
             ->where_in('pv.id', $pv_id)->get('product_variants pv')->result_array();
+            // print_r($new_data);
         $new_partner_id = $new_data[0]["partner_id"];
-        if (!empty($partner_id) && !empty($new_partner_id)) {
+        // if (!empty($partner_id) && !empty($new_partner_id)) {
             if (in_array($new_partner_id, $partner_id)) {
                 // clear to add to cart
                 return true;
@@ -4191,9 +4192,9 @@ function is_single_seller($product_variant_id, $user_id)
                 // another restro id verient, give single restro error
                 return false;
             }
-        } else {
-            return false;
-        }
+        // } else {
+        //     return false;
+        // }
     } else {
         return false;
     }

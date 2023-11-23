@@ -6954,7 +6954,7 @@ $('.add-to-cart').on('click', function (e) {
     var btn = $(this)
     var btn_html = $(this).html()
     // var qty = $(this).parent().siblings('.item-quantity').find('.itemQty').val()
-    
+
     $.ajax({
         url: base_url + 'app/v1/api/manage_cart',
         type: 'POST',
@@ -6973,7 +6973,12 @@ $('.add-to-cart').on('click', function (e) {
             btn.html(btn_html).attr('disabled', false)
             if (result.error == false) {
                 iziToast.success({
-                    message: result.message
+                    message: result.message,
+                    onOpening: function () {
+                        setTimeout(function () {
+                            window.location.reload(); // Reload the page after 3 seconds
+                        }, 3000); // 3 seconds delay
+                    }
                 });
             } else {
                 iziToast.error({
@@ -6984,6 +6989,264 @@ $('.add-to-cart').on('click', function (e) {
     })
 })
 
+$(document).on(
+    'change',
+    '.product-quantity input,.product-sm-quantity input,.itemQty',
+    function (e) {
+
+        e.preventDefault()
+        var id = $(this).data('id')
+        var price = $(this).data('price')
+        var qty = $(this).val()
+        var temp = $(this)
+        let step
+        if ($(this).attr('step')) {
+            step = $(this).attr('step')
+        } else {
+            step = $(this).data('step')
+        }
+        var min = $(this).attr('min')
+        if (qty <= 0) {
+            iziToast.error({
+                message: `Oops! Please set minimum ${min} quantity for product`
+            });
+            return
+        }
+        if (qty % step == 0) {
+            // if (is_loggedin == 1) {
+            $.ajax({
+                url: base_url + 'app/v1/api/manage_cart',
+                type: 'POST',
+                data: {
+                    product_variant_id: id,
+                    qty: qty,
+                    [csrfName]: csrfHash
+                },
+                dataType: 'json',
+                success: function (result) {
+                    csrfName = result.csrfName
+                    csrfHash = result.csrfHash
+                    if (result.error == false) {
+                        updateQuantity(temp, price)
+                    } else {
+                        iziToast.error({
+                            message: result.message
+                        });
+                    }
+                }
+            })
+            // } else {
+            //     updateQuantity(temp, price)
+            // }
+        } else {
+            iziToast.error({
+                message: `Oops! you can only set quantity in step size of ${step}`
+            });
+        }
+    }
+)
+
+/* Recalculate cart */
+function recalculateCart() {
+    var subtotal = 0
+
+    /* Sum up row totals */
+    $('.product').each(function () {
+        subtotal += parseFloat($(this).children('.product-line-price').text())
+    })
+
+    /* Calculate totals */
+    // var tax = subtotal * taxRate
+    // var shipping = subtotal > 0 ? shippingRate : 0
+    // var total = subtotal + tax + shipping
+    var total = subtotal
+
+    /* Update totals display */
+    $('.totals-value').fadeOut(300, function () {
+        $('#cart-subtotal').html(subtotal.toFixed(2))
+        // $('#cart-tax').html(tax.toFixed(2))
+        // $('#cart-shipping').html(shipping.toFixed(2))
+        $('#cart-total').html(total.toFixed(2))
+        if (total == 0) {
+            $('.checkout').fadeOut(300)
+        } else {
+            $('.checkout').fadeIn(300)
+        }
+        $('.totals-value').fadeIn(300)
+    })
+}
+
+function mycartTotal() {
+    var cartTotal = 0
+    $('#cart_item_table > tbody > tr > .total-price  > .product-line-price').each(
+        function (i) {
+            cartTotal =
+                parseFloat(cartTotal) +
+                parseFloat(
+                    $(this)
+                        .text()
+                        .replace(/[^\d\.]/g, '')
+                )
+        }
+    )
+    $('#final_total').text(cartTotal.toFixed(2))
+}
+
+/* Update quantity */
+function updateQuantity(quantityInput, price) {
+    /* Calculate line price */
+    if (quantityInput.data('page') == 'cart') {
+        var productRow = $(quantityInput)
+            .parent()
+            .parent()
+            .parent()
+            .siblings('.total-price')
+    } else {
+        var productRow = $(quantityInput).parent().parent()
+    }
+    var quantity = $(quantityInput).val()
+    var linePrice = price * quantity
+    /* Update line price display and recalc cart totals */
+    productRow.children('.product-line-price').each(function () {
+        $(this).fadeOut(300, function () {
+            $(this).text($('#currency_symbol').val() + linePrice.toFixed(2))
+            recalculateCart()
+            mycartTotal()
+            $(this).fadeIn(300)
+        })
+    })
+}
+
+// $(document).on('change', 'input.in-num', function (e) {
+//     e.preventDefault()
+//     var $input = $(this)
+//     if ($input.val() == null || typeof $input.val() == 'string') {
+//         if (!$.isNumeric($input.val())) {
+//             $input.val(1)
+//         } else {
+//             if ($input.val() == '0') {
+//                 $input.val(1)
+//             }
+//         }
+//     }
+// })
+// $(document).on('focusout', '.in-num', function (e) { alert('test')
+//     e.preventDefault()
+//     var value = $(this).val()
+//     var min = $(this).data('min')
+//     var step = $(this).data('step')
+//     var max = $(this).data('max')
+//     if (value < min) {
+//         $(this).val(min)
+//         iziToast.error({
+//             message: 'Minimum allowed quantity is ' + min
+//         });
+
+//     } else if (value > max) {
+//         $(this).val(max)
+//         iziToast.error({
+//             message: 'Maximum allowed quantity is ' + max
+//         });
+//     }
+//     // else if (value % step != 0) {
+//     //     $(this).val(min);
+//     //     Toast.fire({
+//     //         icon: 'error',
+//     //         title: 'Invalid quantity'
+//     //     });
+//     // }
+// })
+// $(document).on('click', '.num-block .num-in', function (e) {
+//     e.preventDefault()
+//     var $input = $(this).parents('.num-block').find('input.in-num')
+//     if ($input.val() == null) {
+//         $input.val(1)
+//     }
+//     if ($(this).hasClass('minus')) {
+//         var step = $(this).data('step')
+//         var count = parseFloat($input.val()) - step
+//         var min = $(this).data('min')
+//         if (count >= min) {
+//             $input.val(count)
+//         } else {
+//             $input.val(min)
+//             iziToast.error({
+//                 message: 'Minimum allowed quantity is ' + min
+//             });
+//         }
+//     } else {
+//         var step = $(this).data('step')
+//         var max = $(this).data('max')
+//         var count = parseFloat($input.val()) + step
+//         if (max != 0) {
+//             if (count <= max) {
+//                 $input.val(count)
+//                 if (count > 1) {
+//                     $(this).parents('.num-block').find('.minus').removeClass('dis')
+//                 }
+//             } else {
+//                 $input.val(max)
+//                 iziToast.error({
+//                     message: 'Maximum allowed quantity is ' + max
+//                 });
+//             }
+//         } else {
+//             $input.val(count)
+//         }
+//     }
+//     $input.change()
+//     return false
+// })
+
+$('.place_order').on('click', function (e) {
+    e.preventDefault()
+    var user_id = $('#user_id').val()
+    var mobile = $('#mobile').val()
+    var product_variant_id = $('#product_variant_id').val()
+    var quantity = $('#quantity').val()
+    var final_total = $('#final_total').text()
+    var btn = $(this)
+    var btn_html = $(this).html()
+    // var qty = $(this).parent().siblings('.item-quantity').find('.itemQty').val()
+
+    $.ajax({
+        url: base_url + 'app/v1/api/place_order',
+        type: 'POST',
+        data: {
+            user_id: user_id,
+            mobile: mobile,
+            product_variant_id: product_variant_id,
+            quantity: quantity,
+            final_total: final_total,
+            is_self_pick_up: 1,
+            payment_method: 'COD',
+            is_wallet_used: 0,
+            is_epoints_used: 0,
+            [csrfName]: csrfHash
+        },
+        beforeSend: function () {
+            btn.html('Please Wait').text('Please Wait').attr('disabled', true)
+        },
+        dataType: 'json',
+        success: function (result) {
+            csrfName = result.csrfName
+            csrfHash = result.csrfHash
+            btn.html(btn_html).attr('disabled', false)
+            if (result.error == false) {
+
+                setTimeout(function () {
+                    iziToast.success({
+                        message: result.message
+                    });
+                }, 600);
+            } else {
+                iziToast.error({
+                    message: result.message
+                });
+            }
+        }
+    })
+})
 
 $(document).on('change', '#deliverable_type', function () {
     var type = $(this).val();

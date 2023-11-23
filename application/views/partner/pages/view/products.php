@@ -47,17 +47,23 @@
                             if (!empty($product_details[0]['type'])) {
                                 //Case 1 : Simple Product(simple product)
                                 if ($product_details[0]['type'] == 'simple_product') {
+
                             ?>
+
                                     <h2 class="mb-0">
                                         <?= ($product_variants[0]['special_price'] != null && $product_variants[0]['special_price'] > 0) ? $currency . $product_variants[0]['special_price'] : $currency . $product_variants[0]['price'] ?>
                                     </h2>
 
-                                <?php
+                                    <?php
+
+                                    if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') { ?><td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm mt-3" data-id="<?= $product_details[0]['variants'][0]['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td>
+
+                                    <?php }
                                 }
                                 //Case 2 & 3 : Product level(variable product) ||  Variant level(variable product)
                                 if ($product_details[0]['type'] == 'variable_product') {
                                     $price = "";
-                                ?>
+                                    ?>
                                     <h3 class="">Variants</h3>
                                     <table class="table table-sm">
                                         <thead class="thead-light">
