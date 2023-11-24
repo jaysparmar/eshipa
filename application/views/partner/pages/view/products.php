@@ -53,88 +53,141 @@
                                     <h2 class="mb-0">
                                         <?= ($product_variants[0]['special_price'] != null && $product_variants[0]['special_price'] > 0) ? $currency . $product_variants[0]['special_price'] : $currency . $product_variants[0]['price'] ?>
                                     </h2>
+                                    <td>
+                                        <?php
+                                        $res = fetch_details('product_variant_id=' . $product_details[0]['variants'][0]['id'] . ' and user_id=' . $this->session->userdata('user_id'), 'cart', 'id,qty');
+                                        $is_added = isset($res[0]['id']) && !empty($res[0]['id']) ? 1 : 0;
+                                        if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                            if ($is_added == 1) {
 
+                                        ?>
+
+                                                <div class="input-group plus-minus-input mt-3 num-block">
+                                                    <div class="num-in d-flex align-items-center">
+                                                        <div class="input-group-button">
+                                                            <button type="button" class="btn btn-danger btn-xs mx-1 minus-btn minus dis" data-quantity="minus" data-step="<?= (isset($product_details[0]['quantity_step_size']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>" data-min="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['minimum_order_quantity'])) ? $product_details[0]['minimum_order_quantity'] : 1 ?>">
+                                                                <i class="fa fa-minus"></i>
+                                                            </button>
+                                                        </div>
+                                                        <input class="input-group-field input-field-cart-modal in-num itemQty form-control hide-arrow" type="number" name="qty" value="<?= isset($res[0]['qty']) && !empty($res[0]['qty']) ? $res[0]['qty'] : '' ?>" data-id="<?= $product_details[0]['variants'][0]['id']; ?>" data-step="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>">
+
+                                                        <div class="input-group-button">
+                                                            <button type="button" class="btn btn-primary btn-xs mx-1 plus-btn plus" data-max="<?= (isset($product_details[0]['total_allowed_quantity']) && !empty($product_details[0]['total_allowed_quantity'])) ? $product_details[0]['total_allowed_quantity'] : '0' ?>" data-step="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>">
+                                                                <i class="fa fa-plus"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                    </td><?php } else {
+
+                                            ?>
+
+                                    <td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm mt-3" data-id="<?= $product_details[0]['variants'][0]['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td>
+
+                            <?php }
+                                        }
+                                    }
+                                    //Case 2 & 3 : Product level(variable product) ||  Variant level(variable product)
+                                    if ($product_details[0]['type'] == 'variable_product') {
+                                        $price = "";
+                            ?>
+                            <h3 class="">Variants</h3>
+                            <table class="table table-sm">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Row Id</th>
+                                        <th>Variants</th>
+                                        <th>Price</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     <?php
 
-                                    if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') { ?><td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm mt-3" data-id="<?= $product_details[0]['variants'][0]['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td>
-
-                                    <?php }
-                                }
-                                //Case 2 & 3 : Product level(variable product) ||  Variant level(variable product)
-                                if ($product_details[0]['type'] == 'variable_product') {
-                                    $price = "";
-                                    ?>
-                                    <h3 class="">Variants</h3>
-                                    <table class="table table-sm">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Row Id</th>
-                                                <th>Variants</th>
-                                                <th>Price</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-
-                                            $i = 1;
-                                            $flag = 0;
-                                            //   foreach ($product_details[0]['variants'] as $row) {
-                                            foreach ($product_variants as $row) {
-                                                if ($row['special_price'] != null && $row['special_price'] > 0) {
-                                                    $price = $row['special_price'];
-                                                    $flag = 1;
-                                                    $strike_off_price = $row['price'];
-                                                } else {
-                                                    $price = $row['price'];
-                                                    //   $strike_off_price = $row['price'];
-                                                }
-                                            ?>
-                                                <tr class='<?= ($row['status'] == 7) ? "table-danger" : (($row['status'] == 0) ? "table-warning" : ""); ?>'>
-                                                    <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
-                                                                                                                                                                                    echo '';
-                                                                                                                                                                                } else { ?><?= ($row['status'] == 7) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Restore variant'>Restore</a>" : (($row['status'] == 0) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Activate variant'>Activate</a>" : "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/0/' . $product_details[0]['id']) . "' title='Deactivate variant'>Deactivate</a> | <a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/7/' . $product_details[0]['id']) . "' title='Move variant to Trash'>Trash</a>") ?><?php } ?> </td>
-                                                    <td><?= str_replace(',', ' | ', $row['variant_values']) ?></td>
-                                                    <td><?= (($flag == 1 && isset($strike_off_price) && !empty($strike_off_price)) ? $currency . $price . ' <sup class="text-danger"><s>' . $currency . $strike_off_price . '</s></sup>' : $currency . $price)  ?></td>
-                                                    <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') { ?><td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm" data-id="<?= $row['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td><?php } ?>
-                                                </tr>
-                                            <?php
-                                                $i++;
-                                                $flag = 0;
-                                            } ?>
-                                        </tbody>
-                                    </table>
-                                <?php
-                                }
-                            }
-                            if (!empty($product_details[0]['attributes'])) {
-                                ?>
-                                <h3>Attributes</h3>
-                                <table class="table table-sm">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Row</th>
-                                            <th>Attributes</th>
-                                            <th>Values</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
                                         $i = 1;
-                                        foreach ($product_details[0]['attributes'] as $row) {
-                                        ?>
-                                            <tr>
-                                                <td><?= $i ?></td>
-                                                <td><?= $row['attr_name'] ?></td>
-                                                <td><?= str_replace(',', ' | ', $row['value']) ?></td>
-                                            </tr>
-                                        <?php
+                                        $flag = 0;
+                                        //   foreach ($product_details[0]['variants'] as $row) {
+                                        foreach ($product_variants as $row) {
+                                            if ($row['special_price'] != null && $row['special_price'] > 0) {
+                                                $price = $row['special_price'];
+                                                $flag = 1;
+                                                $strike_off_price = $row['price'];
+                                            } else {
+                                                $price = $row['price'];
+                                                //   $strike_off_price = $row['price'];
+                                            }
+                                    ?>
+                                        <tr class='<?= ($row['status'] == 7) ? "table-danger" : (($row['status'] == 0) ? "table-warning" : ""); ?>'>
+                                            <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                                                                                                                                                            echo '';
+                                                                                                                                                                        } else { ?><?= ($row['status'] == 7) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Restore variant'>Restore</a>" : (($row['status'] == 0) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Activate variant'>Activate</a>" : "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/0/' . $product_details[0]['id']) . "' title='Deactivate variant'>Deactivate</a> | <a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/7/' . $product_details[0]['id']) . "' title='Move variant to Trash'>Trash</a>") ?><?php } ?> </td>
+                                            <td><?= str_replace(',', ' | ', $row['variant_values']) ?></td>
+                                            <td><?= (($flag == 1 && isset($strike_off_price) && !empty($strike_off_price)) ? $currency . $price . ' <sup class="text-danger"><s>' . $currency . $strike_off_price . '</s></sup>' : $currency . $price)  ?></td>
+                                            <?php
+                                            $res = fetch_details('product_variant_id=' . $row['id'] . ' and user_id=' . $this->session->userdata('user_id'), 'cart', 'id,qty');
+                                            $is_added = isset($res[0]['id']) && !empty($res[0]['id']) ? 1 : 0;
+                                            if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                                if ($is_added == 1) {
+
+                                            ?><td>
+                                                        <div class="input-group plus-minus-input mb-3 num-block">
+                                                            <div class="num-in d-flex align-items-center">
+                                                                <div class="input-group-button">
+                                                                    <button type="button" class="btn btn-danger btn-xs mx-1 minus-btn minus dis" data-quantity="minus" data-step="<?= (isset($product_details[0]['quantity_step_size']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>" data-min="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['minimum_order_quantity'])) ? $product_details[0]['minimum_order_quantity'] : 1 ?>">
+                                                                        <i class="fa fa-minus"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <input class="input-group-field input-field-cart-modal in-num itemQty form-control hide-arrow" type="number" name="qty" value="<?= isset($res[0]['qty']) && !empty($res[0]['qty']) ? $res[0]['qty'] : '' ?>" data-id="<?= $row['id']; ?>" data-step="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>">
+
+                                                                <div class="input-group-button">
+                                                                    <button type="button" class="btn btn-primary btn-xs mx-1 plus-btn plus" data-max="<?= (isset($product_details[0]['total_allowed_quantity']) && !empty($product_details[0]['total_allowed_quantity'])) ? $product_details[0]['total_allowed_quantity'] : '0' ?>" data-step="<?= (isset($product_details[0]['minimum_order_quantity']) && !empty($product_details[0]['quantity_step_size'])) ? $product_details[0]['quantity_step_size'] : 1 ?>">
+                                                                        <i class="fa fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td><?php } else { ?>
+                                                    <td><a href="javascript:void(0)" class="btn btn-info add-to-cart btn-sm mt-3" data-id="<?= $row['id'] ?>" title="Add to cart"><span class="add-in-cart-icon"><i class="fa fa-cart-plus"></i></span></a></td>
+                                            <?php }
+                                                    } ?>
+                                        </tr>
+                                    <?php
                                             $i++;
+                                            $flag = 0;
                                         } ?>
-                                    </tbody>
-                                </table>
-                            <?php
-                            } ?>
+                                </tbody>
+                            </table>
+                        <?php
+                                    }
+                                }
+                                if (!empty($product_details[0]['attributes'])) {
+                        ?>
+                        <h3>Attributes</h3>
+                        <table class="table table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Row</th>
+                                    <th>Attributes</th>
+                                    <th>Values</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                    $i = 1;
+                                    foreach ($product_details[0]['attributes'] as $row) {
+                                ?>
+                                    <tr>
+                                        <td><?= $i ?></td>
+                                        <td><?= $row['attr_name'] ?></td>
+                                        <td><?= str_replace(',', ' | ', $row['value']) ?></td>
+                                    </tr>
+                                <?php
+                                        $i++;
+                                    } ?>
+                            </tbody>
+                        </table>
+                    <?php
+                                } ?>
                         </div>
 
 

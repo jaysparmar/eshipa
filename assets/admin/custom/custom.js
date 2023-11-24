@@ -1303,6 +1303,7 @@ function orders_query_params(p) {
         start_date: $("#start_date").val(),
         end_date: $("#end_date").val(),
         order_status: $("#order_status").val(),
+        order_type: $("#order_type").val(),
         user_id: $("#order_user_id").val(),
         partner_id: $("#order_partner_id").val(),
         payment_method: $("#payment_method").val(),
@@ -7000,15 +7001,33 @@ $(document).on(
         var qty = $(this).val()
         var temp = $(this)
         let step
+        var $input = $(this).parents('.num-block').find('input.in-num')
         if ($(this).attr('step')) {
             step = $(this).attr('step')
         } else {
             step = $(this).data('step')
         }
+        var cart_page = $(this).data('page') && $(this).data('page') == 'cart' ? 1 : 0;
         var min = $(this).attr('min')
+        var max = $(this).attr('max')
         if (qty <= 0) {
             iziToast.error({
                 message: `Oops! Please set minimum ${min} quantity for product`
+            });
+            $(this).val(min).trigger('change')
+            return
+        }
+        if (qty < min) {
+            $(this).val(min).trigger('change')
+            iziToast.error({
+                message: 'Minimum allowed quantity is ' + min
+            });
+            return
+
+        } else if (max != 0 && qty > max) {
+            $(this).val(max).trigger('change')
+            iziToast.error({
+                message: 'Maximum allowed quantity is ' + max
             });
             return
         }
@@ -7027,7 +7046,13 @@ $(document).on(
                     csrfName = result.csrfName
                     csrfHash = result.csrfHash
                     if (result.error == false) {
-                        updateQuantity(temp, price)
+                        if (cart_page == 1) {
+                            updateQuantity(temp, price)
+                        } else {
+                            iziToast.success({
+                                message: result.message
+                            });
+                        }
                     } else {
                         iziToast.error({
                             message: result.message
@@ -7117,6 +7142,7 @@ function updateQuantity(quantityInput, price) {
     })
 }
 
+
 // $(document).on('change', 'input.in-num', function (e) {
 //     e.preventDefault()
 //     var $input = $(this)
@@ -7130,32 +7156,104 @@ function updateQuantity(quantityInput, price) {
 //         }
 //     }
 // })
-// $(document).on('focusout', '.in-num', function (e) { alert('test')
-//     e.preventDefault()
-//     var value = $(this).val()
-//     var min = $(this).data('min')
-//     var step = $(this).data('step')
-//     var max = $(this).data('max')
-//     if (value < min) {
-//         $(this).val(min)
-//         iziToast.error({
-//             message: 'Minimum allowed quantity is ' + min
-//         });
 
-//     } else if (value > max) {
-//         $(this).val(max)
-//         iziToast.error({
-//             message: 'Maximum allowed quantity is ' + max
-//         });
-//     }
-//     // else if (value % step != 0) {
-//     //     $(this).val(min);
-//     //     Toast.fire({
-//     //         icon: 'error',
-//     //         title: 'Invalid quantity'
-//     //     });
-//     // }
-// })
+$(document).on('click', '.plus', function (e) {
+    e.preventDefault()
+    var step = $(this).data('step')
+    var max = $(this).data('max')
+    var $input = $(this).parents('.num-block').find('input.in-num')
+    var count = parseFloat($input.val()) + step
+    if (max != 0) {
+        if (count <= max) {
+            $input.val(count).trigger('change')
+            if (count > 1) {
+                $(this).parents('.num-block').find('.minus').removeClass('dis')
+            }
+        } else {
+            $input.val(max)
+            iziToast.error({
+                message: 'Maximum allowed quantity is ' + max
+            });
+        }
+    } else {
+        $input.val(count).trigger('change')
+    }
+})
+
+$(document).on('click', '.minus', function (e) {
+    e.preventDefault()
+    var step = $(this).data('step')
+    var min = $(this).data('min')
+    var $input = $(this).parents('.num-block').find('input.in-num')
+    var count = parseFloat($input.val()) - step
+    if (count >= min) {
+        $input.val(count).trigger('change')
+    } else {
+        $input.val(min)
+        iziToast.error({
+            message: 'Minimum allowed quantity is ' + min
+        });
+    }
+})
+
+$(document).on('click', '.remove-from-cart', function (e) {
+    e.preventDefault()
+    var product_variant_id = $(this).data('id')
+    var btn = $(this)
+    var btn_html = $(this).html()
+
+    Swal.fire({
+        title: "Are You Sure!",
+        text: "You won't be able to revert this!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, remove it!",
+        showLoaderOnConfirm: true,
+        preConfirm: function () {
+            return new Promise((resolve, reject) => {
+
+
+                $.ajax({
+                    url: base_url + 'app/v1/api/manage_cart',
+                    type: 'POST',
+                    data: {
+                        product_variant_id: product_variant_id,
+                        qty: 0,
+                        [csrfName]: csrfHash
+                    },
+                    beforeSend: function () {
+                        btn.html('Please Wait').text('Please Wait').attr('disabled', true)
+                    },
+                    dataType: 'json',
+                    success: function (result) {
+                        csrfName = result.csrfName
+                        csrfHash = result.csrfHash
+                        btn.html(btn_html).attr('disabled', false)
+                        if (result.error == false) {
+                            iziToast.success({
+                                message: result.message,
+                                onOpening: function () {
+                                    setTimeout(function () {
+                                        window.location.reload(); // Reload the page after 3 seconds
+                                    }, 3000); // 3 seconds delay
+                                }
+                            });
+                        } else {
+                            iziToast.error({
+                                message: result.message
+                            });
+                        }
+                    }
+                })
+
+            })
+        },
+        allowOutsideClick: false
+    })
+
+})
 // $(document).on('click', '.num-block .num-in', function (e) {
 //     e.preventDefault()
 //     var $input = $(this).parents('.num-block').find('input.in-num')
@@ -7178,6 +7276,7 @@ function updateQuantity(quantityInput, price) {
 //         var step = $(this).data('step')
 //         var max = $(this).data('max')
 //         var count = parseFloat($input.val()) + step
+//         alert(max)
 //         if (max != 0) {
 //             if (count <= max) {
 //                 $input.val(count)
@@ -7234,11 +7333,14 @@ $('.place_order').on('click', function (e) {
             btn.html(btn_html).attr('disabled', false)
             if (result.error == false) {
 
-                setTimeout(function () {
-                    iziToast.success({
-                        message: result.message
-                    });
-                }, 600);
+                iziToast.success({
+                    message: result.message,
+                    onOpening: function () {
+                        setTimeout(function () {
+                            window.location.reload(); // Reload the page after 3 seconds
+                        }, 3000); // 3 seconds delay
+                    }
+                });
             } else {
                 iziToast.error({
                     message: result.message

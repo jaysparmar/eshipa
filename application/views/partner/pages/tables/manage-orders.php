@@ -22,15 +22,16 @@
                 <div class="col-md-12 main-content">
                     <div class="card content-area p-4">
                         <div class="card-innr">
-                            <div class="gaps-1-5x row d-flex adjust-items-center">
-                                <div class="">
-                                    <label for="settle_commission" class="col col-form-label">Settle Payments </label>
-                                    <div class="col-md-12">
-                                        <a href="#" class="btn btn-info update-admin-commission" title="Partner Self Pickup orders will be settle here by clicking here. Admin will get his commission and remaining amount will be transfer to partner's wallet!">Settle Self Pickup Order Payments</a>
+                            <div class="gaps-1-5x row d-flex align-items-center">
+                                <div class="col-md-3 mb-3">
+                                    <label for="settle_commission" class="col-form-label">Settle Payments</label>
+                                    <div>
+                                        <a href="#" class="btn btn-info update-admin-commission" title="Partner Self Pickup orders will be settled here by clicking here. Admin will get their commission and the remaining amount will be transferred to the partner's wallet!">Settle Self Pickup Order Payments</a>
                                     </div>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label>Date and time range:</label>
+
+                                <div class="col-md-3 mb-3">
+                                    <label for="datepicker">Date range:</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="far fa-clock"></i></span>
@@ -39,29 +40,36 @@
                                         <input type="hidden" id="start_date" class="form-control float-right">
                                         <input type="hidden" id="end_date" class="form-control float-right">
                                     </div>
-                                    <!-- /.input group -->
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label>Filter By status</label>
-                                            <select id="order_status" name="order_status" placeholder="Select Status" required="" class="form-control">
-                                                <option value="">All Orders</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="confirmed">Confirmed</option>
-                                                <option value="preparing">Preparing</option>
-                                                <option value="out_for_delivery">Out For Delivery</option>
-                                                <option value="delivered">Delivered</option>
-                                                <option value="cancelled">Cancelled</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2 mt-4">
-                                            <button type="button" class="btn btn-info mt-2" onclick="status_date_wise_search()">Search</button>
-                                        </div>
-                                    </div>
                                 </div>
 
+                                <div class="col-md-2 mb-3">
+                                    <label for="order_status">Filter By status</label>
+                                    <select id="order_status" name="order_status" placeholder="Select Status" required="" class="form-control">
+                                        <option value="">All Orders</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="preparing">Preparing</option>
+                                        <option value="out_for_delivery">Out For Delivery</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <!-- New Filter -->
+                                <div class="col-md-3 mb-3">
+                                    <label for="">Please select</label>
+                                    <select id="order_type" name="order_type" class="form-control">
+                                        <option value="">To me</option>
+                                        <option value="1">From me</option>
+                                    </select>
+                                </div>
+
+                                <!-- Filter Button -->
+                                <div class="col-md-1 pt-3">
+                                    <button type="button" class="btn btn-info mt-2" onclick="status_date_wise_search()">Search</button>
+                                </div>
                             </div>
+
                             <table class='table-striped' data-toggle="table" data-url="<?= base_url('partner/orders/view_orders?partner_id=' . $user_id) ?>" data-click-to-select="true" data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-show-columns="true" data-show-refresh="true" data-trim-on-search="false" data-sort-name="id" data-sort-order="desc" data-mobile-responsive="true" data-toolbar="" data-show-export="true" data-maintain-selected="true" data-export-types='["txt","excel","csv"]' data-export-options='{
                         "fileName": "order-list",
                         "ignoreColumn": ["state"] 

@@ -508,6 +508,8 @@ class Order_model extends CI_Model
             $limit = $_GET['limit'];
         }
 
+        $from_me = isset($_GET['order_type']) && $_GET['order_type'] == 1 ? 1 : 0;
+
         if (isset($_GET['search']) and $_GET['search'] != '') {
             $search = $_GET['search'];
 
@@ -566,11 +568,15 @@ class Order_model extends CI_Model
         if (isset($_GET['user_id']) && $_GET['user_id'] != null) {
             $count_res->where("o.user_id", $_GET['user_id']);
         }
+
+        if ($from_me) {
+            $count_res->where("o.user_id", $this->session->userdata('user_id'));
+        }
         // Filter By payment
         if (isset($_GET['payment_method']) && !empty($_GET['payment_method'])) {
             $count_res->where('payment_method', $_GET['payment_method']);
         }
-        if (isset($_GET['partner_id']) && !empty($_GET['partner_id'])) {
+        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me==0) {
             $count_res->where("oi.partner_id", $_GET['partner_id']);
         }
 
@@ -589,6 +595,10 @@ class Order_model extends CI_Model
         if (!empty($_GET['start_date']) && !empty($_GET['end_date'])) {
             $search_res->where(" DATE(o.date_added) >= DATE('" . $_GET['start_date'] . "') ");
             $search_res->where(" DATE(o.date_added) <= DATE('" . $_GET['end_date'] . "') ");
+        }
+
+        if ($from_me) {
+            $search_res->where("o.user_id", $this->session->userdata('user_id'));
         }
 
         if (isset($is_pending)) {
@@ -616,7 +626,7 @@ class Order_model extends CI_Model
             $search_res->where("o.user_id", $_GET['user_id']);
         }
 
-        if (isset($_GET['partner_id']) && !empty($_GET['partner_id'])) {
+        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me==0) {
             $search_res->where("oi.partner_id", $_GET['partner_id']);
         }
         // Filter By payment

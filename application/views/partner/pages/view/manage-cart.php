@@ -32,7 +32,7 @@
                                         <th scope="col">PRICE</th>
                                         <th scope="col">QUANTITY</th>
                                         <th scope="col">SUBTOTAL</th>
-                                        <!-- <th scope="col">REMOVE</th> -->
+                                        <th scope="col">REMOVE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -71,9 +71,10 @@
                                                                             <i class="fa fa-minus"></i>
                                                                         </button>
                                                                     </div>
-                                                                    <input class="input-group-field input-field-cart-modal in-num itemQty form-control" type="number" name="qty" data-page="cart" data-id="<?= $row['id']; ?>" value="<?= $row['qty'] ?>" data-price="<?= $price ?>" data-step="<?= (isset($row['minimum_order_quantity']) && !empty($row['quantity_step_size'])) ? $row['quantity_step_size'] : 1 ?>" data-min="<?= (isset($row['minimum_order_quantity']) && !empty($row['minimum_order_quantity'])) ? $row['minimum_order_quantity'] : 1 ?>" data-max="<?= (isset($row['total_allowed_quantity']) && !empty($row['total_allowed_quantity'])) ? $row['total_allowed_quantity'] : '' ?>">
+                                                                    <input class="input-group-field input-field-cart-modal in-num itemQty form-control hide-arrow" type="number" name="qty" data-page="cart" data-id="<?= $row['id']; ?>" value="<?= $row['qty'] ?>" data-price="<?= $price ?>" step="<?= (isset($row['minimum_order_quantity']) && !empty($row['quantity_step_size'])) ? $row['quantity_step_size'] : 1 ?>" min="<?= (isset($row['minimum_order_quantity']) && !empty($row['minimum_order_quantity'])) ? $row['minimum_order_quantity'] : 1 ?>" max="<?= (isset($row['total_allowed_quantity']) && !empty($row['total_allowed_quantity'])) ? $row['total_allowed_quantity'] : '' ?>">
+
                                                                     <div class="input-group-button">
-                                                                        <button type="button" class="btn btn-primary btn-xs mx-1 plus-btn plus" data-quantity="plus" data-max="<?= (isset($row['total_allowed_quantity']) && !empty($row['total_allowed_quantity'])) ? $row['total_allowed_quantity'] : '0' ?> " data-step="<?= (isset($row['minimum_order_quantity']) && !empty($row['quantity_step_size'])) ? $row['quantity_step_size'] : 1 ?>">
+                                                                        <button type="button" class="btn btn-primary btn-xs mx-1 plus-btn plus" data-quantity="plus" data-max="<?= (isset($row['total_allowed_quantity']) && !empty($row['total_allowed_quantity'])) ? $row['total_allowed_quantity'] : '0' ?>" data-step="<?= (isset($row['minimum_order_quantity']) && !empty($row['quantity_step_size'])) ? $row['quantity_step_size'] : 1 ?>">
                                                                             <i class="fa fa-plus"></i>
                                                                         </button>
                                                                     </div>
@@ -85,9 +86,13 @@
                                                     <td class="product-subtotal total-price">
                                                         <p class="product-line-price"><?= $settings['currency'] . number_format(($row['qty'] * $price), 2) ?></p>
                                                     </td>
-                                                    <!-- <td class="product-removal">
-                                                    <ion-icon name="close-outline" class="remove-product pointer" id="remove_inventory" data-id="<?= $row['id']; ?>" title="Remove From Cart"></ion-icon>
-                                                </td> -->
+                                                    <td class="product-removal">
+                                                        <div class="input-group-button">
+                                                            <button type="button" class="btn btn-danger btn-xs mx-1 remove-from-cart" data-id="<?= $row['id']; ?>">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                         <?php }
                                         }
@@ -106,7 +111,6 @@
                             </table>
 
                         </div>
-
                     </div>
                     <input type="hidden" id="user_id" value="<?= $this->session->userdata('user_id') ?>">
                     <input type="hidden" id="mobile" value="<?= fetch_details(['id' => $this->session->userdata('user_id')], "users", "mobile")[0]['mobile']; ?>">
@@ -118,16 +122,41 @@
                             <table class="table cart-total-table">
                                 <tbody>
                                     <?php
-                                    $total = !empty($cart['sub_total']) ? number_format($cart['overall_amount'], 2) : 0;
+                                    $total = !empty($cart['sub_total']) ? number_format($cart['sub_total'], 2) : 0;
                                     ?>
                                     <tr class="order-total">
-                                        <th>Total</th>
+                                        <th>Sub total</th>
                                         <td>
-                                            <p class="h4"><?= $settings['currency'] ?><span id="final_total"><?= $total ?></span></p>
+                                            <p class="h4"><?= $settings['currency'] ?><span id="total"><?= $total ?></span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="order-total">
+                                        <th>Tax amount</th>
+                                        <td>
+                                            <p class="h4"><?= $settings['currency'] ?><span id="tax_amount"><?= $cart['tax_amount'] ?></span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="order-total">
+                                        <th>Final total</th>
+                                        <td>
+                                            <p class="h4"><?= $settings['currency'] ?><span id="final_total"><?= number_format($cart['sub_total'] + $cart['tax_amount'], 2) ?></span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="order-total">
+                                        <th>Payment method</th>
+                                        <td>
+                                            <p class="h5">COD</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="order-total">
+                                        <th>Delivery type</th>
+                                        <td>
+                                            <p class="h5">Self pickup</span></p>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+
                             <a href="javascript:void(0)" class="text-decoration-none">
                                 <button class="btn btn-primary w-100 mt-3 place_order" <?= count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) != 0 ? '' : 'disabled' ?>>Place order</button>
                             </a>
