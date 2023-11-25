@@ -1156,6 +1156,7 @@ function home_query_params(p) {
         start_date: $("#start_date").val(),
         end_date: $("#end_date").val(),
         order_status: $("#order_status").val(),
+        order_type: $("#order_type").val(),
         limit: p.limit,
         sort: p.sort,
         order: p.order,
@@ -6420,9 +6421,6 @@ $("#sign_up_restro_form").on("submit", function (e) {
                     iziToast.error({
                         message: "<span>" + result.message + "</span> "
                     });
-                    setTimeout(function () {
-                        window.location.replace(base_url + "partner/login");
-                    }, 3000);
                 }
             }
         });
@@ -7048,6 +7046,8 @@ $(document).on(
                     if (result.error == false) {
                         if (cart_page == 1) {
                             updateQuantity(temp, price)
+                            $('#tax_amount').text(result.data.tax_amount)
+                            $('#final_total').text(result.data.overall_amount)
                         } else {
                             iziToast.success({
                                 message: result.message
@@ -7114,7 +7114,8 @@ function mycartTotal() {
                 )
         }
     )
-    $('#final_total').text(cartTotal.toFixed(2))
+    // $('#final_total').text(cartTotal.toFixed(2))
+    $('#total').text(cartTotal.toFixed(2))
 }
 
 /* Update quantity */

@@ -70,11 +70,11 @@ class Auth extends CI_Controller
             $this->form_validation->set_rules('user_mobile', 'Mobile', 'trim|required|xss_clean|min_length[5]');
         }
 
-        $this->form_validation->set_rules('profile', 'Partner Profile', 'trim|xss_clean');
-        $this->form_validation->set_rules('national_identity_card', 'National Identity Card', 'trim|xss_clean');
+        $this->form_validation->set_rules('profile', 'Profile picture', 'trim|xss_clean');
+        $this->form_validation->set_rules('id_passport_number', 'ID/Passport Number', 'trim|required|xss_clean');
         $this->form_validation->set_rules('address_proof', 'Address Proof', 'trim|xss_clean');
-        $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean');
-        $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|required|xss_clean|numeric');
+        $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean|required');
+        $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|xss_clean|numeric');
 
         // validate restro details
         $this->form_validation->set_rules('partner_name', 'Partner Name', 'trim|required|xss_clean');
@@ -94,9 +94,8 @@ class Auth extends CI_Controller
         $this->form_validation->set_rules('pan_number', 'Pan Number', 'trim|xss_clean');
 
         // licence details
-        $this->form_validation->set_rules('licence_name', 'Licence Name', 'trim|xss_clean');
-        $this->form_validation->set_rules('licence_code', 'Licence Code', 'trim|xss_clean');
-        $this->form_validation->set_rules('licence_proof', 'Licence Proof', 'trim|xss_clean');
+        $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|required|xss_clean');
 
 
         if (!$this->form_validation->run()) {
@@ -162,14 +161,14 @@ class Auth extends CI_Controller
                 }
             }
 
-            if ($licence_error != NULL) {
-                $this->response['error'] = true;
-                $this->response['csrfName'] = $this->security->get_csrf_token_name();
-                $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                $this->response['message'] =  $licence_error;
-                print_r(json_encode($this->response));
-                return;
-            }
+            // if ($licence_error != NULL) {
+            //     $this->response['error'] = true;
+            //     $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            //     $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            //     $this->response['message'] =  $licence_error;
+            //     print_r(json_encode($this->response));
+            //     return;
+            // }
 
             // process images
 
@@ -290,14 +289,14 @@ class Auth extends CI_Controller
                 }
             }
 
-            if ($id_card_error != NULL) {
-                $this->response['error'] = true;
-                $this->response['csrfName'] = $this->security->get_csrf_token_name();
-                $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                $this->response['message'] =  $id_card_error;
-                print_r(json_encode($this->response));
-                return;
-            }
+            // if ($id_card_error != NULL) {
+            //     $this->response['error'] = true;
+            //     $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            //     $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            //     $this->response['message'] =  $id_card_error;
+            //     print_r(json_encode($this->response));
+            //     return;
+            // }
 
             //process address_proof
             $temp_array_proof = $proof_doc = array();
@@ -351,14 +350,14 @@ class Auth extends CI_Controller
                 }
             }
 
-            if ($proof_error != NULL) {
-                $this->response['error'] = true;
-                $this->response['csrfName'] = $this->security->get_csrf_token_name();
-                $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                $this->response['message'] =  $proof_error;
-                print_r(json_encode($this->response));
-                return;
-            }
+            // if ($proof_error != NULL) {
+            //     $this->response['error'] = true;
+            //     $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            //     $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            //     $this->response['message'] =  $proof_error;
+            //     print_r(json_encode($this->response));
+            //     return;
+            // }
             // process working hours for restro
 
             $work_time = [];
@@ -455,6 +454,7 @@ class Auth extends CI_Controller
                     $data = array(
                         'user_id' => $user_id[0]['id'],
                         'address_proof' => (!empty($proof_doc)) ? $proof_doc : null,
+                        'id_passport_number' => $this->input->post('id_passport_number', true),
                         'national_identity_card' => (!empty($id_card_doc)) ? $id_card_doc : null,
                         'licence_proof' => (!empty($licence_doc)) ? $licence_doc : [],
                         'profile' => (!empty($profile_doc)) ? $profile_doc : null,

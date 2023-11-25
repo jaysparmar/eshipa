@@ -201,7 +201,7 @@
                                         </div>
                                         <!-- /.input group -->
                                     </div>
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-3">
                                         <div>
                                             <label>Filter Orders By status</label>
                                             <select id="order_status" name="order_status" placeholder="Select Status" required="" class="form-control">
@@ -216,12 +216,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group col-md-4 d-flex align-items-center pt-4">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="">Please select</label>
+                                        <select id="order_type" name="order_type" class="form-control">
+                                            <option value="">To me</option>
+                                            <option value="1">From me</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group col-md-2 d-flex align-items-center pt-4">
                                         <button type="button" class="btn btn-outline-info btn-sm" onclick="status_date_wise_search()">Filter</button>
                                     </div>
                                 </div>
                             </div>
-                            <table class='table-striped' data-toggle="table" data-url="<?= base_url('partner/orders/view_orders?partner_id='.$user_id) ?>" data-click-to-select="true" data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-show-columns="true" data-show-refresh="true" data-trim-on-search="false" data-sort-name="id" data-sort-order="desc" data-mobile-responsive="true" data-toolbar="" data-show-export="true" data-maintain-selected="true" data-export-types='["txt","excel","csv"]' data-export-options='{
+                            <table class='table-striped' data-toggle="table" data-url="<?= base_url('partner/orders/view_orders?partner_id=' . $user_id) ?>" data-click-to-select="true" data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-show-columns="true" data-show-refresh="true" data-trim-on-search="false" data-sort-name="id" data-sort-order="desc" data-mobile-responsive="true" data-toolbar="" data-show-export="true" data-maintain-selected="true" data-export-types='["txt","excel","csv"]' data-export-options='{
                         "fileName": "order-list",
                         "ignoreColumn": ["state"] 
                         }' data-query-params="home_query_params">

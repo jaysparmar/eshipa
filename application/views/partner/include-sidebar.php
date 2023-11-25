@@ -94,7 +94,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a href="<?= base_url('partner/buy_stock/') ?>" class="nav-link">
+                    <a href="<?= base_url('partner/buy-stock/') ?>" class="nav-link">
                         <i class="nav-icon fas fa-arrow-right text-warning"></i>
                         <p>
                             Buy stock

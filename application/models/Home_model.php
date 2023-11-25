@@ -36,12 +36,22 @@ class Home_model extends CI_Model
             ->get('`users` u')->result_array();
         return $res[0]['counter'];
     }
-    public function count_partners()
+    public function count_partners($field = null, $value = null)
     {
-        $res = $this->db->select('count(u.id) as counter')->where('ug.group_id', '4')->join('users_groups ug', 'ug.user_id=u.id')
-            ->get('`users` u')->result_array();
+        $this->db->select('count(u.id) as counter')
+            ->where('ug.group_id', '4')
+            ->join('users_groups ug', 'ug.user_id=u.id')
+            ->join('partner_data pd', 'pd.user_id=u.id');
+
+        if ($field !== null && $value !== null) {
+            $this->db->where($field, $value);
+        }
+
+        $res = $this->db->get('`users` u')->result_array();
+
         return $res[0]['counter'];
     }
+
 
     public function count_products($partner_id = "")
     {
@@ -92,27 +102,27 @@ class Home_model extends CI_Model
         $count_res->where('p.stock ', '0');
         $count_res->where('p.availability ', '0');
         $count_res->or_where('product_variants.stock ', '0');
-        $count_res->where('product_variants.availability', '0');        
+        $count_res->where('product_variants.availability', '0');
         $product_count = $count_res->get('products p')->result_array();
         return $product_count[0]['total'];
     }
     public function total_earnings($type = "admin")
     {
         $select = "";
-        if($type == "admin"){
+        if ($type == "admin") {
             $select = "SUM(admin_commission_amount) as total ";
         }
-        if($type == "partner"){
+        if ($type == "partner") {
             $select = "SUM(partner_commission_amount) as total ";
         }
-        if($type == "overall"){
+        if ($type == "overall") {
             $select = "SUM(final_total) as total ";
         }
         $count_res = $this->db->select($select);
         $where = "is_credited=1";
         $count_res->where($where);
-       
+
         $product_count = $count_res->get('orders')->result_array();
         return $product_count[0]['total'];
-    }    
+    }
 }

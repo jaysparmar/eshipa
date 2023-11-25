@@ -11,7 +11,7 @@ class Partners extends CI_Controller
         $this->load->database();
         $this->load->library(['ion_auth', 'form_validation', 'upload']);
         $this->load->helper(['url', 'language', 'file']);
-        $this->load->model('Partner_model');
+        $this->load->model(['Home_model', 'Partner_model']);
         if (!has_permissions('read', 'partner')) {
             $this->session->set_flashdata('authorize_flag', PERMISSION_ERROR_MSG);
             redirect('admin/home', 'refresh');
@@ -25,6 +25,10 @@ class Partners extends CI_Controller
             $settings = get_settings('system_settings', true);
             $this->data['title'] = 'Spaza Management | ' . $settings['app_name'];
             $this->data['meta_description'] = ' Spaza Management  | ' . $settings['app_name'];
+            $this->data['approved_partners'] = $this->Home_model->count_partners('status', 1);
+            $this->data['not_approved_partners'] = $this->Home_model->count_partners('status', 2);
+            $this->data['deactive_partners'] = $this->Home_model->count_partners('status', 0);
+            $this->data['removed_partners'] = $this->Home_model->count_partners('status', 7);
             $this->load->view('admin/template', $this->data);
         } else {
             redirect('admin/login', 'refresh');
@@ -268,7 +272,7 @@ class Partners extends CI_Controller
                 $this->form_validation->set_rules('confirm_password', 'Confirm password', 'trim|required|matches[password]|xss_clean|min_length[8]');
                 // }
                 // if (!isset($_POST['edit_restro'])) {
-                $this->form_validation->set_rules('profile', 'Partner Profile', 'trim|xss_clean');
+                $this->form_validation->set_rules('profile', 'Profile picture', 'trim|xss_clean');
                 $this->form_validation->set_rules('id_passport_number', 'ID/Passport Number', 'trim|required|xss_clean');
                 $this->form_validation->set_rules('address_proof', 'Address Proof', 'trim|xss_clean');
                 $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean|required');

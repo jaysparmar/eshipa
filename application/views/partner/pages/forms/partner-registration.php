@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h4 class="text text-info">Partner Registration <span class='text-danger text-sm'>DO NOT REFRESH OR RELOAD THIS PAGE</span></h4>
+                    <h4 class="text text-info">Spaza Registration <span class='text-danger text-sm'>DO NOT REFRESH OR RELOAD THIS PAGE</span></h4>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -25,18 +25,18 @@
                     <div class="col-md-12">
                         <div class="card card-info">
                             <div class="card-body">
-                                <h4>Partner Details</h4>
+                                <h4>Spaza Details</h4>
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group ">
                                             <label for="name" class="col-sm-3 col-form-label">Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="partner_name" placeholder="Partner Name" name="partner_name">
+                                                <input type="text" class="form-control" id="partner_name" placeholder="Restro Name" name="partner_name">
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="profile" class="col-sm-4 col-form-label">Partner Profile<span class='text-danger text-sm'>*</span></label>
+                                            <label for="profile" class="col-sm-4 col-form-label">Profile Picture<span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <span class="text-danger">*Leave blank if there is no change</span>
 
@@ -57,7 +57,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group d-none">
                                             <label for="cooking_time" class="col-sm-8 col-form-label">Cooking Time <span class='text-danger text-sm'>*</span> <small>(Enter in Minutes)</small> </label>
                                             <div class="col-sm-10">
                                                 <input type="number" class="form-control" name="cooking_time" id="cooking_time" placeholder="Food Preparation Time in Minutes" min="0">
@@ -70,9 +70,9 @@
                                         <div class="row">
                                             <div class="col-md-4 map-div">
                                                 <label for="city_name">Search Reataurant Location</label>
-                                                <input id="city-input" type="text" class="form-control" placeholder="Enter Partner Name" />
+                                                <input id="city-input" type="text" class="form-control" placeholder="Enter Spaza Name" />
                                                 </br>
-                                                <span class="text text-primary">Search your partner name and you will get the location points(Latitude & Longitude) below.</span>
+                                                <span class="text text-primary">Search your spaza name and you will get the location points(Latitude & Longitude) below.</span>
                                             </div>
                                             <div class="col-md-8">
                                                 <div id="map"></div>
@@ -119,13 +119,13 @@
                                                 <?= $timing ?>
                                             </div>
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group">
                                             <label for="address" class="col-sm-3 col-form-label">Address <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <textarea type="text" class="form-control" id="address" placeholder="Enter Address" name="address"></textarea>
                                             </div>
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="address_proof" class="col-sm-3 col-form-label">Address Proof <span class='text-danger text-sm'>*</span> </label>
                                             <div class="col-sm-10">
                                                 <span class="text-danger">*Leave blank if there is no change</span>
@@ -181,10 +181,11 @@
                                             </div>
                                         <?php } ?>
                                         <div class="form-group ">
-                                            <label for="national_identity_card" class="col-sm-6 col-form-label">National Identity Card <span class='text-danger text-sm'>*</span></label>
+                                            <label for="national_identity_card" class="col-sm-12 col-form-label">ID/Passport Number <span class='text-danger text-sm'>*</span>
+                                            </label>
+
                                             <div class="col-sm-10">
-                                                <span class="text-danger">*Leave blank if there is no change</span>
-                                                <input type="file" class="form-control" name="national_identity_card" id="national_identity_card" accept="image/*" />
+                                                <input type="text" class="form-control" placeholder="ID/Passport Number" id="id_passport_number" name="id_passport_number">
                                             </div>
                                         </div>
                                         <!-- need to show commission percentage for admin so restro can get idea about commission -->
@@ -201,23 +202,22 @@
                     <div class="col-md-6">
                         <div class="card card-info">
                             <div class="card-body">
-                                <h4>Food Safety Licence</h4>
+                                <h4>Company registration</h4>
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group ">
-                                            <label for="licence_name" class="col-sm-4 col-form-label">Licence Name</span></label>
+                                            <label for="licence_name" class="col-sm-12 col-form-label">Company Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="licence_name" placeholder="Licence Name" name="licence_name" value="<?= @$fetched_data[0]['licence_name'] ?>">
+                                                <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name">
                                             </div>
                                         </div>
-                                        <div class="form-group ">
-                                            <label for="licence_code" class="col-sm-4 col-form-label">Licence Code</span></label>
-                                            <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="licence_code" placeholder="Licence Code" name="licence_code" value="<?= @$fetched_data[0]['licence_code'] ?>">
-                                            </div>
+                                        <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
+                                        </label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" id="company_registration_no" placeholder="Ex. XXXX/XXXXXX/XX" name="licence_code">
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="licence_proof" class="col-sm-3 col-form-label">Licence Proof </label>
                                             <div class="col-sm-10">
                                                 <span class="text-danger">*Leave blank if there is no change</span>
@@ -235,37 +235,37 @@
                                         <div class="form-group ">
                                             <label for="tax_name" class="col-sm-4 col-form-label">Tax Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="tax_name" placeholder="Tax Name" name="tax_name" value="<?= @$fetched_data[0]['tax_name'] ?>">
+                                                <input type="text" class="form-control" id="tax_name" placeholder="Tax Name" name="tax_name">
                                             </div>
                                         </div>
                                         <div class="form-group ">
                                             <label for="tax_number" class="col-sm-4 col-form-label">Tax Number <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="tax_number" placeholder="Tax Number" name="tax_number" value="<?= @$fetched_data[0]['tax_number'] ?>">
+                                                <input type="text" class="form-control" id="tax_number" placeholder="Tax Number" name="tax_number">
                                             </div>
                                         </div>
                                         <div class="form-group ">
                                             <label for="account_number" class="col-sm-4 col-form-label">Account Number </label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="account_number" placeholder="Account Number" name="account_number" value="<?= @$fetched_data[0]['account_number'] ?>">
+                                                <input type="text" class="form-control" id="account_number" placeholder="Account Number" name="account_number">
                                             </div>
                                         </div>
                                         <div class="form-group ">
                                             <label for="account_name" class="col-sm-6 col-form-label">Account Name </label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="account_name" placeholder="Account Name" name="account_name" value="<?= @$fetched_data[0]['account_name'] ?>">
+                                                <input type="text" class="form-control" id="account_name" placeholder="Account Name" name="account_name">
                                             </div>
                                         </div>
                                         <div class="form-group ">
                                             <label for="bank_code" class="col-sm-4 col-form-label">Bank Code</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="bank_code" placeholder="Bank Code" name="bank_code" value="<?= @$fetched_data[0]['bank_code'] ?>">
+                                                <input type="text" class="form-control" id="bank_code" placeholder="Bank Code" name="bank_code">
                                             </div>
                                         </div>
                                         <div class="form-group ">
                                             <label for="bank_name" class="col-sm-4 col-form-label">Bank Name </label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="bank_name" placeholder="Bank Name" name="bank_name" value="<?= @$fetched_data[0]['bank_name'] ?>">
+                                                <input type="text" class="form-control" id="bank_name" placeholder="Bank Name" name="bank_name">
                                             </div>
                                         </div>
                                     </div>

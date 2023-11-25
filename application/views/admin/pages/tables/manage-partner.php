@@ -4,7 +4,7 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
+                <div class="col-sm-6 mb-3">
                     <h4>Manage Spazas</h4>
                 </div>
                 <div class="col-sm-6">
@@ -13,6 +13,45 @@
                         <li class="breadcrumb-item active">Spazas</li>
                     </ol>
                 </div>
+
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-success"> <i class="ion-ios-checkmark-outline display-4"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Approved</span>
+                            <span class="info-box-number"><?= number_format($approved_partners) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-warning"> <i class="ion-ios-close-outline display-4"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Not approved</span>
+                            <span class="info-box-number"><?= number_format($not_approved_partners) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-secondary"> <i class="fas fa-ban"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">De-active</span>
+                            <span class="info-box-number"><?= number_format($deactive_partners) ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 col-12">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-danger"> <i class="fas fa-arrow-right"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Removed</span>
+                            <span class="info-box-number"><?= number_format($removed_partners) ?></span>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div><!-- /.container-fluid -->
     </section>
