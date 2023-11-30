@@ -203,6 +203,7 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('minimum_order_quantity', 'Minimum Order Quantity', 'trim|xss_clean');
             $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
             $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
+            $this->form_validation->set_rules('admin_added', 'Admin added', 'trim|xss_clean');
 
             if (isset($_POST['highlights']) && $_POST['highlights'] != '') {
                 $_POST['highlights'] = json_decode($_POST['highlights'], 1);
@@ -261,6 +262,8 @@ class Product extends CI_Controller
                     }
                 }
             }
+
+            $_POST['admin_added'] = (isset($_POST['admin_added']) && $_POST['admin_added'] == 1) ? 1 : 0;
 
             if (!$this->form_validation->run()) {
                 $this->response['error'] = true;

@@ -354,6 +354,7 @@ class Product extends CI_Controller
                 $this->response['message'] = validation_errors();
                 print_r(json_encode($this->response));
             } else {
+                $_POST['admin_added'] = 1;
                 $this->product_model->add_product($_POST);
                 $this->response['error'] = false;
                 $this->response['csrfName'] = $this->security->get_csrf_token_name();
@@ -445,7 +446,7 @@ class Product extends CI_Controller
                 $settings = get_settings('system_settings', true);
                 $this->data['title'] = 'View Product | ' . $settings['app_name'];
                 $this->data['meta_description'] = 'View Product | ' . $settings['app_name'];
-                $res = fetch_product($user_id = NULL, $filter = NULL, $this->input->get('edit_id', true));                
+                $res = fetch_product($user_id = NULL, $filter = NULL, $this->input->get('edit_id', true));
                 if (empty($res['product'])) {
                     redirect(base_url('admin/product/'));
                 }

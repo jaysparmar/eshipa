@@ -34,6 +34,7 @@ class Product_model extends CI_Model
         $calories = (isset($data['calories']) && !empty($data['calories'])) ? $data['calories'] : 0;
         $barcode = (isset($data['barcode']) && !empty($data['barcode'])) ? $data['barcode'] : NULL;
         $sku = (isset($data['sku']) && !empty($data['sku'])) ? $data['sku'] : NULL;
+        $admin_added = (isset($data['admin_added']) && !empty($data['admin_added'])) ? $data['admin_added'] : 0;
 
         $pro_data = [
             'name' => $data['pro_input_name'],
@@ -50,6 +51,7 @@ class Product_model extends CI_Model
             'calories' => $calories,
             'barcode' => $barcode,
             'sku' => $sku,
+            'admin_added' => $admin_added,
             'start_time' => isset($start_time) && !empty($start_time) ? $start_time : '00:00:00',
             'end_time' => isset($end_time) && !empty($end_time) ? $end_time : '00:00:00',
         ];

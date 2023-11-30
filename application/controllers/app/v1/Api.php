@@ -206,7 +206,7 @@ class Api extends CI_Controller
         header("Pragma: no-cache");
 
         $this->load->library(['upload', 'ion_auth', 'form_validation', 'paypal_lib']);
-        $this->load->model(['category_model', 'order_model', 'rating_model', 'Area_model', 'cart_model', 'address_model', 'Transaction_model', 'ticket_model', 'Order_model', 'notification_model', 'faq_model', 'Partner_model', 'Promo_code_model', 'Rider_model']);
+        $this->load->model(['Customer_model', 'category_model', 'order_model', 'rating_model', 'Area_model', 'cart_model', 'address_model', 'Transaction_model', 'ticket_model', 'Order_model', 'notification_model', 'faq_model', 'Partner_model', 'Promo_code_model', 'Rider_model']);
         $this->load->helper(['language', 'string', 'function']);
         $this->form_validation->set_error_delimiters($this->config->item('error_start_delimiter', 'ion_auth'), $this->config->item('error_end_delimiter', 'ion_auth'));
         $this->lang->load('auth');
@@ -2244,7 +2244,7 @@ class Api extends CI_Controller
                     return;
                 }
             }
-            
+
 
             if (!$this->cart_model->add_to_cart($_POST, $check_status)) {
                 $response = get_cart_total($_POST['user_id'], false); // we will calculate add ons in this function
@@ -5896,6 +5896,41 @@ class Api extends CI_Controller
                 print_r(json_encode($this->response));
                 return;
             }
+        }
+    }
+
+    public function get_customers()
+    {
+        /*
+          get_customers
+             search : Search keyword // { optional }
+             limit:25                // { default - 25 } optional
+             offset:0                // { default - 0 } optional
+         */
+        if (!verify_tokens()) {
+            return false;
+        }
+
+        $this->form_validation->set_rules('search', 'Search keyword', 'trim|xss_clean');
+        $this->form_validation->set_rules('sort', 'sort', 'trim|xss_clean');
+        $this->form_validation->set_rules('limit', 'limit', 'trim|numeric|xss_clean');
+        $this->form_validation->set_rules('offset', 'offset', 'trim|numeric|xss_clean');
+        $this->form_validation->set_rules('order', 'order', 'trim|xss_clean');
+        if (!$this->form_validation->run()) {
+            $this->response['error'] = true;
+            $this->response['message'] = strip_tags(validation_errors());
+            $this->response['data'] = array();
+            print_r(json_encode($this->response));
+            return;
+        } else {
+            $search = (isset($_POST['search']) && !empty(trim($_POST['search']))) ? $this->input->post('search', true) : "";
+            $limit = (isset($_POST['limit']) && is_numeric($_POST['limit']) && !empty(trim($_POST['limit']))) ? $this->input->post('limit', true) : 10;
+            $offset = (isset($_POST['offset']) && is_numeric($_POST['offset']) && !empty(trim($_POST['offset']))) ? $this->input->post('offset', true) : 0;
+            $order = (isset($_POST['order']) && !empty(trim($_POST['order']))) ? $_POST['order'] : 'DESC';
+            $sort = (isset($_POST['sort']) && !empty(trim($_POST['sort']))) ? $_POST['sort'] : 'id';
+            $customers = $this->Customer_model->get_customers(NULL, $search, $offset, $limit, $sort, $order, 1);
+            print_r(json_encode($customers));
+            return false;
         }
     }
 

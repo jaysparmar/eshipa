@@ -38,7 +38,7 @@ class Contact_us extends CI_Controller
             if (print_msg(!has_permissions('update', 'contact_us'), PERMISSION_ERROR_MSG, 'contact_us')) {
                 return false;
             }
-            $this->form_validation->set_rules('contact_input_description', 'Contact Description', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('contact_input_description', 'Contact Description', 'trim|required');
             if (!$this->form_validation->run()) {
 
                 $this->response['error'] = true;

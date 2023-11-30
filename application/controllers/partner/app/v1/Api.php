@@ -1435,6 +1435,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('minimum_order_quantity', 'Minimum Order Quantity', 'trim|xss_clean');
         $this->form_validation->set_rules('product_type', 'Product Type', 'trim|required|xss_clean|in_list[simple_product,variable_product]');
         $this->form_validation->set_rules('variant_stock_level_type', 'Product Lavel', 'trim|xss_clean|in_list[product_level]');
+        $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
+        $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
         $_POST['variant_price'] = (isset($_POST['variant_price']) && !empty($_POST['variant_price'])) ?  explode(",", $this->input->post('variant_price', true)) : NULL;
         $_POST['variant_special_price'] = (isset($_POST['variant_special_price']) && !empty($_POST['variant_special_price'])) ?  explode(",", $this->input->post('variant_special_price', true)) : NULL;
@@ -2258,7 +2260,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('minimum_order_quantity', 'Minimum Order Quantity', 'trim|xss_clean');
         $this->form_validation->set_rules('product_type', 'Product Type', 'trim|required|xss_clean|in_list[simple_product,variable_product]');
         $this->form_validation->set_rules('variant_stock_level_type', 'Product Lavel', 'trim|required|xss_clean|in_list[product_level]');
-
+        $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
+        $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
         $_POST['variant_price'] = (isset($_POST['variant_price']) && !empty($_POST['variant_price'])) ?  explode(",", $this->input->post('variant_price', true)) : NULL;
         $_POST['variant_special_price'] = (isset($_POST['variant_special_price']) && !empty($_POST['variant_special_price'])) ?  explode(",", $this->input->post('variant_special_price', true)) : NULL;
         $_POST['variants_ids'] = (isset($_POST['variants_ids']) && !empty($_POST['variants_ids'])) ?  explode(",", $this->input->post('variants_ids', true)) : NULL;

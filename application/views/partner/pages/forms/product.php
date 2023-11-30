@@ -24,6 +24,7 @@
                     <input type="hidden" name="edit_product_id" value="<?= (isset($product_details[0]['id'])) ? $product_details[0]['id'] : "" ?>">
                 <?php } ?>
                 <input type="hidden" name="product_add_ons" id="product_add_ons" value="">
+                <input type="hidden" name="admin_added" id="admin_added" value="0">
 
                 <div class="row">
                     <div class="col-md-6">

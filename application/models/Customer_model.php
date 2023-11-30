@@ -130,7 +130,7 @@ class Customer_model extends CI_Model
         return $this->db->where('id', $rider_id)->update('users');
     }
 
-    public function get_customers($id, $search, $offset, $limit, $sort, $order)
+    public function get_customers($id = NULL, $search = NULL, $offset = NULL, $limit = NULL, $sort = NULL, $order = NULL, $api_call = NULL)
     {
         $multipleWhere = '';
         $where['ug.group_id'] =  2;
@@ -204,6 +204,9 @@ class Customer_model extends CI_Model
         } else {
             $bulkData['data'] = [];
         }
+        if ($api_call) {
+            return  $bulkData;
+        }
         print_r(json_encode($bulkData));
     }
 
@@ -276,7 +279,7 @@ class Customer_model extends CI_Model
             $tempRow['amount'] = $row['amount'];
             $tempRow['balance'] = $row['balance'];
             $tempRow['status'] = $row['status'];
-            $tempRow['message'] = $row['message'].", order ID: #" . $row['order_id'];
+            $tempRow['message'] = $row['message'] . ", order ID: #" . $row['order_id'];
             $tempRow['date_created'] = $row['date_created'];
             $rows[] = $tempRow;
         }
