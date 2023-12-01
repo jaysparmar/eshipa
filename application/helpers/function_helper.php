@@ -1298,6 +1298,7 @@ function update_epoints($operation, $user_id, $amount, $message = "ePoints Debit
                 'user_id' => $user_id,
                 'type' => $operation,
                 'amount' => $amount,
+                'status' => "success",
                 'message' => $message,
             ];
             if ($operation == 'debit') {

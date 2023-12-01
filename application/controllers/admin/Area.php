@@ -262,7 +262,7 @@ class Area extends CI_Controller
             if (isset($_GET['edit_id'])) {
                 $this->data['fetched_data'] = fetch_details('zipcodes', ['id' => $_GET['edit_id']]);
             }
-            $this->data['city'] = fetch_details('cities', '');
+            $this->data['city'] = fetch_details(NULL, 'cities', '');
             // $this->data['default_zipcode_detail'] = $default_zipcode_detail;
             $this->load->view('admin/template', $this->data);
         } else {

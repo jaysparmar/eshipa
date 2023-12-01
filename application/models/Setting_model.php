@@ -43,6 +43,7 @@ class Setting_model extends CI_Model
             'max_items_cart' => $post['max_items_cart'],
             'is_rider_otp_setting_on' => (isset($post['is_rider_otp_setting_on'])) ? '1' : '0',
             'epoints_percentage' => $post['epoints_percentage'],
+            'outside_product_charge' => $post['outside_product_charge'],
             'verify_id_api_key' => $post['verify_id_api_key'],
             'is_app_maintenance_mode_on' => (isset($post['is_app_maintenance_mode_on'])) ? '1' : '0',
             'is_rider_app_maintenance_mode_on' => (isset($post['is_rider_app_maintenance_mode_on'])) ? '1' : '0',

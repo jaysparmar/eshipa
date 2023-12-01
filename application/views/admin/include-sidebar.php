@@ -493,7 +493,7 @@
                 <?php } ?>
                 <?php if (has_permissions('read', 'city')) { ?>
                     <li class="nav-item">
-                        <a href="#" class="nav-link d-none">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-map-marked-alt text-danger"></i>
                             <p>
                                 Location

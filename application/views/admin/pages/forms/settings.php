@@ -170,7 +170,7 @@
                                 <h4>Delivery Settings</h4>
                                 <hr>
                                 <div class="row">
-                                    <div class="form-group col-md-4">
+                                    <div class="form-group col-md-12">
                                         <label for="is_rider_otp_setting_on"> Order Delivery OTP System
                                         </label>
                                         <div class="card-body">
@@ -178,11 +178,19 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group col-md-8">
+                                    <div class="form-group col-md-12">
                                         <label for=""> Customer ePoints percentage
                                         </label>
                                         <div class="card-body">
-                                            <input type="text" class="form-control" name="epoints_percentage" value="<?= (isset($settings['epoints_percentage'])) ? $settings['epoints_percentage'] : '' ?>" placeholder='ePonints Percentage ' />
+                                            <input type="text" class="form-control" name="epoints_percentage" value="<?= (isset($settings['epoints_percentage'])) ? $settings['epoints_percentage'] : '' ?>" placeholder='ePonints Percentage' />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-12">
+                                        <label for=""> Perc. charged if Spaza sells product outside eShipa list
+                                        </label>
+                                        <div class="card-body">
+                                            <input type="number" class="form-control" name="outside_product_charge" value="<?= (isset($settings['outside_product_charge'])) ? $settings['outside_product_charge'] : '' ?>" placeholder='Please enter Percentage' />
                                         </div>
                                     </div>
                                 </div>
@@ -195,7 +203,7 @@
                                 <hr>
                                 <div class="form-group col-md-12">
                                     <label for="google_map_javascript_api_key">VerifyID API KEY (<a href="https://www.verifyid.co.za/api-key" target="_blank">Click to find</a>)</label>
-                                    
+
 
                                     <input type="text" class="form-control" name="verify_id_api_key" value="<?= (isset($settings['verify_id_api_key']) ? $settings['verify_id_api_key'] : '') ?>" placeholder="Enter your VerifyID API KEY" />
                                 </div>

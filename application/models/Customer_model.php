@@ -130,7 +130,7 @@ class Customer_model extends CI_Model
         return $this->db->where('id', $rider_id)->update('users');
     }
 
-    public function get_customers($id = NULL, $search = NULL, $offset = NULL, $limit = NULL, $sort = NULL, $order = NULL, $api_call = NULL)
+    public function get_customers($id = NULL, $search = NULL, $offset = NULL, $limit = NULL, $sort = NULL, $order = NULL, $api_call = NULL, $mobile = NULL)
     {
         $multipleWhere = '';
         $where['ug.group_id'] =  2;
@@ -141,6 +141,10 @@ class Customer_model extends CI_Model
         }
         if (!empty($id)) {
             $where['u.id'] = $id;
+        }
+
+        if (!empty($mobile)) {
+            $where['u.mobile'] = $mobile;
         }
 
         $count_res = $this->db->select(' COUNT(DISTINCT u.id) as `total` ,a.area as area_name,c.name as city_name')->join('cities c', 'u.city=c.id', 'left')->join('addresses a', 'u.id=a.user_id', 'left');

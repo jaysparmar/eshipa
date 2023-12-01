@@ -87,7 +87,9 @@ header("Content-Type: application/json");
     60. delete_order_rating
     61. get_order_rating
     62. get_partner_ratings
-    63.re_order
+    63. re_order
+    64. get_customers
+    65. share_wallet_balance
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
 
@@ -481,7 +483,7 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|max_length[16]|numeric|is_unique[users.mobile]', array('is_unique' => ' The mobile number is already registered . Please login'));
         $this->form_validation->set_rules('country_code', 'Country Code', 'trim|required|xss_clean');
         $this->form_validation->set_rules('fcm_id', 'Fcm Id', 'trim|xss_clean');
-        $this->form_validation->set_rules('referral_code', 'Referral code', 'trim|is_unique[users.referral_code]|xss_clean');
+        $this->form_validation->set_rules('referral_code', 'Referral code', 'trim|required|is_unique[users.referral_code]|xss_clean');
         $this->form_validation->set_rules('friends_code', 'Friends code', 'trim|xss_clean');
         $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean|numeric');
         $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean|numeric');
@@ -5903,14 +5905,16 @@ class Api extends CI_Controller
     {
         /*
           get_customers
-             search : Search keyword // { optional }
-             limit:25                // { default - 25 } optional
-             offset:0                // { default - 0 } optional
+            mobile:9876543210 // { optional }
+            search : Search keyword // { optional }
+            limit:25                // { default - 25 } optional
+            offset:0                // { default - 0 } optional
          */
         if (!verify_tokens()) {
             return false;
         }
 
+        $this->form_validation->set_rules('mobile', 'Mobile', 'trim|xss_clean');
         $this->form_validation->set_rules('search', 'Search keyword', 'trim|xss_clean');
         $this->form_validation->set_rules('sort', 'sort', 'trim|xss_clean');
         $this->form_validation->set_rules('limit', 'limit', 'trim|numeric|xss_clean');
@@ -5923,14 +5927,96 @@ class Api extends CI_Controller
             print_r(json_encode($this->response));
             return;
         } else {
+            $mobile = (isset($_POST['mobile']) && !empty(trim($_POST['mobile']))) ? $this->input->post('mobile', true) : "";
             $search = (isset($_POST['search']) && !empty(trim($_POST['search']))) ? $this->input->post('search', true) : "";
             $limit = (isset($_POST['limit']) && is_numeric($_POST['limit']) && !empty(trim($_POST['limit']))) ? $this->input->post('limit', true) : 10;
             $offset = (isset($_POST['offset']) && is_numeric($_POST['offset']) && !empty(trim($_POST['offset']))) ? $this->input->post('offset', true) : 0;
             $order = (isset($_POST['order']) && !empty(trim($_POST['order']))) ? $_POST['order'] : 'DESC';
             $sort = (isset($_POST['sort']) && !empty(trim($_POST['sort']))) ? $_POST['sort'] : 'id';
-            $customers = $this->Customer_model->get_customers(NULL, $search, $offset, $limit, $sort, $order, 1);
+            $customers = $this->Customer_model->get_customers(NULL, $search, $offset, $limit, $sort, $order, 1, $mobile);
             print_r(json_encode($customers));
             return false;
+        }
+    }
+
+
+
+    public function share_wallet_balance()
+    {
+        /*
+          share_wallet_balance
+             from : 269 {required}
+             to:25 {required}
+             amount:100 {required}
+         */
+        if (!verify_tokens()) {
+            return false;
+        }
+
+        $this->form_validation->set_rules('from', 'From', 'trim|required|numeric|xss_clean');
+        $this->form_validation->set_rules('to', 'To', 'trim|required|numeric|xss_clean');
+        $this->form_validation->set_rules('amount', 'Amount', 'trim|required|numeric|xss_clean');
+        if (!$this->form_validation->run()) {
+            $this->response['error'] = true;
+            $this->response['message'] = strip_tags(validation_errors());
+            $this->response['data'] = array();
+            print_r(json_encode($this->response));
+            return;
+        } else {
+            $from = $this->input->post('from', true);
+            $to = $this->input->post('to', true);
+            $amount = $this->input->post('amount', true);
+            if (!is_exist(['id' => $from], 'users')) {
+                $this->response['error'] = true;
+                $this->response['message'] = 'From user not found!';
+                echo json_encode($this->response);
+                return false;
+            }
+            if (!is_exist(['id' => $to], 'users')) {
+                $this->response['error'] = true;
+                $this->response['message'] = 'To user not found!';
+                echo json_encode($this->response);
+                return false;
+            }
+            if ($from == $to) {
+                $this->response['error'] = true;
+                $this->response['message'] = 'From and to users should not be the same!';
+                echo json_encode($this->response);
+                return false;
+            }
+            $from_user = fetch_details(['id' => $from], 'users');
+            $to_user = fetch_details(['id' => $to], 'users');
+            if ($from_user[0]['balance'] >= $amount) {
+                $this->db->set('balance', '`balance` - ' . $amount, false)->where('id', $from)->update('users');
+                $this->db->set('balance', '`balance` + ' . $amount, false)->where('id', $to)->update('users');
+                $data = [
+                    'transaction_type' => 'wallet',
+                    'user_id' => $from,
+                    'type' => 'debit',
+                    'amount' => $amount,
+                    'status' => 'success',
+                    'message' => 'Wallet balance shared with ' . $to_user[0]['username'] . ' - ' . $to_user[0]['mobile'],
+                ];
+                $this->db->insert('transactions', $data);
+                $data = [
+                    'transaction_type' => 'wallet',
+                    'user_id' => $to,
+                    'type' => 'credit',
+                    'amount' => $amount,
+                    'status' => 'success',
+                    'message' => 'Wallet balance received from ' . $from_user[0]['username'] . ' - ' . $from_user[0]['mobile'],
+                ];
+                $this->db->insert('transactions', $data);
+                $this->response['error'] = false;
+                $this->response['message'] = 'Wallet balance shared successfully.';
+                echo json_encode($this->response);
+                return false;
+            } else {
+                $this->response['error'] = true;
+                $this->response['message'] = 'Amount exceeded available balance!';
+                echo json_encode($this->response);
+                return false;
+            }
         }
     }
 
