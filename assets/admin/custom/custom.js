@@ -551,7 +551,21 @@ function create_variants(preproccessed_permutation_result = false, from) {
                     ' style="" class="collapse">';
 
                 html +=
-                    '<div class="form-group row"><div class="col col-xs-12"><label class="control-label">Price :</label><input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" min="0" step="0.01"></div><div class="col col-xs-12"><label class="control-label">Special Price :</label><input type="number" name="variant_special_price[]" class="col form-control discounted_price" min="0" step="0.01"></div>';
+                    '<div class="form-group row">' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Price :</label>' +
+                    '<input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" min="0" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Special Price :</label>' +
+                    '<input type="number" name="variant_special_price[]" class="col form-control discounted_price" min="0" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Barcode :</label>' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control barcode">' +
+                    '</div>' +
+                    '</div>';
+
 
                 html += "</div></div></div></div></div>";
             });
@@ -1039,25 +1053,55 @@ function create_editable_variants(
             ) {
                 var selected = b.availability == "0" ? "selected" : " ";
                 html +=
-                    '<div class="form-group row"><div class="col col-xs-12"><label class="control-label">Price :</label><input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" value="' +
-                    b.price +
-                    '" min="0" step="0.01"></div><div class="col col-xs-12"><label class="control-label">Special Price :</label><input type="number" name="variant_special_price[]" class="col form-control discounted_price" min="0" value="' +
-                    b.special_price +
-                    '" step="0.01"></div><div class="col col-xs-12"> <label class="control-label">Sku :</label> <input type="text" name="variant_sku[]" class="col form-control varaint-must-fill-field"  value="' +
-                    b.sku +
-                    '" ></div><div class="col col-xs-12"> <label class="control-label">Total Stock :</label> <input type="text" name="variant_total_stock[]" class="col form-control varaint-must-fill-field" value="' +
-                    b.stock +
-                    '"></div><div class="col col-xs-12"> <label class="control-label">Stock Status :</label> <select type="text" name="variant_level_stock_status[]" class="col form-control varaint-must-fill-field"><option value="1">In Stock</option><option value="0"  ' +
-                    selected +
-                    "  >Out Of Stock</option> </select></div></div>";
+                    '<div class="form-group row">' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Price :</label>' +
+                    '<input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" value="' + b.price + '" min="0" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Special Price :</label>' +
+                    '<input type="number" name="variant_special_price[]" class="col form-control discounted_price" min="0" value="' + b.special_price + '" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Sku :</label>' +
+                    '<input type="text" name="variant_sku[]" class="col form-control varaint-must-fill-field" value="' + b.sku + '">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Barcode :</label>' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control barcode" value="' + b.barcode + '">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Total Stock :</label>' +
+                    '<input type="text" name="variant_total_stock[]" class="col form-control varaint-must-fill-field" value="' + b.stock + '">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Stock Status :</label>' +
+                    '<select type="text" name="variant_level_stock_status[]" class="col form-control varaint-must-fill-field">' +
+                    '<option value="1">In Stock</option>' +
+                    '<option value="0" ' + selected + '>Out Of Stock</option>' +
+                    '</select>' +
+                    '</div>' +
+                    '</div>';
+
+
             } else {
                 html +=
-                    '<div class="form-group row"><div class="col col-xs-12"><label class="control-label">Price :</label><input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" value="' +
-                    b.price +
-                    '" min="0" step="0.01"></div><div class="col col-xs-12"><label class="control-label">Special Price :</label><input type="number" name="variant_special_price[]" class="col form-control discounted_price"  min="0" value="' +
-                    b.special_price +
-                    '" step="0.01"></div></div>';
+                    '<div class="form-group row">' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Price :</label>' +
+                    '<input type="number" name="variant_price[]" class="col form-control price varaint-must-fill-field" value="' + b.price + '" min="0" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Special Price :</label>' +
+                    '<input type="number" name="variant_special_price[]" class="col form-control discounted_price" value="' + b.special_price + '" min="0" step="0.01">' +
+                    '</div>' +
+                    '<div class="col col-xs-12">' +
+                    '<label class="control-label">Barcode :</label>' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control barcode" value="' + b.barcode + '">' +
+                    '</div>' +
+                    '</div>';
             }
+
             html +=
                 '<div class="col-12 pt-3"><label class="control-label">Images :</label><div class="col-md-3"><a class="uploadFile img btn btn-primary text-white btn-sm"  data-input="variant_images[' +
                 a +

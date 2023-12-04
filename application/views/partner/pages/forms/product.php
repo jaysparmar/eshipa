@@ -51,13 +51,13 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="" class="col-sm-3 col-form-label">Barcode</label>
                                             <div class="col-sm-12">
                                                 <input type="text" class="form-control" placeholder="Product Barcode" name="barcode" value="<?= @$product_details[0]['barcode'] ?>">
                                             </div>
                                         </div>
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="" class="col-sm-3 col-form-label">SKU ID</label>
                                             <div class="col-sm-12">
                                                 <input type="text" class="form-control" placeholder="Product SKU ID" name="sku" value="<?= @$product_details[0]['sku'] ?>">
@@ -373,6 +373,12 @@
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group">
+                                                                        <label for="type" class="col-md-2">Barcode:</label>
+                                                                        <div class="col-md-12">
+                                                                            <input type="text" name="simple_barcode" class="form-control" value="<?= $product_variants[0]['barcode'] ?>">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
                                                                         <div class="col">
                                                                             <input type="checkbox" name="simple_stock_management_status" class="align-middle simple_stock_management_status" <?= (isset($product_details[0]['id']) && $product_details[0]['stock_type'] != NULL) ? 'checked' : '' ?>> <span class="align-middle">Enable Stock Management</span>
                                                                         </div>
@@ -516,6 +522,12 @@
                                                                                 <label for="type" class="col-md-2">Special Price:</label>
                                                                                 <div class="col-md-12">
                                                                                     <input type="number" name="simple_special_price" class="form-control discounted_price" min='0' step="0.01">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="form-group ">
+                                                                                <label for="" class="col-sm-3 col-form-label">Barcode</label>
+                                                                                <div class="col-sm-12">
+                                                                                    <input type="text" class="form-control" name="simple_barcode">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group">

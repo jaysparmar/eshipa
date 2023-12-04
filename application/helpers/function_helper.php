@@ -2644,7 +2644,7 @@ function get_image_url($path, $image_type = '', $image_size = '', $file_type = '
 function fetch_users($id)
 {
     $t = &get_instance();
-    $user_details = $t->db->select('u.id,username,email,u.mobile,balance,dob, referral_code, friends_code, c.name as city_name,a.area as area,a.landmark,a.pincode')
+    $user_details = $t->db->select('u.id,username,email,u.mobile,balance,epoints,dob, referral_code, friends_code, c.name as city_name,a.area as area,a.landmark,a.pincode')
         ->join('addresses a', 'u.id = a.user_id', 'left')
         ->join('cities c', 'u.city = c.id', 'left')
         ->where('u.id', $id)->limit(1)->get('users u')

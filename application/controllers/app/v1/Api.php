@@ -5934,6 +5934,8 @@ class Api extends CI_Controller
             $order = (isset($_POST['order']) && !empty(trim($_POST['order']))) ? $_POST['order'] : 'DESC';
             $sort = (isset($_POST['sort']) && !empty(trim($_POST['sort']))) ? $_POST['sort'] : 'id';
             $customers = $this->Customer_model->get_customers(NULL, $search, $offset, $limit, $sort, $order, 1, $mobile);
+            $customers['data'][0]['user_name'] = $customers['data'][0]['name'];
+            unset($customers['data'][0]['name']);
             print_r(json_encode($customers));
             return false;
         }
@@ -6009,6 +6011,7 @@ class Api extends CI_Controller
                 $this->db->insert('transactions', $data);
                 $this->response['error'] = false;
                 $this->response['message'] = 'Wallet balance shared successfully.';
+                $this->response['remaining_balance'] = strval($from_user[0]['balance'] - $amount);
                 echo json_encode($this->response);
                 return false;
             } else {

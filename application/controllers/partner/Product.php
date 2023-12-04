@@ -388,10 +388,11 @@ class Product extends CI_Controller
             $partner_id =  (isset($_GET['partner_id']) && $_GET['partner_id'] != '') ? $this->input->get('partner_id', true) : $this->session->userdata('user_id');
             $status =  (isset($_GET['status']) && $_GET['status'] != "") ? $this->input->get('status', true) : NULL;
             $buy_stock =  (isset($_GET['buy_stock']) && $_GET['buy_stock'] == 1) ? 1 : NULL;
+            $barcode =  (isset($_POST['barcode']) && $_POST['barcode'] != "") ? $_POST['barcode'] : NULL;
             if (isset($_GET['flag']) && !empty($_GET['flag'])) {
-                return $this->product_model->get_product_details($_GET['flag'], $partner_id, $status, $buy_stock);
+                return $this->product_model->get_product_details($_GET['flag'], $partner_id, $status, $buy_stock, $barcode);
             }
-            return $this->product_model->get_product_details(null, $partner_id, $status, $buy_stock);
+            return $this->product_model->get_product_details(null, $partner_id, $status, $buy_stock, $barcode);
         } else {
             redirect('partner/login', 'refresh');
         }

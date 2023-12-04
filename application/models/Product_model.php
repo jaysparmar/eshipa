@@ -32,8 +32,8 @@ class Product_model extends CI_Model
         $minimum_order_quantity = (isset($data['minimum_order_quantity']) && !empty($data['minimum_order_quantity'])) ? $data['minimum_order_quantity'] : 1;
         // $tax = (isset($data['pro_input_tax']) && $data['pro_input_tax'] != 0 && !empty($data['pro_input_tax'])) ? $data['pro_input_tax'] : 0;
         $calories = (isset($data['calories']) && !empty($data['calories'])) ? $data['calories'] : 0;
-        $barcode = (isset($data['barcode']) && !empty($data['barcode'])) ? $data['barcode'] : NULL;
-        $sku = (isset($data['sku']) && !empty($data['sku'])) ? $data['sku'] : NULL;
+        // $barcode = (isset($data['barcode']) && !empty($data['barcode'])) ? $data['barcode'] : NULL;
+        // $sku = (isset($data['sku']) && !empty($data['sku'])) ? $data['sku'] : NULL;
         $admin_added = (isset($data['admin_added']) && !empty($data['admin_added'])) ? $data['admin_added'] : 0;
 
         $pro_data = [
@@ -49,8 +49,8 @@ class Product_model extends CI_Model
             'minimum_order_quantity' => $minimum_order_quantity,
             'highlights' => $highlights,
             'calories' => $calories,
-            'barcode' => $barcode,
-            'sku' => $sku,
+            // 'barcode' => $barcode,
+            // 'sku' => $sku,
             'admin_added' => $admin_added,
             'start_time' => isset($start_time) && !empty($start_time) ? $start_time : '00:00:00',
             'end_time' => isset($end_time) && !empty($end_time) ? $end_time : '00:00:00',
@@ -182,7 +182,8 @@ class Product_model extends CI_Model
             $pro_variance_data = [
                 'product_id' => $p_id,
                 'price' => $data['simple_price'],
-                'special_price' => (isset($data['simple_special_price']) && !empty($data['simple_special_price'])) ? $data['simple_special_price'] : '0'
+                'special_price' => (isset($data['simple_special_price']) && !empty($data['simple_special_price'])) ? $data['simple_special_price'] : '0',
+                'barcode' => (isset($data['simple_barcode']) && !empty($data['simple_barcode'])) ? $data['simple_barcode'] : NULL
             ];
 
             if (isset($data['edit_product_id'])) {
@@ -205,10 +206,12 @@ class Product_model extends CI_Model
                     $pro_variance_data['availability']  = $data['variant_status'];
                     $variant_price = $data['variant_price'];
                     $variant_special_price = (isset($data['variant_special_price']) && !empty($data['variant_special_price'])) ? $data['variant_special_price'] : '0';
+                    $variant_barcode = (isset($data['variant_barcode']) && !empty($data['variant_barcode'])) ? $data['variant_barcode'] : NULL;
                 }
             } else {
                 $variant_price = $data['variant_price'];
                 $variant_special_price = (isset($data['variant_special_price']) && !empty($data['variant_special_price'])) ? $data['variant_special_price'] : '0';
+                $variant_barcode = (isset($data['variant_barcode']) && !empty($data['variant_barcode'])) ? $data['variant_barcode'] : NULL;
             }
 
             if (!empty($data['variants_ids'])) {
@@ -224,6 +227,7 @@ class Product_model extends CI_Model
                     $value = str_replace(' ', ',', trim($variants_ids[$i]));
                     $pro_variance_data['price'] = $variant_price[$i];
                     $pro_variance_data['special_price'] = (isset($variant_special_price[$i]) && !empty($variant_special_price[$i])) ? $variant_special_price[$i] : '0';
+                    $pro_variance_data['barcode'] = (isset($variant_barcode[$i]) && !empty($variant_barcode[$i])) ? $variant_barcode[$i] : NULL;
                     $pro_variance_data['attribute_value_ids'] = $value;
                     if (isset($data['edit_variant_id'][$i]) && !empty($data['edit_variant_id'][$i])) {
                         $this->db->where('id', $data['edit_variant_id'][$i])->update('product_variants', $pro_variance_data);
@@ -235,7 +239,7 @@ class Product_model extends CI_Model
         }
     }
 
-    public function get_product_details($flag = NULL, $partner_id = NULL, $p_status = NULL, $buy_stock = NULL)
+    public function get_product_details($flag = NULL, $partner_id = NULL, $p_status = NULL, $buy_stock = NULL, $barcode = NULL)
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
@@ -298,6 +302,10 @@ class Product_model extends CI_Model
         }
         if (isset($p_status) && $p_status != "") {
             $count_res->where("p.status", $p_status);
+        }
+
+        if (isset($barcode) && $barcode != "") {
+            $count_res->where("product_variants.barcode", $barcode);
         }
 
         if ($flag == 'sold') {
@@ -364,14 +372,19 @@ class Product_model extends CI_Model
             $search_res->group_End();
         }
         if (isset($partner_id) && $partner_id != "") {
-            $count_res->where("p.partner_id", $partner_id);
+            $search_res->where("p.partner_id", $partner_id);
         }
 
         if (isset($p_status) && $p_status != NULL) {
-            $count_res->where("p.status", $p_status);
+            $search_res->where("p.status", $p_status);
         }
 
-        $pro_search_res = $search_res->group_by('pid')->order_by($sort, "DESC")->limit($limit, $offset)->get('products p')->result_array();
+        if (isset($barcode) && $barcode != "") {
+            $search_res->where("product_variants.barcode", $barcode);
+        }
+
+
+        $pro_search_res = $search_res->group_by('pid')->order_by($sort, "DESC")->limit($limit, $offset)->get('products p')->result_array();        
         $currency = get_settings('currency');
         $bulkData = array();
         $bulkData['total'] = $total;

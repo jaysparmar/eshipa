@@ -31,6 +31,9 @@
                     <li class="nav-item ">
                         <input type="search" name="search_products" class="form-control" id="search_products" value="" placeholder="Search Products">
                     </li>
+                    <li class="nav-item ">
+                        <input type="text" name="barcode" id="barcode" class="form-control" value="">
+                    </li>
                 </ul>
             </nav>
             <div class="container-fluid mt-4">
