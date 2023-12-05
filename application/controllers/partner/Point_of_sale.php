@@ -41,7 +41,9 @@ class Point_of_sale extends CI_Controller
         $order = (isset($_GET['order']) && !empty($_GET['order'])) ? $_GET['order'] : 'desc';
         $filter['search'] = (isset($_GET['search']) && !empty($_GET['search'])) ? $_GET['search'] : '';
         $filter_by = (isset($_POST['filter_by']) && !empty($_POST['filter_by'])) ? $this->input->post("filter_by", true) : 'p.id';
-        $products =  $this->data['products'] = fetch_product("", $filter, "", $category_id, $limit, $offset, $sort, $order, "", "", $partner_id, $filter_by);
+        $barcode = (isset($_POST['barcode']) && !empty($_POST['barcode'])) ? $this->input->post("barcode", true) : NULL;
+        $products =  $this->data['products'] = fetch_product("", $filter, "", $category_id, $limit, $offset, $sort, $order, "", "", $partner_id, $filter_by, NULL, $barcode);
+        // print_r($products);
         $response['error'] = (!empty($products)) ? false : true;
         $response['message'] = (!empty($products)) ? "Products fetched successfully" : "No products found";
         $response['products'] = (!empty($products)) ? $products : [];

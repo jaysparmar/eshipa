@@ -32,6 +32,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
+                                    <input type="text" name="barcode" id="partner_barcode" class="form-control" value="">
                                         <div class="form-group ">
                                             <label for="name" class="col-sm-3 col-form-label">Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
@@ -41,7 +42,7 @@
                                         <div class="form-group">
                                             <label for="partners" class="col-sm-4 col-form-label">Select Category <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
-                                                <select class="search_category select_multiple" name="product_category_id" data-placeholder=" Type to search and select Category">
+                                                <select class="search_category select_multiple" id="product_category_id" name="product_category_id" data-placeholder=" Type to search and select Category">
                                                     <option value=""></option>
                                                     <?php if (isset($categories) && !empty($categories)) {
                                                         foreach ($categories as $category) { ?>
@@ -92,7 +93,7 @@
                                             <div class="form-group ">
                                                 <label for="is_cod_allowed" class="col-12 col-form-label">Is COD allowed?</label>
                                                 <div class="col-12">
-                                                    <input type="checkbox" name="cod_allowed" <?= (isset($product_details[0]['cod_allowed']) && $product_details[0]['cod_allowed'] == '1') ? 'Checked' : '' ?> data-bootstrap-switch data-off-color="danger" data-on-color="success">
+                                                    <input type="checkbox" name="cod_allowed" id="cod_allowed" <?= (isset($product_details[0]['cod_allowed']) && $product_details[0]['cod_allowed'] == '1') ? 'Checked' : '' ?> data-bootstrap-switch data-off-color="danger" data-on-color="success">
                                                 </div>
                                             </div>
                                             <div class="form-group ">
@@ -103,7 +104,7 @@
                                             </div>
                                             <div class="form-group <?= (isset($product_details[0]['is_cancelable']) && $product_details[0]['is_cancelable'] == 1) ? '' : 'collapse' ?>" id='cancelable_till'>
                                                 <label for="cancelable_till" class=" col-12 col-form-label">Till which status ? <span class='text-danger text-sm'>*</span></label>
-                                                <select class='form-control' name="cancelable_till">
+                                                <select class='form-control' name="cancelable_till" id="cancelable_till_status">
                                                     <option value='pending' <?= (isset($product_details[0]['cancelable_till']) && $product_details[0]['cancelable_till'] == 'pending') ? 'selected' : '' ?>>Pending</option>
                                                     <option value='confirmed' <?= (isset($product_details[0]['cancelable_till']) && $product_details[0]['cancelable_till'] == 'confirmed') ? 'selected' : '' ?>>Confirmed</option>
                                                     <option value='preparing' <?= (isset($product_details[0]['cancelable_till']) && $product_details[0]['cancelable_till'] == 'preparing') ? 'selected' : '' ?>>Preparing</option>
@@ -144,7 +145,7 @@
                                         <div class="form-group ">
                                             <label for="cities" class="col-sm-2 col-form-label">Select Tags <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
-                                                <select name="tags[]" class="search_tags w-100" multiple onload="multiselect()">
+                                                <select name="tags[]" id="product_tags" class="search_tags w-100" multiple onload="multiselect()">
                                                     <option value="">Select Tags for Product</option>
                                                     <?php foreach ($tags as $row) { ?>
                                                         <option value=<?= $row['tag_id'] ?> selected> <?= output_escaping($row['title']) ?></option>
@@ -155,7 +156,7 @@
                                         <div class="form-group">
                                             <label for="indicator" class="col-sm-3 col-form-label">Indicator <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
-                                                <select class='form-control' name='indicator'>
+                                                <select class='form-control' name='indicator' id='indicator'>
                                                     <option value='' <?= (isset($product_details[0]['indicator']) &&  $product_details[0]['indicator'] == '0') ? 'selected' : ''; ?>>None</option>
                                                     <option value='1' <?= (isset($product_details[0]['indicator']) &&  $product_details[0]['indicator'] == '1') ? 'selected' : ''; ?>>Veg</option>
                                                     <option value='2' <?= (isset($product_details[0]['indicator']) &&  $product_details[0]['indicator'] == '2') ? 'selected' : ''; ?>>Non-Veg</option>
@@ -177,13 +178,13 @@
                                         <div class="form-group">
                                             <label for="total_allowed_quantity" class="col-sm-4 col-form-label">Total Allowed Quantity</label>
                                             <div class="col-sm-12">
-                                                <input type="number" class="form-control" name="total_allowed_quantity" value="<?= (isset($product_details[0]['total_allowed_quantity'])) ? $product_details[0]['total_allowed_quantity'] : ''; ?>" placeholder='Total Allowed Quantity' min="0">
+                                                <input type="number" class="form-control" id="total_allowed_quantity" name="total_allowed_quantity" value="<?= (isset($product_details[0]['total_allowed_quantity'])) ? $product_details[0]['total_allowed_quantity'] : ''; ?>" placeholder='Total Allowed Quantity' min="0">
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label for="minimum_order_quantity" class="col-sm-4 col-form-label">Minimum Order Quantity</label>
                                             <div class="col-sm-12">
-                                                <input type="number" class="form-control" name="minimum_order_quantity" min="1" value="<?= (isset($product_details[0]['minimum_order_quantity'])) ? $product_details[0]['minimum_order_quantity'] : 1; ?>" placeholder='Minimum Order Quantity' min="0">
+                                                <input type="number" class="form-control" id="minimum_order_quantity" name="minimum_order_quantity" min="1" value="<?= (isset($product_details[0]['minimum_order_quantity'])) ? $product_details[0]['minimum_order_quantity'] : 1; ?>" placeholder='Minimum Order Quantity' min="0">
                                             </div>
                                         </div>
                                         <div class="form-group ">

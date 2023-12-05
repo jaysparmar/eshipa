@@ -7032,6 +7032,87 @@ $('.add-to-cart').on('click', function (e) {
     })
 })
 
+$("#partner_barcode").on("focusout", function (e) {
+    e.preventDefault();
+    var barcode = $(this).val();
+    if (barcode.trim() !== '') {
+
+        $.ajax({
+            type: "POST",
+            url: base_url + "partner/point_of_sale/get_products",
+            dataType: "json",
+            data: { [csrfName]: csrfHash, barcode: barcode },
+            success: function (result) {
+                if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
+                    playBeepSound();
+                    iziToast.success({
+                        message: 'Product fetched successfully.'
+                    });
+                    var product = result.products.product[0];
+                    console.log(product);
+                    $('#admin_added').val(product.admin_added);
+                    $('#pro_input_text').val(product.name);
+                    $('#product_category_id').val(product.category_id).trigger('change');
+                    $('#short_description').val(product.short_description);
+                    if (product.cod_allowed == 1) {
+                        $('#cod_allowed').prop('checked', true).change();
+                    } else {
+                        $('#cod_allowed').prop('checked', false).change();
+                    }
+                    if (product.is_cancelable == 1) {
+                        $('#is_cancelable').prop('checked', true).change();
+                        $('#cancelable_till').show();
+                        $('#cancelable_till_status').val(product.cancelable_till);
+                    } else {
+                        $('#is_cancelable').prop('checked', false).change();
+                        $('#cancelable_till').hide();
+                    }
+                    $(".image-upload-section")
+                        .html(
+                            '<div class="col-md-3 col-sm-12 shadow p-3 mb-5 bg-white rounded m-4 text-center grow image"><div class="image-upload-div"><img class="img-fluid" src=' +
+                            product.image +
+                            ' ><input type="hidden" name="pro_input_image"' +
+                            " value=" +
+                            product.relative_path +
+                            "></div>" +
+                            "</div>"
+                        );
+                    $('#product_tags').val(['1', '2']).trigger('change');
+                    $('#indicator').val(product.indicator);
+                    // var tagify = new Tagify(document.querySelector('#highlights'));
+                    // Assuming `tagify` holds the Tagify instance for #highlights
+                    // tagify.addTags(product.highlights);
+
+                    $('#calories').val(product.calories);
+                    $('#total_allowed_quantity').val(product.total_allowed_quantity);
+                    $('#minimum_order_quantity').val(product.minimum_order_quantity);
+                    if (product.available_time == 1) {
+                        $('#available_time').prop('checked', true).change();
+                        $('#product_start_time').val(product.start_time);
+                        $('#product_end_time').val(product.end_time);
+                    } else {
+                        $('#available_time').prop('checked', false).change();
+                        $('#product_start_time').val('');
+                        $('#product_end_time').val('');
+                    }
+                    // $('#product-type').val(product.type).trigger('change');
+
+
+                } else {
+                    iziToast.error({
+                        message: 'Product not found.'
+                    });
+                }
+            }
+        });
+
+    }
+});
+function playBeepSound() {
+    var audio = new Audio(base_url + 'assets/beep.mp3');
+    audio.play();
+}
+
 $(document).on(
     'change',
     '.product-quantity input,.product-sm-quantity input,.itemQty',

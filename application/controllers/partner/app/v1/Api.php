@@ -72,7 +72,7 @@ class Api extends CI_Controller
         // "partner/app/v1/api/edit_attributes",
         "partner/app/v1/api/verify_user",
         "partner/app/v1/api/get_settings",
-        // "partner/app/v1/api/get_cities",
+        "partner/app/v1/api/get_cities",
         // "partner/app/v1/api/get_taxes",
         // "partner/app/v1/api/reset_password",
         // "partner/app/v1/api/update_partner",
@@ -541,6 +541,7 @@ class Api extends CI_Controller
         partner_id:175
         id:101              // optional
         category_id:29      // optional
+        barcode:1234567890      // optional
         user_id:15          // optional
         search:keyword      // optional   // search by product name and highlights and tags
         tags:multiword tag1, tag2, another tag      // optional {search by restro and product tags}
@@ -574,6 +575,7 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('vegetarian', 'vegetarian', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('search', 'Search', 'trim|xss_clean');
         $this->form_validation->set_rules('category_id', 'Category id', 'trim|numeric|xss_clean');
+        $this->form_validation->set_rules('barcode', 'Barcode', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('attribute_value_ids', 'Attr Ids', 'trim|xss_clean');
         $this->form_validation->set_rules('sort', 'sort', 'trim|xss_clean');
         $this->form_validation->set_rules('limit', 'limit', 'trim|numeric|xss_clean');
@@ -610,6 +612,7 @@ class Api extends CI_Controller
             $filters['show_only_active_products'] = (isset($_POST['show_only_active_products'])) ? $this->input->post('show_only_active_products', true) : false;
 
             $category_id = (isset($_POST['category_id'])) ?  $this->input->post('category_id', true)  : null;
+            $barcode = (isset($_POST['barcode'])) ?  $this->input->post('barcode', true)  : null;
             $product_id = (isset($_POST['id'])) ? $this->input->post('id', true)  : null;
             $product_ids = (isset($_POST['product_ids'])) ?  $this->input->post('product_ids', true) : null;
             $product_variant_ids = (isset($_POST['product_variant_ids']) && !empty($_POST['product_variant_ids'])) ? $this->input->post("product_variant_ids", true) : null;
@@ -621,7 +624,7 @@ class Api extends CI_Controller
             }
             $user_id = (isset($_POST['user_id'])) ? $this->input->post('user_id', true)  : null;
 
-            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by);
+            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by, NULL, $barcode);
 
             $final_total = "0";
             if (isset($filters['discount']) && !empty($filters['discount'])) {
@@ -1037,9 +1040,9 @@ class Api extends CI_Controller
             offset:0            // { default - 0 } optional
        */
 
-        if (!verify_tokens()) {
-            return false;
-        }
+        // if (!verify_tokens()) {
+        //     return false;
+        // }
 
         $this->form_validation->set_rules('sort', 'sort', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('order', 'order', 'trim|xss_clean');

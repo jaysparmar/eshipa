@@ -376,7 +376,7 @@ function fetch_details($where = NULL, $table = "", $fields = '*', $limit = '', $
     return $res;
 }
 
-function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id", $buy_stock = NULL)
+function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id", $buy_stock = NULL, $barcode = NULL)
 {
     $settings = get_settings('system_settings', true);
     $near_by_distance = 5;
@@ -412,7 +412,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     // 3. discount filter done
     $discount_filter_data = (isset($filter['discount']) && !empty($filter['discount'])) ? ' ( if(pv.special_price > 0,( (pv.price-pv.special_price)/pv.price)*100,0)) as cal_discount_percentage, ' : '';
     $join = $t->ion_auth->is_admin() || $buy_stock ? 'LEFT' : '';
-    $t->db->select($discount_filter_data . ' (select count(id)  from products where products.category_id=c.id ) as total,count(p.id) as sales, p.stock_type,p.calories,p.status ,p.is_prices_inclusive_tax,p.tax as tax_id, p.type ,GROUP_CONCAT(DISTINCT(pa.attribute_value_ids)) as attr_value_ids, p.partner_id,p.id,p.stock,p.name,p.category_id,p.short_description,p.slug,p.total_allowed_quantity,p.minimum_order_quantity,p.cod_allowed,p.row_order,p.rating,p.no_of_ratings,p.image,p.is_cancelable,p.cancelable_till,p.indicator, p.highlights,p.availability,c.name as category_name,c.slug as category_slug,p.available_time,p.start_time,p.end_time,tax.percentage as tax_percentage ')
+    $t->db->select($discount_filter_data . ' (select count(id)  from products where products.category_id=c.id ) as total,count(p.id) as sales,p.admin_added, p.stock_type,p.calories,p.status ,p.is_prices_inclusive_tax,p.tax as tax_id, p.type ,GROUP_CONCAT(DISTINCT(pa.attribute_value_ids)) as attr_value_ids, p.partner_id,p.id,p.stock,p.name,p.category_id,p.short_description,p.slug,p.total_allowed_quantity,p.minimum_order_quantity,p.cod_allowed,p.row_order,p.rating,p.no_of_ratings,p.image,p.is_cancelable,p.cancelable_till,p.indicator, p.highlights,p.availability,c.name as category_name,c.slug as category_slug,p.available_time,p.start_time,p.end_time,tax.percentage as tax_percentage ')
         ->join(" categories c", "p.category_id=c.id ", 'LEFT')
         ->join(" partner_data sd", "p.partner_id=sd.user_id ", $join)
         ->join(" users u", "p.partner_id=u.id", $join)
@@ -465,6 +465,9 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     // 10. reasturant wise products done
     if (isset($partner_id) && !empty($partner_id) && $partner_id != "") {
         $where['p.partner_id'] = $partner_id;
+    }
+    if (isset($barcode) && !empty($barcode) && $barcode != "") {
+        $where['pv.barcode'] = $barcode;
     }
 
     // 6 limit stock and out of stock filter
@@ -701,6 +704,9 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
 
     if (isset($partner_id) && !empty($partner_id) && $partner_id != "") {
         $where['p.partner_id'] = $partner_id;
+    }
+    if (isset($barcode) && !empty($barcode) && $barcode != "") {
+        $where['pv.barcode'] = $barcode;
     }
 
     if (isset($filter) && !empty($filter['flag']) && $filter['flag'] != "null" && $filter['flag'] != "") {
