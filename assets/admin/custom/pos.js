@@ -216,11 +216,12 @@ function get_products(
     category_id = "",
     limit = 2,
     offset = 0,
-    search_parameter = ""
+    search_parameter = "",
+    barcode = ""
 ) {
     $.ajax({
         type: "GET",
-        url: `${base_url}partner/point_of_sale/get_products?category_id=${category_id}&limit=${limit}&offset=${offset}&search=${search_parameter}`,
+        url: `${base_url}partner/point_of_sale/get_products?category_id=${category_id}&limit=${limit}&offset=${offset}&search=${search_parameter}&barcode=${barcode}`,
         dataType: "json",
         beforeSend: function () {
             $("#get_products").html(
@@ -471,16 +472,12 @@ function add_to_cart(cart_item) {
     cart = localStorage.getItem("cart") !== null ? JSON.parse(cart) : null;
 
     if (cart !== null && cart !== undefined) {
-        // console.log(variant_id);
         if (cart.find((item) => item.variant_id === variant_id)) {
-            alert("This item is already present in your cart");
-            return;
-        } else {
-            // iziToast.success({
-            //     message: "Product added to cart"
-            // });
+            var item = cart.find((item) => item.variant_id === variant_id)
+            item.quantity = item.quantity + 1;
+        }else{
+            cart.push(items);
         }
-        cart.push(items);
     } else {
         cart = [items];
     }
@@ -976,35 +973,32 @@ $("#barcode").on("focusout", function (e) {
 
                 if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
                     var product = result.products.product[0];
-                    if (product.availability == 1) {
-                        var product_id = product.id;
-                        var partner_id = product.partner_id;
-                        var variant_id = product.variants[0].id;
-                        var title = product.name;
-                        var variant_values = product.variants[0].variant_values;
-                        var image = product.image;
-                        var special_price = product.variants[0].price;
-                        var price = product.variants[0].special_price;
-                        var cart_item = {
-                            product_id: product_id.trim(),
-                            partner_id: partner_id.trim(),
-                            variant_id: variant_id,
-                            title: title,
-                            variant: variant_values,
-                            image: image,
-                            display_price: special_price.trim(),
-                            quantity: 1,
-                            special_price: special_price,
-                            price: price
-                        };
+                    var product_id = product.id;
+                    var partner_id = product.partner_id;
+                    var variant_id = product.variants[0].id;
+                    var title = product.name;
+                    var variant_values = product.variants[0].variant_values;
+                    var image = product.image;
+                    var special_price = product.variants[0].price;
+                    var price = product.variants[0].special_price;
+                    var cart_item = {
+                        product_id: product_id.trim(),
+                        partner_id: partner_id.trim(),
+                        variant_id: variant_id,
+                        title: title,
+                        variant: variant_values,
+                        image: image,
+                        display_price: special_price.trim(),
+                        quantity: 1,
+                        special_price: special_price,
+                        price: price
+                    };
 
-                        add_to_cart(cart_item);
-
-                    } else {
-                        iziToast.error({
-                            message: 'Product is out of stock.'
-                        });
-                    }
+                    add_to_cart(cart_item);
+                    var category_id = $("#product_categories").val();
+                    var limit = $("#limit").val();
+                    var offset = $("#offset").val();
+                    get_products(category_id, limit, offset, '', barcode);
 
                 } else {
                     iziToast.error({

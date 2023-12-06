@@ -385,6 +385,7 @@ class Product_model extends CI_Model
 
 
         $pro_search_res = $search_res->group_by('pid')->order_by($sort, "DESC")->limit($limit, $offset)->get('products p')->result_array();        
+        // echo $this->db->last_query();
         $currency = get_settings('currency');
         $bulkData = array();
         $bulkData['total'] = $total;

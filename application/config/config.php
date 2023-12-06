@@ -456,7 +456,7 @@ $config['csrf_token_name'] = 'ekart_security_token';
 $config['csrf_cookie_name'] = 'ekart_security_cookie';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
-$config['csrf_exclude_uris'] = array('partner/point_of_sale/get_products','admin/partners/verify_id_passport_number','admin/partners/verify_company_registration_no','admin/product/process_bulk_upload','admin/product/get_subcategory', 'cart/pre-payment-setup', 'cart/validate-promo-code', 'my-account/get-address', 'cart/place-order','payment/[a-z_-]+', 'admin/category/add_category', 'admin/orders/update_orders', 'admin/product/update_product_order', 'admin/orders/delete_orders', 'admin/product/delete_product', 'app/v1/api/[a-z_-]+', 'rider/app/v1/api/[a-z_-]+', 'admin/app/v1/api/[a-z_-]+', 'admin/home/fetch_sales', 'partner/app/v1/api/[a-z_-]+');
+$config['csrf_exclude_uris'] = array('partner/product/get_product_data','partner/point_of_sale/get_products','admin/partners/verify_id_passport_number','admin/partners/verify_company_registration_no','admin/product/process_bulk_upload','admin/product/get_subcategory', 'cart/pre-payment-setup', 'cart/validate-promo-code', 'my-account/get-address', 'cart/place-order','payment/[a-z_-]+', 'admin/category/add_category', 'admin/orders/update_orders', 'admin/product/update_product_order', 'admin/orders/delete_orders', 'admin/product/delete_product', 'app/v1/api/[a-z_-]+', 'rider/app/v1/api/[a-z_-]+', 'admin/app/v1/api/[a-z_-]+', 'admin/home/fetch_sales', 'partner/app/v1/api/[a-z_-]+');
 
 
 /*

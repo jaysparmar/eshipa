@@ -34,6 +34,7 @@
                                         echo get_categories_option_html($categories);
                                         ?>
                                     </select>
+                                    <!-- <input type="text" name="barcode" id="buy_stock_barcode" class="form-control" value=""> -->
                                 </div>
                                 <input type="hidden" id="restro_filter" value="0">
                                 <input type="hidden" id="buy_stock" value="1">

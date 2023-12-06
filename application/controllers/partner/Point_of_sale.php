@@ -32,7 +32,7 @@ class Point_of_sale extends CI_Controller
     public function get_products()
     {
         $max_limit = 25;
-        $partner_id = $_SESSION['user_id'];
+        $partner_id = isset($_POST['partner_id']) && $_POST['partner_id'] != '' ? $_POST['partner_id'] : $_SESSION['user_id'];
 
         $category_id = (isset($_GET['category_id']) && !empty($_GET['category_id']) && is_numeric($_GET['category_id'])) ? $this->input->get('category_id', true) : "";
         $limit = (isset($_GET['limit']) && !empty($_GET['limit']) && is_numeric($_GET['limit']) && $_GET['limit'] <= $max_limit) ? $this->input->get('limit') : $max_limit;
@@ -42,7 +42,9 @@ class Point_of_sale extends CI_Controller
         $filter['search'] = (isset($_GET['search']) && !empty($_GET['search'])) ? $_GET['search'] : '';
         $filter_by = (isset($_POST['filter_by']) && !empty($_POST['filter_by'])) ? $this->input->post("filter_by", true) : 'p.id';
         $barcode = (isset($_POST['barcode']) && !empty($_POST['barcode'])) ? $this->input->post("barcode", true) : NULL;
-        $products =  $this->data['products'] = fetch_product("", $filter, "", $category_id, $limit, $offset, $sort, $order, "", "", $partner_id, $filter_by, NULL, $barcode);
+        $barcode = (isset($_GET['barcode']) && !empty($_GET['barcode'])) ? $this->input->get("barcode", true) : $barcode;
+        $buy_stock = (isset($_POST['buy_stock']) && !empty($_POST['buy_stock'])) ? 1 : NULL;
+        $products =  $this->data['products'] = fetch_product("", $filter, "", $category_id, $limit, $offset, $sort, $order, "", "", $partner_id, $filter_by, $buy_stock, $barcode);
         // print_r($products);
         $response['error'] = (!empty($products)) ? false : true;
         $response['message'] = (!empty($products)) ? "Products fetched successfully" : "No products found";

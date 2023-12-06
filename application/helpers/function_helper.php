@@ -3656,15 +3656,18 @@ function get_cart_count($user_id)
     $res = $ci->db->get('cart')->result_array();
     return $res;
 }
-function is_variant_available_in_cart($product_variant_id, $user_id)
+function is_variant_available_in_cart($product_variant_id, $user_id, $return_qty = NULL)
 {
     $ci = &get_instance();
     $ci->db->where('product_variant_id', $product_variant_id);
     $ci->db->where('user_id', $user_id);
     $ci->db->where('qty !=', 0);
     $ci->db->where('is_saved_for_later =', 0);
-    $ci->db->select('id');
+    $ci->db->select('id,qty');
     $res = $ci->db->get('cart')->result_array();
+    if ($return_qty==1) {
+        return $res[0]['qty'];
+    }
     if (!empty($res[0]['id'])) {
         return true;
     } else {

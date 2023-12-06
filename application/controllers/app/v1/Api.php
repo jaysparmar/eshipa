@@ -2183,6 +2183,7 @@ class Api extends CI_Controller
         //     return false;
         // }
         $_POST['qty'] = isset($_POST['qty']) && $_POST['qty'] != '' ? $_POST['qty'] : 1;
+        $buy_stock = isset($_POST['buy_stock']) && $_POST['buy_stock'] != '' ? 1 : 0;
         $_POST['user_id'] = isset($_POST['user_id']) && $_POST['user_id'] != '' ? $_POST['user_id'] : ($this->ion_auth->logged_in() ? $this->session->userdata('user_id') : '');
         $this->form_validation->set_rules('user_id', 'User', 'trim|numeric|required|xss_clean');
         $this->form_validation->set_rules('product_variant_id', 'Product Variant', 'trim|required|xss_clean');
@@ -2224,7 +2225,7 @@ class Api extends CI_Controller
                 }
             }
 
-            if (!is_single_seller($product_variant_id, $user_id)) {
+            if (!is_single_seller($product_variant_id, $user_id) && !$buy_stock) {
                 $this->response['error'] = true;
                 $this->response['message'] = 'Only single partner items are allow in cart.You can remove privious item(s) and add this item.';
                 $this->response['data'] = array();
@@ -2246,8 +2247,10 @@ class Api extends CI_Controller
                     return;
                 }
             }
-
-
+            if($is_variant_available_in_cart && $buy_stock==1){
+                $current_qty = is_variant_available_in_cart($this->input->post('product_variant_id', true),  $this->input->post('user_id', true), 1);
+                $_POST['qty'] = $current_qty + 1;
+            }
             if (!$this->cart_model->add_to_cart($_POST, $check_status)) {
                 $response = get_cart_total($_POST['user_id'], false); // we will calculate add ons in this function
                 $cart_user_data = $this->cart_model->get_user_cart($_POST['user_id'], 0);

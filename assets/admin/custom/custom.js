@@ -1289,6 +1289,7 @@ function product_query_params(p) {
         partner_id: $("#restro_filter").val(),
         status: $("#status_filter").val(),
         buy_stock: $("#buy_stock").val(),
+        barcode: $("#buy_stock_barcode").val(),
         limit: p.limit,
         sort: p.sort,
         order: p.order,
@@ -7032,7 +7033,7 @@ $('.add-to-cart').on('click', function (e) {
     })
 })
 
-$("#partner_barcode").on("focusout", function (e) {
+$("#partner_barcode").on("focusout", function (e) { // For add product
     e.preventDefault();
     var barcode = $(this).val();
     if (barcode.trim() !== '') {
@@ -7041,7 +7042,7 @@ $("#partner_barcode").on("focusout", function (e) {
             type: "POST",
             url: base_url + "partner/point_of_sale/get_products",
             dataType: "json",
-            data: { [csrfName]: csrfHash, barcode: barcode },
+            data: { [csrfName]: csrfHash, barcode: barcode, partner_id: 0, buy_stock:1 },
             success: function (result) {
                 if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
                     playBeepSound();
@@ -7049,7 +7050,6 @@ $("#partner_barcode").on("focusout", function (e) {
                         message: 'Product fetched successfully.'
                     });
                     var product = result.products.product[0];
-                    console.log(product);
                     $('#admin_added').val(product.admin_added);
                     $('#pro_input_text').val(product.name);
                     $('#product_category_id').val(product.category_id).trigger('change');
@@ -7108,6 +7108,64 @@ $("#partner_barcode").on("focusout", function (e) {
 
     }
 });
+
+$("#buy_stock_barcode").on("focusout", function (e) {
+    e.preventDefault();
+    var barcode = $(this).val();
+    var buy_stock = 1;
+    if (barcode.trim() !== '') {
+
+        $.ajax({
+            type: "POST",
+            url: base_url + "partner/product/get_product_data",
+            dataType: "json",
+            data: { [csrfName]: csrfHash, barcode: barcode, buy_stock: buy_stock },
+            success: function (result) {
+                // console.log(result);
+                if (result.rows[0] !== undefined && result.rows[0] !== null && result.rows[0] !== '') {
+                    playBeepSound();
+                    var product = result.rows[0];
+                    $.ajax({
+                        url: base_url + 'app/v1/api/manage_cart',
+                        type: 'POST',
+                        data: {
+                            product_variant_id: product.varaint_id,
+                            qty: 1,
+                            buy_stock:buy_stock,
+                            [csrfName]: csrfHash
+                        },                        
+                        dataType: 'json',
+                        success: function (result) {
+                            csrfName = result.csrfName
+                            csrfHash = result.csrfHash                            
+                            if (result.error == false) {
+                                $('.partner-cart-count').text(result.data.total_items);
+                                $(".table-striped").bootstrapTable("refresh");
+                                iziToast.success({
+                                    message: result.message,
+                                });
+                            } else {
+                                iziToast.error({
+                                    message: result.message
+                                });
+                            }
+                        }
+                    })
+
+
+
+                } else {
+                    iziToast.error({
+                        message: 'Product not found.'
+                    });
+                }
+            }
+        });
+
+    }
+});
+
+
 function playBeepSound() {
     var audio = new Audio(base_url + 'assets/beep.mp3');
     audio.play();

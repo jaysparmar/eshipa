@@ -57,7 +57,7 @@
                                         <?php
                                         $res = fetch_details('product_variant_id=' . $product_details[0]['variants'][0]['id'] . ' and user_id=' . $this->session->userdata('user_id'), 'cart', 'id,qty');
                                         $is_added = isset($res[0]['id']) && !empty($res[0]['id']) ? 1 : 0;
-                                        if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                        if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy-stock') {
                                             if ($is_added == 1) {
 
                                         ?>
@@ -118,7 +118,7 @@
                                             }
                                     ?>
                                         <tr class='<?= ($row['status'] == 7) ? "table-danger" : (($row['status'] == 0) ? "table-warning" : ""); ?>'>
-                                            <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                            <td><?= $row['id'] ?> <small><?= ($row['status'] == 7) ? "Trashed" : (($row['status'] == 0) ? "Deactived" : ""); ?></small> <?php if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy-stock') {
                                                                                                                                                                             echo '';
                                                                                                                                                                         } else { ?><?= ($row['status'] == 7) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Restore variant'>Restore</a>" : (($row['status'] == 0) ? "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/1/' . $product_details[0]['id']) . "' title='Activate variant'>Activate</a>" : "<a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/0/' . $product_details[0]['id']) . "' title='Deactivate variant'>Deactivate</a> | <a href='" . base_url('partner/product/change_variant_status/' . $row['id'] . '/7/' . $product_details[0]['id']) . "' title='Move variant to Trash'>Trash</a>") ?><?php } ?> </td>
                                             <td><?= str_replace(',', ' | ', $row['variant_values']) ?></td>
@@ -126,7 +126,7 @@
                                             <?php
                                             $res = fetch_details('product_variant_id=' . $row['id'] . ' and user_id=' . $this->session->userdata('user_id'), 'cart', 'id,qty');
                                             $is_added = isset($res[0]['id']) && !empty($res[0]['id']) ? 1 : 0;
-                                            if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy_stock') {
+                                            if ($this->uri->segment(2) != null && $this->uri->segment(2) == 'buy-stock') {
                                                 if ($is_added == 1) {
 
                                             ?><td>

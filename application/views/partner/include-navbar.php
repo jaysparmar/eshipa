@@ -20,7 +20,7 @@ $current_status = $this->ion_auth->partner_status(); ?>
         <li class="nav-item dropdown mx-2">
             <a href="<?= base_url('partner/cart') ?>" class="nav-link">
                 <i class="fas fa-shopping-cart"></i>
-                <span class="badge bg-danger navbar-badge"><?= (count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) != 0 ? count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) : ''); ?></span>
+                <span class="badge bg-danger navbar-badge partner-cart-count"><?= (count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) != 0 ? count($this->cart_model->get_user_cart($this->session->userdata('user_id'))) : ''); ?></span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right p-2">
 
