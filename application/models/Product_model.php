@@ -243,6 +243,7 @@ class Product_model extends CI_Model
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
+        $low_stock_limit += get_safety_stock($partner_id);
         $offset = 0;
         $limit = 10;
         $sort = 'id';
@@ -384,7 +385,7 @@ class Product_model extends CI_Model
         }
 
 
-        $pro_search_res = $search_res->group_by('pid')->order_by($sort, "DESC")->limit($limit, $offset)->get('products p')->result_array();        
+        $pro_search_res = $search_res->group_by('pid')->order_by($sort, "DESC")->limit($limit, $offset)->get('products p')->result_array();
         // echo $this->db->last_query();
         $currency = get_settings('currency');
         $bulkData = array();

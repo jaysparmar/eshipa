@@ -687,8 +687,14 @@ function create_attributes(value, selected_attr) {
         .trigger("change");
 }
 
-function create_fetched_attributes_html(from) {
-    var edit_id = $('input[name="edit_product_id"]').val();
+function create_fetched_attributes_html(from, product_id = '') {
+    var edit_id = '';
+
+    if (product_id !== '') {
+        edit_id = product_id;
+    } else {
+        edit_id = $('input[name="edit_product_id"]').val();
+    }
     $.ajax({
         type: "GET",
         url: base_url + from + "/product/fetch_attributes_by_id",
@@ -2621,7 +2627,7 @@ $(document).on("click", ".remove_attributes , .remove_variants", function (e) {
     });
 });
 
-$(document).on("select2:select", "#product-type", function () {
+$(document).on("change", "#product-type", function () {
     var value = $(this).val();
     if ($.trim(value) != "") {
         if (value == "simple_product") {
@@ -2749,7 +2755,7 @@ $(document).on("click", ".reset-settings", function (e) {
         }
     });
 });
-$(document).on("click", ".save-settings", function (e) {
+$(document).on("click", ".save-settings", function (e, data) {
     e.preventDefault();
 
     if ($(".simple_stock_management_status").is(":checked")) {
@@ -2776,10 +2782,12 @@ $(document).on("click", ".save-settings", function (e) {
         } else {
             $('input[name="simple_product_stock_status"]').val("");
         }
-        $("#product-type").prop("disabled", true);
+        if (!data || !data.hasOwnProperty('barcode')) {
+            $("#product-type").prop("disabled", true);
+            $(".simple_stock_management_status").prop("disabled", true);
+        }
         $(".product-attributes").removeClass("disabled");
         $(".product-variants").removeClass("disabled");
-        $(".simple_stock_management_status").prop("disabled", true);
         setTimeout(function () {
             $(".additional-info").unblock();
         }, 2000);
@@ -7042,7 +7050,7 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
             type: "POST",
             url: base_url + "partner/point_of_sale/get_products",
             dataType: "json",
-            data: { [csrfName]: csrfHash, barcode: barcode, partner_id: 0, buy_stock:1 },
+            data: { [csrfName]: csrfHash, barcode: barcode, partner_id: 0, buy_stock: 1 },
             success: function (result) {
                 if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
                     playBeepSound();
@@ -7050,6 +7058,7 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                         message: 'Product fetched successfully.'
                     });
                     var product = result.products.product[0];
+                    console.log(product);
                     $('#admin_added').val(product.admin_added);
                     $('#pro_input_text').val(product.name);
                     $('#product_category_id').val(product.category_id).trigger('change');
@@ -7077,7 +7086,7 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                             "></div>" +
                             "</div>"
                         );
-                    $('#product_tags').val(['1', '2']).trigger('change');
+                    // $('#product_tags').val(['1', '2']).trigger('change');
                     $('#indicator').val(product.indicator);
                     // var tagify = new Tagify(document.querySelector('#highlights'));
                     // Assuming `tagify` holds the Tagify instance for #highlights
@@ -7095,7 +7104,31 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                         $('#product_start_time').val('');
                         $('#product_end_time').val('');
                     }
-                    // $('#product-type').val(product.type).trigger('change');
+                    $('#product-type').val(product.type).trigger('change');
+                    if (product.type == 'simple_product') {
+                        $('.price').val(product.variants[0]['price']);
+                        $('.discounted_price').val(product.variants[0]['special_price']);
+                        $('#simple_barcode').val(product.variants[0]['barcode']);
+                        if (product.stock_type !== null && product.stock_type !== "") {
+                            $('.simple_stock_management_status').prop('checked', true).trigger('change');
+                            $('#product_total_stock').val(product.variants[0]['stock']);
+                            $('#simple_product_stock_status').val(product.variants[0]['availability']);
+                        }else{
+                            $('.simple_stock_management_status').prop('checked', false).trigger('change');
+                        }
+                        var additionalData = {
+                            barcode: 1
+                        };
+                        $('.save-settings').trigger('click', additionalData);
+                        $('#attributes_process').empty();
+                        create_fetched_attributes_html(from, product.id).done(function () {
+                            $(".no-attributes-added").hide();
+                            $("#save_attributes").removeClass("d-none");
+                            $(".no-variants-added").hide();
+                            save_attributes();
+                        });
+
+                    }
 
 
                 } else {
@@ -7131,13 +7164,13 @@ $("#buy_stock_barcode").on("focusout", function (e) {
                         data: {
                             product_variant_id: product.varaint_id,
                             qty: 1,
-                            buy_stock:buy_stock,
+                            buy_stock: buy_stock,
                             [csrfName]: csrfHash
-                        },                        
+                        },
                         dataType: 'json',
                         success: function (result) {
                             csrfName = result.csrfName
-                            csrfHash = result.csrfHash                            
+                            csrfHash = result.csrfHash
                             if (result.error == false) {
                                 $('.partner-cart-count').text(result.data.total_items);
                                 $(".table-striped").bootstrapTable("refresh");

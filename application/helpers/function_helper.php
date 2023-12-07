@@ -825,7 +825,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
             $product[$i]['product_add_ons'] = fetch_details(['product_id' => $product[$i]['id'], 'status' => 1], 'product_add_ons', 'id,product_id,title,description,price,calories');
             $product[$i]['variants'] = get_variants_values_by_pid($product[$i]['id']);
             $product[$i]['min_max_price'] = get_min_max_price_of_product($product[$i]['id']);
-            $product[$i]['stock_type'] = isset($product[$i]['stock_type']) && !empty($product[$i]['stock_type']) ? $product[$i]['stock_type'] : '';
+            $product[$i]['stock_type'] = isset($product[$i]['stock_type']) && $product[$i]['stock_type'] != '' ? $product[$i]['stock_type'] : '';
             $product[$i]['indicator'] = isset($product[$i]['indicator']) && !empty($product[$i]['indicator']) ? $product[$i]['indicator'] : '';
             $product[$i]['stock'] = isset($product[$i]['stock']) && !empty($product[$i]['stock']) ? $product[$i]['stock'] : '';
             $product[$i]['calories'] = isset($product[$i]['calories']) && !empty($product[$i]['calories']) ? $product[$i]['calories'] : '0';
@@ -3665,7 +3665,7 @@ function is_variant_available_in_cart($product_variant_id, $user_id, $return_qty
     $ci->db->where('is_saved_for_later =', 0);
     $ci->db->select('id,qty');
     $res = $ci->db->get('cart')->result_array();
-    if ($return_qty==1) {
+    if ($return_qty == 1) {
         return $res[0]['qty'];
     }
     if (!empty($res[0]['id'])) {
@@ -4613,6 +4613,24 @@ function remove_dine_in_cart($table_id)
 {
     delete_details(['table_id' => $table_id], "dine_in_cart");
     update_details(['status' => 1], ['id' => $table_id], "tables");
+}
+
+function check_partner_barcode_exists($partner_id, $barcode)
+{
+    $CI = &get_instance();
+    // Check product_variants for the barcode associated with the provided partner_id
+    $CI->db->where('barcode', $barcode);
+    $CI->db->where('product_id IN (SELECT id FROM products WHERE partner_id = ' . $partner_id . ')');
+    $query = $CI->db->get('product_variants');
+
+    return $query->num_rows() > 0; // Returns true if the barcode exists for the given partner_id
+}
+
+function get_safety_stock($partner_id)
+{
+    $safety_stock_res = fetch_details(['user_id' => $partner_id], 'partner_data', 'safety_stock');
+    $safety_stock = isset($safety_stock_res[0]['safety_stock']) && !empty($safety_stock_res[0]['safety_stock']) ? $safety_stock_res[0]['safety_stock'] : 0;
+    return $safety_stock;
 }
 
 function test()

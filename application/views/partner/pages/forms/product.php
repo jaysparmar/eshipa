@@ -528,7 +528,7 @@
                                                                             <div class="form-group ">
                                                                                 <label for="" class="col-sm-3 col-form-label">Barcode</label>
                                                                                 <div class="col-sm-12">
-                                                                                    <input type="text" class="form-control" name="simple_barcode">
+                                                                                    <input type="text" class="form-control" name="simple_barcode" id="simple_barcode">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="form-group">
@@ -540,7 +540,7 @@
                                                                         <div class="form-group simple-product-level-stock-management collapse">
                                                                             <div class="col col-xs-12">
                                                                                 <label class="control-label">Total Stock :</label>
-                                                                                <input type="text" name="product_total_stock" class="col form-control stock-simple-mustfill-field">
+                                                                                <input type="text" name="product_total_stock" id="product_total_stock" class="col form-control stock-simple-mustfill-field">
                                                                             </div>
                                                                             <div class="col col-xs-12">
                                                                                 <label class="control-label">Stock Status :</label>

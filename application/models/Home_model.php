@@ -76,6 +76,7 @@ class Home_model extends CI_Model
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
+        $low_stock_limit += get_safety_stock($partner_id);
         $count_res = $this->db->select(' COUNT( distinct(p.id)) as `total` ')->join('product_variants', 'product_variants.product_id = p.id');
         $where = "p.stock_type is  NOT NULL";
 
