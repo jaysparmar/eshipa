@@ -290,6 +290,46 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
             $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
+
+            if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists($this->session->userdata('user_id'), $_POST['simple_barcode'])) {
+                $this->response['error'] = true;
+                $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                $this->response['message'] = 'Product with barcode ' . $_POST['simple_barcode'] . ' is already added by you.';
+                print_r(json_encode($this->response));
+                return false;
+            }
+
+            if (isset($_POST['variant_barcode']) && is_array($_POST['variant_barcode'])) {
+                $barcodes = $_POST['variant_barcode'];
+
+                $barcodeCounts = array_count_values($barcodes);
+
+                // Check for duplicates
+                foreach ($barcodeCounts as $barcode => $count) {
+                    if ($count > 1) {
+                        // Duplicates found
+                        $this->response['error'] = true;
+                        $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                        $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                        $this->response['message'] = 'Duplicate barcode ' . $barcode;
+                        print_r(json_encode($this->response));
+                        return false;
+                    }
+                }
+
+                foreach ($barcodes as $barcode) {
+                    if ($barcode !== '' && check_barcode_exists(0, $barcode)) {
+                        $this->response['error'] = true;
+                        $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                        $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                        $this->response['message'] = 'Product with barcode ' . $barcode . ' is already added by you.';
+                        print_r(json_encode($this->response));
+                        return false;
+                    }
+                }
+            }
+
             if (isset($_POST['highlights']) && $_POST['highlights'] != '') {
                 $_POST['highlights'] = json_decode($_POST['highlights'], 1);
                 $highlights = array_column($_POST['highlights'], 'value');

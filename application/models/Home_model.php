@@ -76,7 +76,6 @@ class Home_model extends CI_Model
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
-        $low_stock_limit += get_safety_stock($partner_id);
         $count_res = $this->db->select(' COUNT( distinct(p.id)) as `total` ')->join('product_variants', 'product_variants.product_id = p.id');
         $where = "p.stock_type is  NOT NULL";
 
@@ -90,6 +89,26 @@ class Home_model extends CI_Model
         }
         $product_count = $count_res->get('products p')->result_array();
         return $product_count[0]['total'];
+    }
+
+    public function count_products_under_safety_stock($partner_id)
+    {
+        $safety_stock = get_safety_stock($partner_id);
+        if(!empty($safety_stock)){
+            $count_res = $this->db->select(' COUNT( distinct(p.id)) as `total` ')->join('product_variants', 'product_variants.product_id = p.id');
+            $where = "p.stock_type is  NOT NULL";
+    
+            $count_res->where($where);
+            $count_res->where('p.stock  <=', $safety_stock);
+            $count_res->where('p.availability  =', '1');
+            $count_res->or_where('product_variants.stock  <=', $safety_stock);
+            $count_res->where('product_variants.availability  =', '1');
+            if (!empty($partner_id) && $partner_id != '') {
+                $count_res->where('p.partner_id  =', $partner_id);
+            }
+            $product_count = $count_res->get('products p')->result_array();
+            return $product_count[0]['total'];
+        }
     }
 
     public function count_products_availability_status($partner_id = "")

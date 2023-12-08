@@ -58,6 +58,9 @@ class Product extends CI_Controller
                     redirect('partner/product/create_product', 'refresh');
                 }
             }
+            else{
+                $this->data['tags'] = fetch_details(NULL, "tags", "id,title", null, null, null, "DESC", "", '');
+            }
 
             if (!isset($_GET['edit_id']) && empty($_GET['edit_id'])) {
                 $where = ['attr_val.status' => 1, 'attr.status' => 1];
@@ -205,11 +208,11 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
             $this->form_validation->set_rules('admin_added', 'Admin added', 'trim|xss_clean');
 
-            if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_partner_barcode_exists($this->session->userdata('user_id'), $_POST['barcode'])) {
+            if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists($this->session->userdata('user_id'), $_POST['simple_barcode'])) {
                 $this->response['error'] = true;
                 $this->response['csrfName'] = $this->security->get_csrf_token_name();
                 $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                $this->response['message'] = 'Product with barcode ' . $_POST['barcode'] . ' is already added by you.';
+                $this->response['message'] = 'Product with barcode ' . $_POST['simple_barcode'] . ' is already added by you.';
                 print_r(json_encode($this->response));
                 return false;
             }
@@ -217,8 +220,23 @@ class Product extends CI_Controller
             if (isset($_POST['variant_barcode']) && is_array($_POST['variant_barcode'])) {
                 $barcodes = $_POST['variant_barcode'];
 
+                $barcodeCounts = array_count_values($barcodes);
+
+                // Check for duplicates
+                foreach ($barcodeCounts as $barcode => $count) {
+                    if ($count > 1) {
+                        // Duplicates found
+                        $this->response['error'] = true;
+                        $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                        $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                        $this->response['message'] = 'Duplicate barcode ' . $barcode;
+                        print_r(json_encode($this->response));
+                        return false;
+                    }
+                }
+
                 foreach ($barcodes as $barcode) {
-                    if ($barcode !== '' && check_partner_barcode_exists($this->session->userdata('user_id'), $barcode)) {
+                    if ($barcode !== '' && check_barcode_exists($this->session->userdata('user_id'), $barcode)) {
                         $this->response['error'] = true;
                         $this->response['csrfName'] = $this->security->get_csrf_token_name();
                         $this->response['csrfHash'] = $this->security->get_csrf_hash();
@@ -1136,7 +1154,7 @@ class Product extends CI_Controller
     public function set_safety_stock()
     {
         if ($this->ion_auth->logged_in() && $this->ion_auth->is_partner() && ($this->ion_auth->partner_status() == 1 || $this->ion_auth->partner_status() == 0)) {
-            $this->form_validation->set_rules('safety_stock', 'Safety stock', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('safety_stock', 'Safety stock', 'trim|xss_clean|greater_than_equal_to[0]');
             if (!$this->form_validation->run()) {
                 $this->response['error'] = true;
                 $this->response['csrfName'] = $this->security->get_csrf_token_name();

@@ -216,7 +216,10 @@ class Product_model extends CI_Model
 
             if (!empty($data['variants_ids'])) {
                 $variants_ids = $data['variants_ids'];
-                if (isset($data['edit_variant_id']) && !empty($data['edit_variant_id'])) {
+                if (
+                    isset($data['edit_variant_id']) && !empty($data['edit_variant_id']) &&
+                    isset($data['edit_product_id']) && !empty($data['edit_product_id'])
+                ) {
                     $this->db->set('status', 7)->where('product_id', $data['edit_product_id'])->where('status !=', 0)->where_not_in('id', $data['edit_variant_id'])->update('product_variants');
                 }
 
@@ -229,7 +232,10 @@ class Product_model extends CI_Model
                     $pro_variance_data['special_price'] = (isset($variant_special_price[$i]) && !empty($variant_special_price[$i])) ? $variant_special_price[$i] : '0';
                     $pro_variance_data['barcode'] = (isset($variant_barcode[$i]) && !empty($variant_barcode[$i])) ? $variant_barcode[$i] : NULL;
                     $pro_variance_data['attribute_value_ids'] = $value;
-                    if (isset($data['edit_variant_id'][$i]) && !empty($data['edit_variant_id'][$i])) {
+                    if (
+                        isset($data['edit_variant_id']) && !empty($data['edit_variant_id']) &&
+                        isset($data['product_id']) && !empty($data['product_id'])
+                    ) {
                         $this->db->where('id', $data['edit_variant_id'][$i])->update('product_variants', $pro_variance_data);
                     } else {
                         $this->db->insert('product_variants', $pro_variance_data);
@@ -243,7 +249,7 @@ class Product_model extends CI_Model
     {
         $settings = get_settings('system_settings', true);
         $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
-        $low_stock_limit += get_safety_stock($partner_id);
+        $safety_stock = !empty($partner_id) ? get_safety_stock($partner_id) : 0;
         $offset = 0;
         $limit = 10;
         $sort = 'id';
@@ -294,6 +300,17 @@ class Product_model extends CI_Model
             $count_res->where('p.stock <=', $low_stock_limit);
             $count_res->where('p.availability  =', '1');
             $count_res->or_where('product_variants.stock <=', $low_stock_limit);
+            $count_res->where('product_variants.availability  =', '1');
+            $count_res->group_End();
+        }
+
+        if ($flag == 'safety_stock' && !empty($safety_stock)) {
+            $count_res->group_Start();
+            $where = "p.stock_type is  NOT NULL";
+            $count_res->where($where);
+            $count_res->where('p.stock <=', $safety_stock);
+            $count_res->where('p.availability  =', '1');
+            $count_res->or_where('product_variants.stock <=', $safety_stock);
             $count_res->where('product_variants.availability  =', '1');
             $count_res->group_End();
         }
@@ -352,6 +369,16 @@ class Product_model extends CI_Model
             $search_res->where('p.stock <=', $low_stock_limit);
             $search_res->where('p.availability  =', '1');
             $search_res->or_where('product_variants.stock <=', $low_stock_limit);
+            $search_res->where('product_variants.availability  =', '1');
+            $search_res->group_End();
+        }
+        if ($flag == 'safety_stock' && !empty($safety_stock)) {
+            $search_res->group_Start();
+            $where = "p.stock_type is  NOT NULL";
+            $search_res->where($where);
+            $search_res->where('p.stock <=', $safety_stock);
+            $search_res->where('p.availability  =', '1');
+            $search_res->or_where('product_variants.stock <=', $safety_stock);
             $search_res->where('product_variants.availability  =', '1');
             $search_res->group_End();
         }

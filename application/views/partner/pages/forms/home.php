@@ -167,7 +167,10 @@
                     </div>
                     <!-- /.card -->
                 </div>
-                <div class="col-md-6 col-xs-12">
+                <?php
+                $col_md = !empty(get_safety_stock($user_id)) ? '4' : '6';
+                ?>
+                <div class="col-md-<?= $col_md ?> col-xs-12">
                     <div class="alert alert-danger alert-dismissible">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                         <h6><i class="icon fa fa-info"></i> <?= $count_products_availability_status ?> Product(s) sold out!</h6>
@@ -176,13 +179,24 @@
                 </div>
 
                 <?php $settings = get_settings('system_settings', true); ?>
-                <div class="col-md-6 col-xs-12">
+                <div class="col-md-<?= $col_md ?> col-xs-12">
                     <div class="alert alert-primary alert-dismissible">
                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                         <h6><i class="icon fa fa-info"></i> <?= $count_products_low_status ?> Product(s) low in stock!<small> (Low stock limit <?= isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : '5' ?>)</small></h6>
+
                         <a href="<?= base_url('partner/product/?flag=low') ?>" class="text-decoration-none small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
+                <?php if (!empty(get_safety_stock($user_id))) { ?>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="alert alert-danger alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h6><i class="icon fa fa-info"></i> <?= $count_products_under_safety_stock ?> Product(s) running under safety stock!<small> (Safety stock <?= get_safety_stock($user_id) ?>)</small></h6>
+
+                            <a href="<?= base_url('partner/product/?flag=safety_stock') ?>" class="text-decoration-none small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                <?php } ?>
 
                 <div class="col-md-12 main-content">
                     <div class="card content-area p-4">

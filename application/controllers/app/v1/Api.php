@@ -981,6 +981,7 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('vegetarian', 'vegetarian', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('search', 'Search', 'trim|xss_clean');
         $this->form_validation->set_rules('category_id', 'Category id', 'trim|numeric|xss_clean');
+        $this->form_validation->set_rules('barcode', 'Barcode', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('partner_id', 'partner id', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('attribute_value_ids', 'Attr Ids', 'trim|xss_clean');
         $this->form_validation->set_rules('sort', 'sort', 'trim|xss_clean');
@@ -1038,6 +1039,7 @@ class Api extends CI_Controller
             $filter_by = (isset($_POST['filter_by']) && !empty($_POST['filter_by'])) ? $this->input->post("filter_by", true) : 'sd.user_id';
 
             $category_id = (isset($_POST['category_id'])) ? $_POST['category_id'] : null;
+            $barcode = (isset($_POST['barcode'])) ?  $this->input->post('barcode', true)  : null;
             $product_id = (isset($_POST['id'])) ? $_POST['id'] : null;
             $product_ids = (isset($_POST['product_ids'])) ? $_POST['product_ids'] : null;
             $product_variant_ids = (isset($_POST['product_variant_ids']) && !empty($_POST['product_variant_ids'])) ? $this->input->post("product_variant_ids", true) : null;
@@ -1049,7 +1051,7 @@ class Api extends CI_Controller
             }
             $user_id = (isset($_POST['user_id'])) ? $_POST['user_id'] : null;
 
-            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by);
+            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by, $barcode);
 
             $final_total = "0";
             if (isset($filters['discount']) && !empty($filters['discount'])) {

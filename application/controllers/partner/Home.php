@@ -30,6 +30,7 @@ class Home extends CI_Controller
             $this->data['meta_description'] = 'Partner Panel | ' . $settings['app_name'];
             $this->data['count_products_low_status'] = $this->Home_model->count_products_stock_low_status($user_id);
             $this->data['count_products_availability_status'] = $this->Home_model->count_products_availability_status($user_id);
+            $this->data['count_products_under_safety_stock'] = $this->Home_model->count_products_under_safety_stock($user_id);
             $orders_count['pending'] = orders_count("pending", $user_id);
             $orders_count['confirmed'] = orders_count("confirmed", $user_id);
             $orders_count['preparing'] = orders_count("preparing", $user_id);

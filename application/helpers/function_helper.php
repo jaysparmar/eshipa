@@ -378,6 +378,7 @@ function fetch_details($where = NULL, $table = "", $fields = '*', $limit = '', $
 
 function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id", $buy_stock = NULL, $barcode = NULL)
 {
+
     $settings = get_settings('system_settings', true);
     $near_by_distance = 5;
     $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
@@ -823,6 +824,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
             $product[$i]['tax_percentage'] = (isset($product[$i]['tax_percentage']) && intval($product[$i]['tax_percentage']) > 0) ? $product[$i]['tax_percentage'] : '0';
             $product[$i]['attributes'] = get_attribute_values_by_pid($product[$i]['id']);
             $product[$i]['product_add_ons'] = fetch_details(['product_id' => $product[$i]['id'], 'status' => 1], 'product_add_ons', 'id,product_id,title,description,price,calories');
+            $product[$i]['tags'] = fetch_details(["pt.product_id" => $product[$i]['id']], "product_tags pt", "t.id", null, null, null, "DESC", "", '', "tags t", "t.id=pt.tag_id");
             $product[$i]['variants'] = get_variants_values_by_pid($product[$i]['id']);
             $product[$i]['min_max_price'] = get_min_max_price_of_product($product[$i]['id']);
             $product[$i]['stock_type'] = isset($product[$i]['stock_type']) && $product[$i]['stock_type'] != '' ? $product[$i]['stock_type'] : '';
@@ -4615,14 +4617,14 @@ function remove_dine_in_cart($table_id)
     update_details(['status' => 1], ['id' => $table_id], "tables");
 }
 
-function check_partner_barcode_exists($partner_id, $barcode)
+function check_barcode_exists($user_id, $barcode)
 {
     $CI = &get_instance();
     // Check product_variants for the barcode associated with the provided partner_id
     $CI->db->where('barcode', $barcode);
-    $CI->db->where('product_id IN (SELECT id FROM products WHERE partner_id = ' . $partner_id . ')');
+    $CI->db->where('product_id IN (SELECT id FROM products WHERE partner_id = ' . $user_id . ')');
     $query = $CI->db->get('product_variants');
-
+    // echo $CI->db->last_query();
     return $query->num_rows() > 0; // Returns true if the barcode exists for the given partner_id
 }
 

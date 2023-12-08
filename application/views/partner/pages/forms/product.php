@@ -32,7 +32,8 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                    <input type="text" name="barcode" id="partner_barcode" class="form-control" value="">
+                                        <!-- Barcode only for add product -->
+                                        <input type="text" name="barcode" id="partner_barcode" class="form-control" value=""> 
                                         <div class="form-group ">
                                             <label for="name" class="col-sm-3 col-form-label">Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
@@ -145,12 +146,22 @@
                                         <div class="form-group ">
                                             <label for="cities" class="col-sm-2 col-form-label">Select Tags <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
-                                                <select name="tags[]" id="product_tags" class="search_tags w-100" multiple onload="multiselect()">
-                                                    <option value="">Select Tags for Product</option>
-                                                    <?php foreach ($tags as $row) { ?>
-                                                        <option value=<?= $row['tag_id'] ?> selected> <?= output_escaping($row['title']) ?></option>
-                                                    <?php } ?>
-                                                </select>
+                                                <?php if (isset($product_details[0]['id']) && !empty($product_details[0]['id'])) { ?>
+                                                    <select name="tags[]" id="product_tags" class="search_tags w-100" multiple onload="multiselect()">
+                                                        <option value="">Select Tags for Product</option>
+                                                        <?php foreach ($tags as $row) { ?>
+                                                            <option value=<?= $row['tag_id'] ?> selected> <?= output_escaping($row['title']) ?></option>
+                                                        <?php } ?>
+                                                    </select>
+                                                <?php } else { ?>
+                                                    <select name="tags[]" id="product_tags" class="search_tags w-100" multiple onload="multiselect()">
+                                                        <option value="">Select Tags for Product</option>
+                                                        <?php foreach ($tags as $row) { ?>
+                                                            <option value=<?= $row['id'] ?>> <?= output_escaping($row['title']) ?></option>
+                                                        <?php } ?>
+                                                    </select>
+
+                                                <?php } ?>
                                             </div>
                                         </div>
                                         <div class="form-group">
