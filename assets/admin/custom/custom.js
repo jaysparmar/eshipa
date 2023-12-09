@@ -2373,6 +2373,31 @@ $(document).on("click", "#delete-add-ons", function () {
     });
 });
 
+
+$(document).on("click", ".delete-add-on", function () {
+    var clickedButton = $(this); // Store the reference to the clicked button
+
+    Swal.fire({
+        title: "Are You Sure!",
+        text: "You won't be able to revert this!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        preConfirm: function () {
+            return new Promise((resolve, reject) => {
+                var $row = clickedButton.closest('tr'); // Use the stored reference to the clicked button
+                $row.remove();
+                resolve();
+            });
+        },
+        allowOutsideClick: false
+    });
+});
+
+
 // multiple_values
 $(".select_single , .multiple_values , #product-type").each(function () {
     $(this).select2({
@@ -5566,7 +5591,7 @@ $(".closed ").on("input", function (event) {
     save_hours();
 });
 var add_on_data = [];
-$("#save_add_ons").on("click", function (event) {
+$("#save_add_ons").on("click", function (event, data) {
     var table_data = new Object();
     event.preventDefault();
     var title = $("#add_on_title").val();
@@ -5609,6 +5634,7 @@ $("#save_add_ons").on("click", function (event) {
         table_data.description = des ? $("#add_on_description").val() : "";
         table_data.price = $("#add_on_price").val();
         table_data.calories = calories ? $("#add_on_calories").val() : "0";
+        table_data.actions = '<a href="javascript:void(0)" class="delete-add-on btn btn-danger btn-xs"><i class="fa fa-trash"></i></a>';
 
         $("#saved_add_ons_table").bootstrapTable("insertRow", {
             index: 0,
@@ -5620,10 +5646,12 @@ $("#save_add_ons").on("click", function (event) {
         $("#add_on_price").val("");
         $("#add_on_calories").val("");
         $('input[name="product_add_ons"]').val(JSON.stringify(add_on_data));
-        iziToast.success({
-            message:
-                '<span style="text-transform:capitalize">Add Ons Saved Successfully!</span> '
-        });
+        if (!data || !data.hasOwnProperty('barcode')) {
+            iziToast.success({
+                message:
+                    '<span style="text-transform:capitalize">Add Ons Saved Successfully!</span> '
+            });
+        }
     }
 });
 $(document).on("click", ".remove-add-ons", function (event) {
@@ -7054,8 +7082,15 @@ $('.add-to-cart').on('click', function (e) {
         }
     })
 })
+if ($('#partner_add_product_barcode').length > 0) {
+    $('#partner_add_product_barcode').on('keypress', function (event) {
+        if (event.keyCode === 13) {
+            $(this).trigger('focusout'); // Trigger focusout on the barcode input field
+        }
+    });
+}
 
-$("#partner_barcode").on("focusout", function (e) { // For add product
+$("#partner_add_product_barcode").on("focusout", function (e) { // For add product
     e.preventDefault();
     var barcode = $(this).val();
     if (barcode.trim() !== '') {
@@ -7071,8 +7106,11 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                     iziToast.success({
                         message: 'Product fetched successfully.'
                     });
+                    var additionalData = {
+                        barcode: 1
+                    };
                     var product = result.products.product[0];
-                    console.log(product);
+                    // console.log(product);
                     $('#admin_added').val(product.admin_added);
                     $('#pro_input_text').val(product.name);
                     $('#product_category_id').val(product.category_id).trigger('change');
@@ -7121,6 +7159,19 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                         $('#product_start_time').val('');
                         $('#product_end_time').val('');
                     }
+                    product.product_add_ons.forEach(function (addon) {
+                        var addOnTitle = addon.title;
+                        var addOnDescription = addon.description;
+                        var addOnPrice = addon.price;
+                        var addOnCalories = addon.calories;
+
+                        $('#add_on_title').val(addOnTitle);
+                        $('#add_on_description').val(addOnDescription);
+                        $('#add_on_price').val(addOnPrice);
+                        $('#add_on_calories').val(addOnCalories);
+                        $('#save_add_ons').trigger('click', additionalData);
+                    });
+
                     $('#product-type').val(product.type).trigger('change');
                     if (product.type == 'simple_product') {
                         $('.price').val(product.variants[0]['price']);
@@ -7133,9 +7184,6 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                         } else {
                             $('.simple_stock_management_status').prop('checked', false).trigger('change');
                         }
-                        var additionalData = {
-                            barcode: 1
-                        };
                         $('.save-settings').trigger('click', additionalData);
                         $('#attributes_process').empty();
                         create_fetched_attributes_html(from, product.id).done(function () {
@@ -7175,9 +7223,6 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
                         } else {
                             $('.variant_stock_status').prop('checked', false).trigger('change');
                         }
-                        var additionalData = {
-                            barcode: 1
-                        };
                         $('.save-variant-general-settings').trigger('click', additionalData);
                         $('#attributes_process').empty();
                         $('#variants_process').empty();
@@ -7201,6 +7246,14 @@ $("#partner_barcode").on("focusout", function (e) { // For add product
 
     }
 });
+
+if ($('#buy_stock_barcode').length > 0) {
+    $('#buy_stock_barcode').on('keypress', function (event) {
+        if (event.keyCode === 13) {
+            $(this).trigger('focusout'); // Trigger focusout on the barcode input field
+        }
+    });
+}
 
 $("#buy_stock_barcode").on("focusout", function (e) {
     e.preventDefault();

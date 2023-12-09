@@ -958,6 +958,13 @@ $("#search_products").on("keyup", function (e) {
     var search = $(this).val();
     get_products("", 25, 0, search);
 });
+if ($('#barcode').length > 0) {
+    $('#barcode').on('keypress', function (event) {
+        if (event.keyCode === 13) {
+            $(this).trigger('focusout'); // Trigger focusout on the barcode input field
+        }
+    });
+}
 
 $("#barcode").on("focusout", function (e) {
     e.preventDefault();

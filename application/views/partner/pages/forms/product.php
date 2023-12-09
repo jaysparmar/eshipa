@@ -18,6 +18,7 @@
     </section>
     <section class="content">
         <div class="container-fluid">
+            <input type="hidden" id="partner_add_product_barcode" class="form-control" value=""> 
             <form class="form-horizontal" action="<?= base_url('partner/product/add_product'); ?>" method="POST" enctype="multipart/form-data" id="save-product">
                 <?php if (isset($product_details[0]['id'])) {
                 ?>
@@ -33,7 +34,6 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <!-- Barcode only for add product -->
-                                        <input type="text" name="barcode" id="partner_barcode" class="form-control" value=""> 
                                         <div class="form-group ">
                                             <label for="name" class="col-sm-3 col-form-label">Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
@@ -269,6 +269,7 @@
                                                         <a href="javascript:void(0);" class="btn btn-warning" id="update_add_ons" data-product_id=<?= $product_details[0]['id'] ?>>Update Add Ons</a>
                                                         <a href="javascript:void(0);" class="btn btn-info" id="add_new_add_ons" data-product_id=<?= $product_details[0]['id'] ?>>Insert Add Ons</a>
                                                     <?php } else { ?>
+                                                        <!-- <a href="javascript:void(0);" class="btn btn-warning d-none" id="update_add_ons" data-product_id=<?= $product_details[0]['id'] ?>>Update Add Ons</a> -->
                                                         <a href="javascript:void(0);" class="btn btn-info btn-sm" id="save_add_ons">Save Add Ons</a>
                                                         <small class="text text-danger">Click on <strong> Add Product</strong> to save the Add Ons for this product after filling remaining details. </small>
                                                     <?php } ?>
@@ -308,6 +309,7 @@
                                                         <th data-field="description" data-sortable="true">Description</th>
                                                         <th data-field="price" data-sortable="true">Price</th>
                                                         <th data-field="calories" data-sortable="true">Calories</th>
+                                                        <th data-field="actions" data-sortable="true">Action</th>
                                                     </tr>
                                                 </thead>
                                             </table>

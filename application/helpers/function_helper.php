@@ -686,8 +686,6 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
         ->join('`taxes` tax', 'tax.id = p.tax', 'LEFT')
         ->join('`cities` ct', 'ct.id = u.city', 'LEFT')
         ->join('`product_attributes` pa', ' pa.product_id = p.id ', 'LEFT');
-    // print_R($t->db->last_query());
-    // return;
     if (isset($filter) && !empty($filter['search'])) {
         $highlights = explode(" ", $filter['search']);
         $t->db->group_Start();
@@ -815,10 +813,10 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     $min_price = get_price('min');
     $max_price = get_price('max');
 
-
     if (!empty($product)) {
         $t->load->model('rating_model');
         for ($i = 0; $i < count($product); $i++) {
+            $safety_stock = get_safety_stock($product[$i]['partner_id']);
             $rating = $t->rating_model->fetch_rating($product[$i]['id'], '', '', 8, 0, 'pr.id', 'desc', '', 1);
             $product[$i]['review_images'] = (!empty($rating)) ? [$rating] : array();
             $product[$i]['tax_percentage'] = (isset($product[$i]['tax_percentage']) && intval($product[$i]['tax_percentage']) > 0) ? $product[$i]['tax_percentage'] : '0';
@@ -880,7 +878,6 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                 $count_stock = array();
                 $is_purchased_count = array();
                 for ($k = 0; $k < count($product[$i]['variants']); $k++) {
-
                     unset($product[$i]['variants'][$k]['images']);
                     if (($product[$i]['stock_type'] == 0  || $product[$i]['stock_type'] == null)) {
                         if ($product[$i]['availability'] != null) {
@@ -890,6 +887,8 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                         $product[$i]['variants'][$k]['availability'] = ($product[$i]['variants'][$k]['availability'] != null) ? $product[$i]['variants'][$k]['availability'] : "1";
                         array_push($count_stock, $product[$i]['variants'][$k]['availability']);
                     }
+                    
+
                     if (($product[$i]['stock_type'] == 0)) {
                         $product[$i]['variants'][$k]['stock'] = get_stock($product[$i]['id'], 'product');
                     } else {
@@ -899,6 +898,12 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                     $product[$i]['variants'][$k]['special_price'] =  (isset($product[$i]['variants'][$k]['special_price']) && !empty($product[$i]['variants'][$k]['special_price'])) ? strval($product[$i]['variants'][$k]['special_price']) : "0";
                     $product[$i]['variants'][$k]['stock'] =  isset($product[$i]['variants'][$k]['stock']) && !empty($product[$i]['variants'][$k]['stock']) ? $product[$i]['variants'][$k]['stock'] : '';
 
+                    //Modify variant availability to 0 if stock running under safety stock and stock management is on
+                    if ($product[$i]['stock_type'] != NULL && $product[$i]['stock_type'] == 1 || $product[$i]['stock_type'] == 2) {
+                        $product[$i]['variants'][$k]['availability'] = !empty($safety_stock) && $product[$i]['variants'][$k]['stock'] <= $safety_stock ? strval(0) : $product[$i]['variants'][$k]['availability'];
+                        $product[$i]['variants'][$k]['stock'] = !empty($safety_stock) && $product[$i]['variants'][$k]['stock'] <= $safety_stock ? "" : $product[$i]['variants'][$k]['stock'];
+                    }
+                    
                     /* check user details if user id passed */
                     if (isset($user_id) && $user_id != NULL) {
                         /* get cart total */
@@ -952,6 +957,14 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                     }
                 }
             }
+
+            // Modify product availability to 0 if stock running under safety stock and stock management is on
+
+            if ($product[$i]['stock_type'] != NULL && $product[$i]['stock_type'] == 0) {
+                $product[$i]['availability'] = !empty($safety_stock) && $product[$i]['stock'] <= $safety_stock ? strval(0) : $product[$i]['availability'];
+                $product[$i]['stock'] = !empty($safety_stock) && $product[$i]['stock'] <= $safety_stock ? "" : $product[$i]['stock'];
+            }
+
 
             if (isset($user_id) && $user_id != null) {
                 $fav = $t->db->where(['type_id' => $product[$i]['id'], 'type' => 'products', 'user_id' => $user_id])->get('favorites')->num_rows();
