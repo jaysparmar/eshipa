@@ -411,10 +411,10 @@
                         </li>
                         </li>
                         <li>
-                            For example Final total is 1000 and admin commission is 20% then 1000 / 100 X 20 = 200 so 1000 - 200 = 800 will get credited into spaza's wallet
+                            For example Final total is 1000 and admin commission is 20% then 1000 / 100 X 20 = 200 so 1000 - 200 = 800 will get credited into spaza's eZaka
                         </li>
                         <li>
-                            If Order's status is delivered then only spaza will get payment in his wallet.
+                            If Order's status is delivered then only spaza will get payment in his eZaka.
                         </li>
                         <li>
                             If spaza payment doesn't work, make sure cron job is set properly and it is working. If you don't know how to set cron job for once in a day please take help of server support or do search for it.

@@ -18,7 +18,12 @@
     </section>
     <section class="content">
         <div class="container-fluid">
-            <input type="hidden" id="partner_add_product_barcode" class="form-control" value=""> 
+            <!-- Barcode only for add product -->
+            <?php
+            if (!isset($product_details[0]['id'])) { ?>
+                <input type="text" id="partner_add_product_barcode" class="form-control mb-3" placeholder="Scan product barcode to auto fill product details." autofocus>
+            <?php }
+            ?>
             <form class="form-horizontal" action="<?= base_url('partner/product/add_product'); ?>" method="POST" enctype="multipart/form-data" id="save-product">
                 <?php if (isset($product_details[0]['id'])) {
                 ?>
@@ -33,7 +38,6 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <!-- Barcode only for add product -->
                                         <div class="form-group ">
                                             <label for="name" class="col-sm-3 col-form-label">Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-12">
@@ -389,7 +393,7 @@
                                                                     <div class="form-group">
                                                                         <label for="type" class="col-md-2">Barcode:</label>
                                                                         <div class="col-md-12">
-                                                                            <input type="text" name="simple_barcode" class="form-control" value="<?= $product_variants[0]['barcode'] ?>">
+                                                                            <input type="text" name="simple_barcode" id="simple_barcode" class="form-control" value="<?= $product_variants[0]['barcode'] ?>">
                                                                         </div>
                                                                     </div>
                                                                     <div class="form-group">

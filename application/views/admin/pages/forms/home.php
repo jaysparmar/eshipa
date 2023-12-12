@@ -232,7 +232,7 @@
                                         <th data-field="items" data-sortable='true' data-visible="false">Items</th>
                                         <th data-field="total" data-sortable='true' data-visible="true">Total(<?= $curreny ?>)</th>
                                         <th data-field="delivery_charge" data-sortable='true' data-footer-formatter="delivery_chargeFormatter" data-visible="true">D.Charge</th>
-                                        <th data-field="wallet_balance" data-sortable='true' data-visible="true">Wallet Used(<?= $curreny ?>)</th>
+                                        <th data-field="wallet_balance" data-sortable='true' data-visible="true">eZaka Used(<?= $curreny ?>)</th>
                                         <th data-field="promo_code" data-sortable='true' data-visible="false">Promo Code</th>
                                         <th data-field="promo_discount" data-sortable='true' data-visible="true">Promo disc.(<?= $curreny ?>)</th>
                                         <th data-field="delivery_tip" data-sortable='false' data-visible="true">Delivery Tip (<?= $curreny ?>)</th>

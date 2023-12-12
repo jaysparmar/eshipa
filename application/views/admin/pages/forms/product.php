@@ -426,7 +426,7 @@
                                                                 <div class="form-group">
                                                                     <label for="type" class="col-md-2">Barcode:</label>
                                                                     <div class="col-md-12">
-                                                                        <input type="text" name="simple_barcode" class="form-control" value="<?= $product_variants[0]['barcode'] ?>">
+                                                                        <input type="text" name="simple_barcode" id="simple_barcode" class="form-control" value="<?= $product_variants[0]['barcode'] ?>">
                                                                     </div>
                                                                 </div>
                                                                 <div class="form-group">
@@ -578,7 +578,7 @@
                                                                         <div class="form-group ">
                                                                             <label for="" class="col-sm-3 col-form-label">Barcode</label>
                                                                             <div class="col-sm-12">
-                                                                                <input type="text" class="form-control" name="simple_barcode">
+                                                                                <input type="text" class="form-control" name="simple_barcode" id="simple_barcode">
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group">

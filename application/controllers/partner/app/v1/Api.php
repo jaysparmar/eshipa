@@ -1651,7 +1651,8 @@ class Api extends CI_Controller
             $this->form_validation->set_rules('new', $this->lang->line('change_password_validation_new_password_label'), 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']');
         }
         $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean');
-        $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|required|xss_clean|numeric');
+        $this->form_validation->set_rules('id_passport_number', 'ID/Passport Number', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|xss_clean|numeric');
         $this->form_validation->set_rules('restro_tags', 'Restro Tags', 'trim|xss_clean');
 
         // validate restro details
@@ -1661,8 +1662,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
         $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
         $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
+        $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
         $this->form_validation->set_rules('self_pickup', 'Self Pickup', 'trim|xss_clean');
         $this->form_validation->set_rules('delivery_orders', 'Delivery Orders', 'trim|xss_clean');
 
@@ -1674,9 +1675,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('pan_number', 'Pan Number', 'trim|xss_clean');
 
         // licence details
-        $this->form_validation->set_rules('licence_name', 'Licence Name', 'trim|xss_clean');
-        $this->form_validation->set_rules('licence_code', 'Licence Code', 'trim|xss_clean');
-        $this->form_validation->set_rules('licence_proof', 'Licence Proof', 'trim|xss_clean');
+        $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|xss_clean');
 
         if (!$this->form_validation->run()) {
             $this->response['error'] = true;
@@ -1966,7 +1966,7 @@ class Api extends CI_Controller
                     'user_id' => $this->input->post('id', true),
                     'edit_restro_data_id' => $seller_data_id[0]['id'],
                     'address_proof' => (!empty($proof_doc)) ? $proof_doc : $seller_data_id[0]['address_proof'],
-                    'national_identity_card' => (!empty($id_card_doc)) ? $id_card_doc : $seller_data_id[0]['national_identity_card'],
+                    'id_passport_number' => $this->input->post('id_passport_number', true),
                     'profile' => (!empty($profile_doc)) ? $profile_doc : $seller_data_id[0]['profile'],
                     'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
                     'partner_name' => $this->input->post('partner_name', true),
@@ -1980,10 +1980,10 @@ class Api extends CI_Controller
                     'bank_code' => $this->input->post('bank_code', true),
                     'bank_name' => $this->input->post('bank_name', true),
                     'bank_code' => $this->input->post('bank_code', true),
-                    'licence_name' => $this->input->post('licence_name', true),
-                    'licence_code' => $this->input->post('licence_code', true),
+                    'licence_name' => $this->input->post('licence_name', true), // Company name
+                    'licence_code' => $this->input->post('licence_code', true), // // Company registration number
                     'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
-                    'cooking_time' => $this->input->post('cooking_time', true),
+                    // 'cooking_time' => $this->input->post('cooking_time', true),
                     'bank_name' => $this->input->post('bank_name', true),
                     'pan_number' => $this->input->post('pan_number', true),
                     'gallery' => (isset($gallary) && !empty($gallary)) ? $gallary : NULL,
@@ -2106,10 +2106,17 @@ class Api extends CI_Controller
                     $data = array(
                         'user_id' => $user_id[0]['id'],
                         'address_proof' => (!empty($proof_doc)) ? $proof_doc : null,
-                        'national_identity_card' => (!empty($id_card_doc)) ? $id_card_doc : null,
+                        'id_passport_number' => $this->input->post('id_passport_number', true),
                         'profile' => (!empty($profile_doc)) ? $profile_doc : null,
                         'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
                         'partner_name' => $this->input->post('partner_name', true),
+                        'licence_name' => $this->input->post('licence_name', true), // Company name
+                        'licence_code' => $this->input->post('licence_code', true), // Company registration number
+                        'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number status
+                        'id_passport_number_status' => $this->input->post('id_passport_verified', true),
+                        'id_passport_number_verification_result' => $this->input->post('id_passport_number_verification_result', true),
+                        'company_registration_number_verification_result' => $this->input->post('company_registration_number_verification_result', true),
+                        'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
                         'type' => $this->input->post('type', true),
@@ -2119,14 +2126,12 @@ class Api extends CI_Controller
                         'account_name' => $this->input->post('account_name', true),
                         'bank_code' => $this->input->post('bank_code', true),
                         'bank_name' => $this->input->post('bank_name', true),
-                        'licence_name' => $this->input->post('licence_name', true),
-                        'licence_code' => $this->input->post('licence_code', true),
-                        'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                         'pan_number' => $this->input->post('pan_number', true),
-                        'cooking_time' => $this->input->post('cooking_time', true),
+                        // 'cooking_time' => $this->input->post('cooking_time', true),
                         'gallery' => (isset($_POST['gallery']) && !empty($_POST['gallery'])) ? $this->input->post('gallery', true) : NULL,
-                        'status' => 2,
-                        'permissions' => 'restro_profile',
+                        'status' => $this->input->post('status', true),
+                        'licence_status' => 1,
+                        'permissions' => $permmissions,
                         'slug' => create_unique_slug($this->input->post('partner_name', true), 'partner_data')
                     );
                     $insert_id = $this->Partner_model->add_partner($data, [], $work_time, $tags);

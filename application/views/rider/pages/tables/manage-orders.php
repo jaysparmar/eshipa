@@ -70,7 +70,7 @@
                                         <th data-field="items" data-sortable='true' data-visible="false">Items</th>
                                         <th data-field="total" data-sortable='true' data-visible="false">Total(<?= $curreny ?>)</th>
                                         <th data-field="delivery_charge" data-sortable='true' data-footer-formatter="delivery_chargeFormatter">D.Charge</th>
-                                        <th data-field="wallet_balance" data-sortable='true' data-visible="true">Wallet Used(<?= $curreny ?>)</th>
+                                        <th data-field="wallet_balance" data-sortable='true' data-visible="true">eZaka Used(<?= $curreny ?>)</th>
                                         <th data-field="deliver_by" data-sortable='true' data-visible='false'>Deliver By</th>
                                         <th data-field="promo_discount" data-sortable='true' data-visible="false">Promo disc.(<?= $curreny ?>)</th>
                                         <th data-field="delivery_tip" data-sortable='false' data-visible="true">Delivery Tip (<?= $curreny ?>)</th>

@@ -26,7 +26,7 @@
                                 <div class="col-md-3 mb-3">
                                     <label for="settle_commission" class="col-form-label">Settle Payments</label>
                                     <div>
-                                        <a href="#" class="btn btn-info update-admin-commission" title="Partner Self Pickup orders will be settled here by clicking here. Admin will get their commission and the remaining amount will be transferred to the partner's wallet!">Settle Self Pickup Order Payments</a>
+                                        <a href="#" class="btn btn-info update-admin-commission" title="Partner Self Pickup orders will be settled here by clicking here. Admin will get their commission and the remaining amount will be transferred to the partner's eZaka!">Settle Self Pickup Order Payments</a>
                                     </div>
                                 </div>
 

@@ -37,12 +37,14 @@
             <div class="container-fluid mt-4">
                 <div class="row">
                     <div class="col-md-7">
+                        <input type="text" id="partner_add_product_barcode" class="form-control mb-3" placeholder="Scan product barcode to automatically find and add product to cart." autofocus>
                         <div class="card">
                             <input type="hidden" name="session_user_id" id="session_user_id" value="<?= $_SESSION['user_id'] ?>" />
                             <input type="hidden" name="limit" id="limit" value="15" />
                             <input type="hidden" name="offset" id="offset" value="0" />
                             <input type="hidden" name="total" id="total_products" />
                             <input type="hidden" name="current_page" id="current_page" value="0" />
+
                             <div class="row d-flex justify-content-center p-2 align-content-center" class="img-thumbnail" id="get_products">
                                 <!-- product display in this container -->
                             </div>

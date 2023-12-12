@@ -309,7 +309,7 @@
                 <td>+ <?= (isset($order_detls[0]['delivery_tip']) && !empty($order_detls[0]['delivery_tip'])) ? $settings['currency'] . $order_detls[0]['delivery_tip'] : "0"; ?></td>
             </tr>
             <tr>
-                <th>Wallet Used (<?= $settings['currency'] ?>)</th>
+                <th>eZaka Used (<?= $settings['currency'] ?>)</th>
                 <td><?php $total -= $order_detls[0]['wallet_balance'];
                     echo  '- ' . number_format($order_detls[0]['wallet_balance'], 2); ?> </td>
             </tr>

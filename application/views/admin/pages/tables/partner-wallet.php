@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h4>Partner Wallet Transactions </h4>
+                    <h4>Partner eZaka Transactions </h4>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a class="text text-info" href="<?= base_url('admin/home') ?>">Home</a></li>
-                        <li class="breadcrumb-item active">Partner Wallet</li>
+                        <li class="breadcrumb-item active">Partner eZaka</li>
                     </ol>
                 </div>
             </div>

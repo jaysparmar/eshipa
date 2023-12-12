@@ -121,7 +121,7 @@
                 <li class="nav-item">
                     <a href="<?= base_url('partner/transaction/') ?>" class="nav-link">
                         <i class="fa fa-rupee-sign nav-icon text-warning"></i>
-                        <p>Wallet Transactions</p>
+                        <p>eZaka Transactions</p>
                     </a>
                 </li>
                 <li class="nav-item">

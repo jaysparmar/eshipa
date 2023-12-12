@@ -562,7 +562,7 @@ function create_variants(preproccessed_permutation_result = false, from) {
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control barcode">' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode">' +
                     '</div>' +
                     '</div>';
 
@@ -1078,7 +1078,7 @@ function create_editable_variants(
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control barcode" value="' + b.barcode + '">' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode" value="' + b.barcode + '">' +
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Total Stock :</label>' +
@@ -1107,7 +1107,7 @@ function create_editable_variants(
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control barcode" value="' + b.barcode + '">' +
+                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode" value="' + b.barcode + '">' +
                     '</div>' +
                     '</div>';
             }
@@ -7310,6 +7310,28 @@ $("#buy_stock_barcode").on("focusout", function (e) {
 
     }
 });
+$('input[name="simple_barcode"]').on('keypress', function(event) {
+    if (event.which === 13) { // 13 is the key code for Enter
+        event.preventDefault();
+        return false;
+    }
+});
+
+$('input[name="variant_barcode[]"]').on('keypress', function(event) {
+    if (event.which === 13) { // 13 is the key code for Enter
+        event.preventDefault();
+        return false;
+    }
+});
+
+$(document).on('input', 'input[name="simple_barcode"]', function() {
+    playBeepSound();
+});
+
+$(document).on('input', 'input[name="variant_barcode[]"]', function() {
+    playBeepSound();
+});
+
 
 
 function playBeepSound() {

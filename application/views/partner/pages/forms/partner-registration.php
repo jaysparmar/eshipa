@@ -212,7 +212,7 @@
                                                 <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name">
                                             </div>
                                         </div>
-                                        <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
+                                        <label for="licence_code" class="col-sm-12 col-form-label">Registration number
                                         </label>
                                         <div class="col-sm-10">
                                             <input type="text" class="form-control" id="company_registration_no" placeholder="Ex. XXXX/XXXXXX/XX" name="licence_code">
@@ -232,14 +232,14 @@
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="form-group ">
+                                        <div class="form-group d-none">
                                             <label for="tax_name" class="col-sm-4 col-form-label">Tax Name <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="tax_name" placeholder="Tax Name" name="tax_name">
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number <span class='text-danger text-sm'>*</span></label>
+                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="tax_number" placeholder="Tax Number" name="tax_number">
                                             </div>

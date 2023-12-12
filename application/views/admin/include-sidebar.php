@@ -104,7 +104,7 @@
                                 <li class="nav-item">
                                     <a href="<?= base_url('admin/transaction/wallet-transactions') ?>" class="nav-link">
                                         <i class="fa fa-wallet nav-icon"></i>
-                                        <p>Wallet Transactions</p>
+                                        <p>eZaka Transactions</p>
                                     </a>
                                 </li>
                             <?php } ?>
@@ -307,7 +307,7 @@
                             <li class="nav-item">
                                 <a href="<?= base_url('admin/transaction/customer-wallet') ?>" class="nav-link">
                                     <i class="fas fa-wallet nav-icon "></i>
-                                    <p>Wallet Transactions</p>
+                                    <p>eZaka Transactions</p>
                                 </a>
                             </li>
 

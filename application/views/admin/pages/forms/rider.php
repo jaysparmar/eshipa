@@ -87,7 +87,7 @@
                                 </div>
                                 <div class="form-group d-none" id="fixed_commission_per_order_input">
                                     <label for="commission">Fixed Commission per Order(<?=$currency ?>) <span class='text-danger text-sm'>*</span> </label>
-                                    <input type="number" class="form-control" name="commission" id="commission" value="<?= @$fetched_data[0]['commission'] ?>" placeholder="Amount will be transfered to wallet of rider per order" min="0">
+                                    <input type="number" class="form-control" name="commission" id="commission" value="<?= @$fetched_data[0]['commission'] ?>" placeholder="Amount will be transfered to eZaka of rider per order" min="0">
                                 </div>
 
                                 <?php

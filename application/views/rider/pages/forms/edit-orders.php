@@ -197,7 +197,7 @@
                                                             <a href="javascript:void(0)" class="nav-link text-dark">Email <span class="float-right text-primary"><?= (defined('ALLOW_MODIFICATION') && ALLOW_MODIFICATION == 0) ? str_repeat("X", strlen($order_detls[0]['email']) - 3) . substr($order_detls[0]['email'], -3) : $order_detls[0]['email']; ?></span></a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a href="javascript:void(0)" class="nav-link text-dark">User Wallet Balance(<?= $settings['currency'] ?>)<span class="float-right text-primary"><?= $order_detls[0]['user_balance']; ?></span>
+                                                            <a href="javascript:void(0)" class="nav-link text-dark">User eZaka Balance(<?= $settings['currency'] ?>)<span class="float-right text-primary"><?= $order_detls[0]['user_balance']; ?></span>
                                                             </a>
                                                         </li>
                                                         <li class="nav-item">
@@ -237,7 +237,7 @@
                                                                                                                                                                                                         $total = $total + $order_detls[0]['delivery_tip']; ?></span></a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a href="javascript:void(0)" class="nav-link text-dark">Wallet Balance(<?= $settings['currency'] ?>) <span class="float-right text-primary"><?php echo  '- ' . $order_detls[0]['wallet_balance'];
+                                                            <a href="javascript:void(0)" class="nav-link text-dark">eZaka Balance(<?= $settings['currency'] ?>) <span class="float-right text-primary"><?php echo  '- ' . $order_detls[0]['wallet_balance'];
                                                                                                                                                                                                         $total = $total - $order_detls[0]['wallet_balance'];  ?></span></a>
                                                         </li>
                                                         <li class="nav-item">

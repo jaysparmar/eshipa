@@ -261,7 +261,7 @@
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name" value="<?= (isset($fetched_data[0]['licence_name']) && !empty($fetched_data[0]['licence_name'])) ? output_escaping($fetched_data[0]['licence_name']) : "" ?>">
                                             </div>
-                                            <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
+                                            <label for="licence_code" class="col-sm-12 col-form-label">Registration number
                                                 <span class="badge bg-success company-verified <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
 
                                                 <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
@@ -465,7 +465,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number <span class='text-danger text-sm'>*</span></label>
+                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="tax_number" placeholder="Tax Number" name="tax_number" value="<?= @$fetched_data[0]['tax_number'] ?>">
                                             </div>

@@ -205,7 +205,7 @@
                                                             </a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a href="javascript:void(0)" class="nav-link text-info">User Wallet Balance(<?= $settings['currency'] ?>)<span class="float-right text-info"><?= $order_detls[0]['user_balance']; ?></span>
+                                                            <a href="javascript:void(0)" class="nav-link text-info">User eZaka Balance(<?= $settings['currency'] ?>)<span class="float-right text-info"><?= $order_detls[0]['user_balance']; ?></span>
                                                             </a>
                                                         </li>
                                                         <li class="nav-item">
@@ -249,7 +249,7 @@
                                                                                                                                                                                                     $total = $total + $order_detls[0]['delivery_tip']; ?></span></a>
                                                         </li>
                                                         <li class="nav-item">
-                                                            <a href="javascript:void(0)" class="nav-link text-info">Wallet Balance(<?= $settings['currency'] ?>) <span class="float-right text-info"><?php echo  '- ' . $order_detls[0]['wallet_balance'];
+                                                            <a href="javascript:void(0)" class="nav-link text-info">eZaka Balance(<?= $settings['currency'] ?>) <span class="float-right text-info"><?php echo  '- ' . $order_detls[0]['wallet_balance'];
                                                                                                                                                                                                         $total = $total - $order_detls[0]['wallet_balance'];  ?></span></a>
                                                         </li>
                                                         <li class="nav-item">

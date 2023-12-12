@@ -289,7 +289,7 @@ class Partners extends CI_Controller
             $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean|numeric');
             $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
             $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
-            $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
 
             // bank details
             $this->form_validation->set_rules('account_number', 'Account Number', 'trim|xss_clean');
@@ -300,7 +300,7 @@ class Partners extends CI_Controller
 
             // licence details
             $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|xss_clean');
 
             $this->form_validation->set_rules('company_registration_verified', 'Company registration verified', 'trim|xss_clean'); // Company registration number verified status
             $this->form_validation->set_rules('id_passport_verified', 'ID/Passport verified', 'trim|xss_clean');
@@ -619,7 +619,7 @@ class Partners extends CI_Controller
                         'account_number' => $this->input->post('account_number', true),
                         'account_name' => $this->input->post('account_name', true),
                         'bank_code' => $this->input->post('bank_code', true),
-                        'cooking_time' => $this->input->post('cooking_time', true),
+                        // 'cooking_time' => $this->input->post('cooking_time', true),
                         'bank_name' => $this->input->post('bank_name', true),
                         'pan_number' => $this->input->post('pan_number', true),
                         'gallery' => (isset($_POST['gallery']) && !empty($_POST['gallery'])) ? $this->input->post('gallery', true) : NULL,
@@ -725,10 +725,10 @@ class Partners extends CI_Controller
                             'bank_code' => $this->input->post('bank_code', true),
                             'bank_name' => $this->input->post('bank_name', true),
                             'pan_number' => $this->input->post('pan_number', true),
-                            'cooking_time' => $this->input->post('cooking_time', true),
+                            // 'cooking_time' => $this->input->post('cooking_time', true),
                             'gallery' => (isset($_POST['gallery']) && !empty($_POST['gallery'])) ? $this->input->post('gallery', true) : NULL,
-                            'status' => 1,
-                            'licence_status' => 1,
+                            'status' => $this->input->post('status', true),
+                            'licence_status' => $this->input->post('licence_status', true),
                             'permissions' => $permmissions,
                             'slug' => create_unique_slug($this->input->post('partner_name', true), 'partner_data')
                         );

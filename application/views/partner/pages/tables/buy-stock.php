@@ -34,7 +34,10 @@
                                         echo get_categories_option_html($categories);
                                         ?>
                                     </select>
-                                    <input type="hidden" id="buy_stock_barcode" class="form-control" value="">
+                                </div>
+                                <div class="col-md-7">
+                                <label for="" class="col-form-label">Product barcode</label>
+                                    <input type="text" id="buy_stock_barcode" class="form-control" placeholder="Scan product barcode to automatically find and add product to cart." autofocus>
                                 </div>
                                 <input type="hidden" id="restro_filter" value="0">
                                 <input type="hidden" id="buy_stock" value="1">

@@ -41,7 +41,7 @@ class Partner_model extends CI_Model
             'licence_code_status' => (isset($data['licence_code_status']) && !empty($data['licence_code_status'])) ? $data['licence_code_status'] :0,
             'id_passport_number_status' => (isset($data['id_passport_number_status']) && !empty($data['id_passport_number_status'])) ? $data['id_passport_number_status'] :0,
             'bank_name' => $data['bank_name'],
-            'cooking_time' => $data['cooking_time'],
+            'cooking_time' => (isset($data['cooking_time']) && $data['cooking_time'] != "") ? $data['permissions'] : null,
             'pan_number' => $data['pan_number'],
             'gallery' =>  json_encode($gallery),
             'status' => (isset($data['status']) && $data['status'] != "") ? $data['status'] : 2,

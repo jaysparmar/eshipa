@@ -83,8 +83,8 @@ class Auth extends CI_Controller
         $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
         $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
         $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
+        $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
 
         // bank details
         $this->form_validation->set_rules('account_number', 'Account Number', 'trim|xss_clean');
@@ -95,7 +95,7 @@ class Auth extends CI_Controller
 
         // licence details
         $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|xss_clean');
 
 
         if (!$this->form_validation->run()) {

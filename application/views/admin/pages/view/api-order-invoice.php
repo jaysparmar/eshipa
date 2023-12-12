@@ -256,7 +256,7 @@
                                         </tr>
 
                                         <tr>
-                                            <th>Wallet Used</th>
+                                            <th>eZaka Used</th>
                                             <td>-
                                                 <?php $total -= $order_detls[0]['wallet_balance'];
                                                 echo  $settings['currency'] . ' ' . number_format($order_detls[0]['wallet_balance'], 2); ?>
