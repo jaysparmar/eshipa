@@ -1504,6 +1504,7 @@ class Api extends CI_Controller
                     'terms_conditions' => 0,
                     'fcm_server_key' => 0,
                     'contact_us' => 0,
+                    'spaza_contact_us' => 0,
                     'payment_method' => 1,
                     'about_us' => 0,
                     'currency' => 0,

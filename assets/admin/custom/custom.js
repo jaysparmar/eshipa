@@ -1675,9 +1675,9 @@ $(document).on("submit", ".container-fluid .form-submit-event", function (e) {
             btn_html != "" || btn_html != "undefined" ? btn_html : btn_val;
     } else {
         var error_box = $("#error_box", this);
-        var submit_btn = $("#submit_btn");
-        var btn_html = $("#submit_btn").html();
-        var btn_val = $("#submit_btn").val();
+        var submit_btn = $(this).find("#submit_btn");
+        var btn_html = $(this).find("#submit_btn").html();
+        var btn_val = $(this).find("#submit_btn").val();
         var button_text =
             btn_html != "" || btn_html != "undefined" ? btn_html : btn_val;
     }

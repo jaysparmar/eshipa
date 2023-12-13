@@ -25,6 +25,7 @@ class Contact_us extends CI_Controller
             $this->data['title'] = 'Contact Us | ' . $settings['app_name'];
             $this->data['meta_description'] = ' Contact Us | ' . $settings['app_name'];
             $this->data['contact_info'] = get_settings('contact_us');
+            $this->data['spaza_contact_info'] = get_settings('spaza_contact_us');
             $this->load->view('admin/template', $this->data);
         } else {
             redirect('admin/login', 'refresh');
@@ -51,7 +52,7 @@ class Contact_us extends CI_Controller
                 $this->response['error'] = false;
                 $this->response['csrfName'] = $this->security->get_csrf_token_name();
                 $this->response['csrfHash'] = $this->security->get_csrf_hash();
-                $this->response['message'] = 'System Setting Updated Successfully';
+                $this->response['message'] = 'Contact Info Updated Successfully';
                 print_r(json_encode($this->response));
             }
         } else {

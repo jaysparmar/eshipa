@@ -33,11 +33,12 @@
                     </li>
                 </ul>
             </nav>
-            <input type="hidden" id="barcode" class="form-control" value="">
             <div class="container-fluid mt-4">
                 <div class="row">
+                    <div class="col-md-12">
+                        <input type="text" id="barcode" class="form-control mb-3" placeholder="Scan or manually input the product barcode and press enter to automatically find and add the product to cart." autofocus>
+                    </div>
                     <div class="col-md-7">
-                        <input type="text" id="partner_add_product_barcode" class="form-control mb-3" placeholder="Scan product barcode to automatically find and add product to cart." autofocus>
                         <div class="card">
                             <input type="hidden" name="session_user_id" id="session_user_id" value="<?= $_SESSION['user_id'] ?>" />
                             <input type="hidden" name="limit" id="limit" value="15" />

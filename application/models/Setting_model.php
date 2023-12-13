@@ -197,19 +197,20 @@ class Setting_model extends CI_Model
     public function update_contact_details($post)
     {
         $post = escape_array($post);
+        $variable = isset($_POST['variable']) && !empty($_POST['variable']) ? $_POST['variable'] : 'contact_us';
 
         $query = $this->db->get_where('settings', array(
-            'variable' => 'contact_us'
+            'variable' => $variable
         ));
         $count = $query->num_rows();
         if ($count === 0) {
             $data = array(
-                'variable' => 'contact_us',
+                'variable' => $variable,
                 'value' => $post['contact_input_description']
             );
             $this->db->insert('settings', $data);
         } else {
-            $this->db->set('value', $post['contact_input_description'])->where('variable', 'contact_us')->update('settings');
+            $this->db->set('value', $post['contact_input_description'])->where('variable', $variable)->update('settings');
         }
     }
 

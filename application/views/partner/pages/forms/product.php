@@ -21,7 +21,7 @@
             <!-- Barcode only for add product -->
             <?php
             if (!isset($product_details[0]['id'])) { ?>
-                <input type="text" id="partner_add_product_barcode" class="form-control mb-3" placeholder="Scan product barcode to auto fill product details." autofocus>
+                <input type="text" id="partner_add_product_barcode" class="form-control mb-3" placeholder="Scan or manually input the product barcode and press enter to automatically populate product details." autofocus>
             <?php }
             ?>
             <form class="form-horizontal" action="<?= base_url('partner/product/add_product'); ?>" method="POST" enctype="multipart/form-data" id="save-product">

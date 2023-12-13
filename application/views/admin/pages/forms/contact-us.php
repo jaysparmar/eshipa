@@ -26,7 +26,7 @@
               <div class="card-body pad">
                 <label for="other_images">Contact Us </label>
                 <div class="mb-3">
-                  <textarea name="contact_input_description" class="textarea " placeholder="Place some text here text_editor">
+                  <textarea name="contact_input_description" class="textarea " placeholder="Place some text here">
                           <?= $contact_info ?>
                         </textarea>
                 </div>
@@ -39,8 +39,32 @@
                   <button type="submit" class="btn btn-info" id="submit_btn">Update Contact Info</button>
                 </div>
               </div>
+            </form>
           </div>
-          </form>
+        </div>
+        <div class="col-md-12">
+          <div class="card card-info">
+            <!-- form start -->
+            <form class="form-horizontal form-submit-event" action="<?= base_url('admin/Contact_us/update-contact-settings'); ?>" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="variable" value="spaza_contact_us">
+              <div class="card-body pad">
+                <label for="other_images">Spaza Contact Us </label>
+                <div class="mb-3">
+                  <textarea name="contact_input_description" class="textarea " placeholder="Place some text here">
+                          <?= $spaza_contact_info ?>
+                        </textarea>
+                </div>
+                <div class="d-flex justify-content-center">
+                  <div class="form-group" id="error_box">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="reset" class="btn btn-warning">Reset</button>
+                  <button type="submit" class="btn btn-info" id="submit_btn">Update Spaza Contact Info</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
         <!--/.card-->
       </div>

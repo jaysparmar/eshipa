@@ -35,9 +35,9 @@
                                         ?>
                                     </select>
                                 </div>
-                                <div class="col-md-7">
-                                <label for="" class="col-form-label">Product barcode</label>
-                                    <input type="text" id="buy_stock_barcode" class="form-control" placeholder="Scan product barcode to automatically find and add product to cart." autofocus>
+                                <div class="col-md-12">
+                                <label for="" class="col-form-label"></label>
+                                    <input type="text" id="buy_stock_barcode" class="form-control" placeholder="Scan or manually input the product barcode and press enter to automatically find and add the product to cart." autofocus>
                                 </div>
                                 <input type="hidden" id="restro_filter" value="0">
                                 <input type="hidden" id="buy_stock" value="1">
