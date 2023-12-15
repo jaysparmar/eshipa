@@ -562,7 +562,7 @@ function create_variants(preproccessed_permutation_result = false, from) {
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode">' +
+                    '<input type="text" name="variant_barcode[]" placeholder="Scan or manually input barcode." class="col form-control variant-barcode">' +
                     '</div>' +
                     '</div>';
 
@@ -1078,7 +1078,7 @@ function create_editable_variants(
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode" value="' + b.barcode + '">' +
+                    '<input type="text" name="variant_barcode[]" placeholder="Scan or manually input barcode." class="col form-control variant-barcode" value="' + b.barcode + '">' +
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Total Stock :</label>' +
@@ -1107,7 +1107,7 @@ function create_editable_variants(
                     '</div>' +
                     '<div class="col col-xs-12">' +
                     '<label class="control-label">Barcode :</label>' +
-                    '<input type="text" name="variant_barcode[]" class="col form-control variant-barcode" value="' + b.barcode + '">' +
+                    '<input type="text" name="variant_barcode[]" placeholder="Scan or manually input barcode." class="col form-control variant-barcode" value="' + b.barcode + '">' +
                     '</div>' +
                     '</div>';
             }
@@ -2100,6 +2100,11 @@ $(document).on("click", "#save_section_order", function () {
 //form-submit-event
 $(document).on("submit", "#save-product", function (e) {
     e.preventDefault();
+    const focusedElement = $(document.activeElement);
+    if (focusedElement.hasClass('variant-barcode')) {
+        e.preventDefault(); // Prevent form submission
+        return false;
+    }
     var product_type = $("#product-type").val();
     var counter = 0;
     if (product_type != "undefined" && product_type != " ") {
@@ -5810,22 +5815,104 @@ var map_search_type = [];
 if (window.location.href.indexOf("admin/area/manage-cities") > -1) {
     map_search_type = ["(cities)"];
 }
-let marker1;
-let selectedMarkerPosition;
+let marker1; // Define marker1 outside the scope to make it accessible globally
+let userMarker; // Variable to hold the user's marker
+
 function initMap() {
+    // Initialize the map with default location
+    const defaultLocation = { lat: 23.242001, lng: 69.666931 };
     const map = new google.maps.Map(document.getElementById("map"), {
-        center: {
-            lat: 23.242001, // default location for the map
-            lng: 69.666931
-        },
+        center: defaultLocation,
         zoom: 13,
         mapTypeControl: true
     });
+    let userLocation = {};
+    
+    const latitudeInput = $('#city_lat').val();
+    const longitudeInput = $('#city_long').val();
+    
+    
+    if (latitudeInput && longitudeInput) {
+        userLocation.lat = parseFloat(latitudeInput);
+        userLocation.lng = parseFloat(longitudeInput);
+    }else{
+        // Geolocation to get the user's location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                $('#city_lat').val(position.coords.latitude);
+                $('#city_long').val(position.coords.longitude);
 
-    // start
+                // Set the map's center to the user's location
+                map.setCenter(userLocation);
 
+                // Add a marker at the user's location
+                userMarker = new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    title: "Your Location"
+                });
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ 'location': userLocation }, (results, status) => {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[0]) {
+                            const formattedAddress = results[0].formatted_address;
+                            if($('#address').val() == ''){
+                            $('#address').val(formattedAddress);
+                            }
+                            // console.log('Address:', formattedAddress);
+                            // Do something with the formatted address here
+                        } else {
+                            console.error('No address found');
+                        }
+                    } else {
+                        console.error('Geocoder failed due to:', status);
+                    }
+                });
+            },
+            (error) => {
+                console.error('Error getting user location:', error);
+            }
+        );
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+    }
+    }
+
+    
+
+    // Function to add a marker at a specific position
+    function addMarker(position) {
+        // Remove the old marker if it exists and has the setMap method
+        if (marker1 && marker1.setMap) {
+            marker1.setMap(null);
+        }
+
+        // Create a new marker at the clicked location
+        marker1 = new google.maps.Marker({
+            position: position,
+            map: map
+        });
+
+        selectedMarkerPosition = position;
+        // Update text box with marker position
+        const latLngTextBox = document.getElementById("city_lat");
+        if (latLngTextBox) {
+            latLngTextBox.value = `${position.lat()}, ${position.lng()}`;
+            $("#city_lat").val(position.lat());
+            $("#city_long").val(position.lng());
+        }
+    }
+
+    // Map click listener to add a marker
     map.addListener("click", function (event) {
-        marker.setVisible(false);
+        if (marker1) {
+            marker1.setVisible(false);
+        }
         addMarker(event.latLng);
     });
 
@@ -5854,8 +5941,6 @@ function initMap() {
         }
     }
 
-    // end
-
     const input = document.getElementById("city-input");
     const options = {
         fields: ["formatted_address", "geometry", "name"],
@@ -5863,7 +5948,7 @@ function initMap() {
         types: map_search_type
     };
 
-    // auto complte object created
+    // Auto complete object created
     const autocomplete = new google.maps.places.Autocomplete(input, options);
 
     // Bind the map's bounds (viewport) property to the autocomplete object,
@@ -5881,14 +5966,16 @@ function initMap() {
         anchorPoint: new google.maps.Point(0, -29)
     });
 
-    // added listener to the auto complete object
+    // Added listener to the autocomplete object
     autocomplete.addListener("place_changed", () => {
-        // remove old location
+        // Remove old location
         infowindow.close();
         marker.setVisible(true);
-        marker1.setVisible(false);
+        if (marker1) {
+            marker1.setVisible(false);
+        }
 
-        // get new location
+        // Get new location
         const place = autocomplete.getPlace();
 
         if (!place.geometry || !place.geometry.location) {
@@ -5914,12 +6001,14 @@ function initMap() {
         $("#city_lat").attr("readonly", true);
         $("#city_long").attr("readonly", true);
         $("#city_name").val(place.name);
+        $('#address').val(place.formatted_address);
         infowindowContent.children["place-name"].textContent = place.name;
         infowindowContent.children["place-address"].textContent =
             place.formatted_address;
         infowindow.open(map, marker);
     });
 }
+
 
 // set city outlines
 var map; // Global declaration of the map
@@ -7102,7 +7191,7 @@ $("#partner_add_product_barcode").on("focusout", function (e) { // For add produ
             data: { [csrfName]: csrfHash, barcode: barcode, partner_id: 0, buy_stock: 1 },
             success: function (result) {
                 if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
-                    playBeepSound();
+                    // playBeepSound();
                     iziToast.success({
                         message: 'Product fetched successfully.'
                     });
@@ -7241,6 +7330,7 @@ $("#partner_add_product_barcode").on("focusout", function (e) { // For add produ
                         message: 'Product not found.'
                     });
                 }
+                $('#partner_add_product_barcode').val('');
             }
         });
 
@@ -7269,7 +7359,7 @@ $("#buy_stock_barcode").on("focusout", function (e) {
             success: function (result) {
                 // console.log(result);
                 if (result.rows[0] !== undefined && result.rows[0] !== null && result.rows[0] !== '') {
-                    playBeepSound();
+                    // playBeepSound();
                     var product = result.rows[0];
                     $.ajax({
                         url: base_url + 'app/v1/api/manage_cart',
@@ -7305,6 +7395,7 @@ $("#buy_stock_barcode").on("focusout", function (e) {
                         message: 'Product not found.'
                     });
                 }
+                $('#buy_stock_barcode').val('');
             }
         });
 
@@ -7317,20 +7408,14 @@ $('input[name="simple_barcode"]').on('keypress', function(event) {
     }
 });
 
-$('input[name="variant_barcode[]"]').on('keypress', function(event) {
-    if (event.which === 13) { // 13 is the key code for Enter
-        event.preventDefault();
-        return false;
-    }
-});
 
-$(document).on('input', 'input[name="simple_barcode"]', function() {
-    playBeepSound();
-});
+// $(document).on('input', 'input[name="simple_barcode"]', function() {
+//     playBeepSound();
+// });
 
-$(document).on('input', 'input[name="variant_barcode[]"]', function() {
-    playBeepSound();
-});
+// $(document).on('input', 'input[name="variant_barcode[]"]', function() {
+//     playBeepSound();
+// });
 
 
 

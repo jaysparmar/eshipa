@@ -578,7 +578,7 @@
                                                                         <div class="form-group ">
                                                                             <label for="" class="col-sm-3 col-form-label">Barcode</label>
                                                                             <div class="col-sm-12">
-                                                                                <input type="text" class="form-control" name="simple_barcode" id="simple_barcode">
+                                                                                <input type="text" class="form-control" name="simple_barcode" id="simple_barcode" placeholder="Scan or manually input the product barcode.">
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group">

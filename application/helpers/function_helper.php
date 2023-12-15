@@ -378,7 +378,6 @@ function fetch_details($where = NULL, $table = "", $fields = '*', $limit = '', $
 
 function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id = NULL, $limit = NULL, $offset = NULL, $sort = NULL, $order = NULL, $return_count = NULL, $is_deliverable = NULL, $partner_id = NULL, $sort_by = "sd.user_id", $buy_stock = NULL, $barcode = NULL)
 {
-
     $settings = get_settings('system_settings', true);
     $near_by_distance = 5;
     $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
@@ -464,7 +463,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     }
 
     // 10. reasturant wise products done
-    if (isset($partner_id) && !empty($partner_id) && $partner_id != "") {
+    if (isset($partner_id) && !empty($partner_id) && $partner_id != "" && $buy_stock != 1) {
         $where['p.partner_id'] = $partner_id;
     }
     if (isset($barcode) && !empty($barcode) && $barcode != "") {
@@ -701,7 +700,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
         $t->db->group_End();
     }
 
-    if (isset($partner_id) && !empty($partner_id) && $partner_id != "") {
+    if (isset($partner_id) && !empty($partner_id) && $partner_id != "" && $buy_stock !== 1) {
         $where['p.partner_id'] = $partner_id;
     }
     if (isset($barcode) && !empty($barcode) && $barcode != "") {
@@ -887,7 +886,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                         $product[$i]['variants'][$k]['availability'] = ($product[$i]['variants'][$k]['availability'] != null) ? $product[$i]['variants'][$k]['availability'] : "1";
                         array_push($count_stock, $product[$i]['variants'][$k]['availability']);
                     }
-                    
+
 
                     if (($product[$i]['stock_type'] == 0)) {
                         $product[$i]['variants'][$k]['stock'] = get_stock($product[$i]['id'], 'product');
@@ -903,7 +902,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
                         $product[$i]['variants'][$k]['availability'] = !empty($safety_stock) && $product[$i]['variants'][$k]['stock'] <= $safety_stock ? strval(0) : $product[$i]['variants'][$k]['availability'];
                         $product[$i]['variants'][$k]['stock'] = !empty($safety_stock) && $product[$i]['variants'][$k]['stock'] <= $safety_stock ? "" : $product[$i]['variants'][$k]['stock'];
                     }
-                    
+
                     /* check user details if user id passed */
                     if (isset($user_id) && $user_id != NULL) {
                         /* get cart total */

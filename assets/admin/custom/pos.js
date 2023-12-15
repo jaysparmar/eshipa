@@ -217,11 +217,12 @@ function get_products(
     limit = 2,
     offset = 0,
     search_parameter = "",
-    barcode = ""
+    barcode = "",
+    buy_stock = ""
 ) {
     $.ajax({
         type: "GET",
-        url: `${base_url}partner/point_of_sale/get_products?category_id=${category_id}&limit=${limit}&offset=${offset}&search=${search_parameter}&barcode=${barcode}`,
+        url: `${base_url}partner/point_of_sale/get_products?category_id=${category_id}&limit=${limit}&offset=${offset}&search=${search_parameter}&barcode=${barcode}&buy_stock=${buy_stock}`,
         dataType: "json",
         beforeSend: function () {
             $("#get_products").html(
@@ -475,7 +476,7 @@ function add_to_cart(cart_item) {
         if (cart.find((item) => item.variant_id === variant_id)) {
             var item = cart.find((item) => item.variant_id === variant_id)
             item.quantity = item.quantity + 1;
-        }else{
+        } else {
             cart.push(items);
         }
     } else {
@@ -483,7 +484,7 @@ function add_to_cart(cart_item) {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    playBeepSound();
+    // playBeepSound();
 
     display_cart();
 }
@@ -975,7 +976,7 @@ $("#barcode").on("focusout", function (e) {
             type: "POST",
             url: base_url + "partner/point_of_sale/get_products",
             dataType: "json",
-            data: { [csrfName]: csrfHash, barcode: barcode },
+            data: { [csrfName]: csrfHash, barcode: barcode, buy_stock: 1 },
             success: function (result) {
 
                 if (result.products.product[0] !== undefined && result.products.product[0] !== null && result.products.product[0] !== '') {
@@ -1005,13 +1006,14 @@ $("#barcode").on("focusout", function (e) {
                     var category_id = $("#product_categories").val();
                     var limit = $("#limit").val();
                     var offset = $("#offset").val();
-                    get_products(category_id, limit, offset, '', barcode);
+                    get_products(category_id, limit, offset, '', barcode, 1);
 
                 } else {
                     iziToast.error({
                         message: 'Product not found.'
                     });
                 }
+                $('#barcode').val('');
             }
         });
 

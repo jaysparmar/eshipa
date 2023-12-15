@@ -44,6 +44,7 @@ class Point_of_sale extends CI_Controller
         $barcode = (isset($_POST['barcode']) && !empty($_POST['barcode'])) ? $this->input->post("barcode", true) : NULL;
         $barcode = (isset($_GET['barcode']) && !empty($_GET['barcode'])) ? $this->input->get("barcode", true) : $barcode;
         $buy_stock = (isset($_POST['buy_stock']) && !empty($_POST['buy_stock'])) ? 1 : NULL;
+        $buy_stock = (isset($_GET['buy_stock']) && !empty($_GET['buy_stock'])) ? $this->input->get("buy_stock", true) : $buy_stock;
         $products =  $this->data['products'] = fetch_product("", $filter, "", $category_id, $limit, $offset, $sort, $order, "", "", $partner_id, $filter_by, $buy_stock, $barcode);
         // print_r($products);
         $response['error'] = (!empty($products)) ? false : true;

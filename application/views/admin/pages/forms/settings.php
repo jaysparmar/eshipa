@@ -186,7 +186,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group col-md-12">
+                                    <div class="form-group col-md-12 d-none">
                                         <label for=""> Perc. charged if Spaza sells product outside eShipa list
                                         </label>
                                         <div class="card-body">
