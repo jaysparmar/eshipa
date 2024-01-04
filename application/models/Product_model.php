@@ -34,7 +34,6 @@ class Product_model extends CI_Model
         $calories = (isset($data['calories']) && !empty($data['calories'])) ? $data['calories'] : 0;
         // $barcode = (isset($data['barcode']) && !empty($data['barcode'])) ? $data['barcode'] : NULL;
         // $sku = (isset($data['sku']) && !empty($data['sku'])) ? $data['sku'] : NULL;
-        $admin_added = (isset($data['admin_added']) && !empty($data['admin_added'])) ? $data['admin_added'] : 0;
 
         $pro_data = [
             'name' => $data['pro_input_name'],
@@ -51,12 +50,14 @@ class Product_model extends CI_Model
             'calories' => $calories,
             // 'barcode' => $barcode,
             // 'sku' => $sku,
-            'admin_added' => $admin_added,
             'start_time' => isset($start_time) && !empty($start_time) ? $start_time : '00:00:00',
             'end_time' => isset($end_time) && !empty($end_time) ? $end_time : '00:00:00',
         ];
         // echo "product";
         // print_R($pro_data);
+        if(isset($data['admin_added']) && $data['admin_added'] !=''){
+            $pro_data['admin_added'] = $data['admin_added'];
+        }
         if ($data['product_type'] == 'simple_product') {
 
             if (isset($data['simple_product_stock_status']) && empty($data['simple_product_stock_status'])) {
@@ -234,7 +235,7 @@ class Product_model extends CI_Model
                     $pro_variance_data['attribute_value_ids'] = $value;
                     if (
                         isset($data['edit_variant_id']) && !empty($data['edit_variant_id']) &&
-                        isset($data['product_id']) && !empty($data['product_id'])
+                        isset($data['edit_product_id']) && !empty($data['edit_product_id'])
                     ) {
                         $this->db->where('id', $data['edit_variant_id'][$i])->update('product_variants', $pro_variance_data);
                     } else {

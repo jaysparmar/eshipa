@@ -195,6 +195,7 @@ class Order_model extends CI_Model
         $data = escape_array($data);
         $CI = &get_instance();
         $CI->load->model('Address_model');
+        $CI->load->model('Transaction_model');
 
         $response = array();
         $product_variant_id = explode(',', $data['product_variant_id']);
@@ -442,8 +443,23 @@ class Order_model extends CI_Model
 
             $user_balance = fetch_details(['id' => $data['user_id']], 'users', 'balance');
 
+            if (isset($data['txn_id']) && !empty($data['txn_id'])) {
+                $trans_data = [
+                    'transaction_type' => 'transaction',
+                    'user_id' => $data['user_id'],
+                    'order_id' => $last_order_id,
+                    'type' => strtolower($data['payment_method']),
+                    'txn_id' => $data['txn_id'],
+                    'amount' => $final_total,
+                    'status' => "success",
+                    'message' => "POS Order Placed Successfully",
+                ];
+                $this->load->model("transaction_model");
+                $this->transaction_model->add_transaction($trans_data);
+            }
+
             $response['error'] = false;
-            $response['message'] = 'Order Placed Successfully. It will confirm once accepted. Please, Wait for it!';
+            $response['message'] = isset($data['is_pos']) && $data['is_pos'] == 1 ? 'Order Placed Successfully.' : 'Order Placed Successfully. It will confirm once accepted. Please, Wait for it!';
             $response['order_id'] = $last_order_id;
             $response['order_item_data'] = $product_variant_data;
             $response['balance'] = $user_balance;
@@ -576,7 +592,7 @@ class Order_model extends CI_Model
         if (isset($_GET['payment_method']) && !empty($_GET['payment_method'])) {
             $count_res->where('payment_method', $_GET['payment_method']);
         }
-        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me==0) {
+        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me == 0) {
             $count_res->where("oi.partner_id", $_GET['partner_id']);
         }
 
@@ -626,7 +642,7 @@ class Order_model extends CI_Model
             $search_res->where("o.user_id", $_GET['user_id']);
         }
 
-        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me==0) {
+        if (isset($_GET['partner_id']) && !empty($_GET['partner_id']) && $from_me == 0) {
             $search_res->where("oi.partner_id", $_GET['partner_id']);
         }
         // Filter By payment

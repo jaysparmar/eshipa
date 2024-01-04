@@ -75,7 +75,7 @@ class Api extends CI_Controller
         "partner/app/v1/api/get_cities",
         // "partner/app/v1/api/get_taxes",
         // "partner/app/v1/api/reset_password",
-        // "partner/app/v1/api/update_partner",
+        "partner/app/v1/api/update_partner",
         // "partner/app/v1/api/get_orders",
         // "partner/app/v1/api/add_products",
         // "partner/app/v1/api/get_attributes",
@@ -521,10 +521,11 @@ class Api extends CI_Controller
         $sort = (isset($_POST['sort(array)']) && !empty(trim($_POST['sort']))) ? $this->input->post('sort', true) : 'row_order';
         $order = (isset($_POST['order']) && !empty(trim($_POST['order']))) ? $this->input->post('order', true) : 'ASC';
         $search = (isset($_POST['search']) && !empty(trim($_POST['search']))) ? $this->input->post('search', true) : null;
+        $partner_slug = (isset($_POST['partner_slug']) && !empty(trim($_POST['partner_slug']))) ? $this->input->post('partner_slug', true) : null;
 
         $this->response['message'] = "Cateogry(s) retrieved successfully!";
         $id = (!empty($_POST['id']) && isset($_POST['id'])) ? $_POST['id'] : '';
-        $cat_res = $this->category_model->get_categories($id, $limit, $offset, $sort, $order, "", "", 1, $search);
+        $cat_res = $this->category_model->get_categories($id, $limit, $offset, $sort, $order, "", "", 1, $search, $partner_slug);
 
         $this->response['error'] = (empty($cat_res)) ? true : false;
         $this->response['total'] = !empty($cat_res) ? $cat_res[0]['total'] : 0;
@@ -613,6 +614,7 @@ class Api extends CI_Controller
 
             $category_id = (isset($_POST['category_id'])) ?  $this->input->post('category_id', true)  : null;
             $barcode = (isset($_POST['barcode'])) ?  $this->input->post('barcode', true)  : null;
+            $buy_stock = (isset($_POST['buy_stock']) && !empty($_POST['buy_stock'])) ? 1 : NULL;
             $product_id = (isset($_POST['id'])) ? $this->input->post('id', true)  : null;
             $product_ids = (isset($_POST['product_ids'])) ?  $this->input->post('product_ids', true) : null;
             $product_variant_ids = (isset($_POST['product_variant_ids']) && !empty($_POST['product_variant_ids'])) ? $this->input->post("product_variant_ids", true) : null;
@@ -624,7 +626,7 @@ class Api extends CI_Controller
             }
             $user_id = (isset($_POST['user_id'])) ? $this->input->post('user_id', true)  : null;
 
-            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by, NULL, $barcode);
+            $products = fetch_product($user_id, (isset($filters)) ? $filters : null, $product_id, $category_id, $limit, $offset, $sort, $order, null, null, $partner_id, $filter_by, $buy_stock, $barcode);
 
             $final_total = "0";
             if (isset($filters['discount']) && !empty($filters['discount'])) {
@@ -941,6 +943,7 @@ class Api extends CI_Controller
                 'partner_terms_conditions' => 0,
                 'fcm_server_key' => 0,
                 'contact_us' => 0,
+                'spaza_contact_us' => 0,
                 'about_us' => 0,
                 'currency' => 0,
                 'user_data' => 0,
@@ -1441,6 +1444,46 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
         $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
+
+        if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists($_POST['partner_id'], $_POST['simple_barcode'])) {
+            $this->response['error'] = true;
+            $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            $this->response['message'] = 'Product with barcode ' . $_POST['simple_barcode'] . ' is already added by you.';
+            print_r(json_encode($this->response));
+            return false;
+        }
+
+        if (isset($_POST['variant_barcode']) && is_array($_POST['variant_barcode'])) {
+            $barcodes = $_POST['variant_barcode'];
+
+            $barcodeCounts = array_count_values($barcodes);
+
+            // Check for duplicates
+            foreach ($barcodeCounts as $barcode => $count) {
+                if ($count > 1) {
+                    // Duplicates found
+                    $this->response['error'] = true;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = 'Duplicate barcode ' . $barcode;
+                    print_r(json_encode($this->response));
+                    return false;
+                }
+            }
+
+            foreach ($barcodes as $barcode) {
+                if ($barcode !== '' && check_barcode_exists($_POST['partner_id'], $barcode)) {
+                    $this->response['error'] = true;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = 'Product with barcode ' . $barcode . ' is already added by you.';
+                    print_r(json_encode($this->response));
+                    return false;
+                }
+            }
+        }
+
         $_POST['variant_price'] = (isset($_POST['variant_price']) && !empty($_POST['variant_price'])) ?  explode(",", $this->input->post('variant_price', true)) : NULL;
         $_POST['variant_special_price'] = (isset($_POST['variant_special_price']) && !empty($_POST['variant_special_price'])) ?  explode(",", $this->input->post('variant_special_price', true)) : NULL;
         $_POST['variants_ids'] = (isset($_POST['variants_ids']) && !empty($_POST['variants_ids'])) ?  explode(",", $this->input->post('variants_ids', true)) : NULL;
@@ -1497,6 +1540,7 @@ class Api extends CI_Controller
 
         // print_R($_POST);
         // return;
+        $_POST['admin_added'] = (isset($_POST['admin_added']) && $_POST['admin_added'] == 1) ? 1 : 0;
         if (!$this->form_validation->run()) {
             $this->response['error'] = true;
             $this->response['message'] = strip_tags(validation_errors());
@@ -1659,8 +1703,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('partner_name', 'partner Name', 'trim|required|xss_clean');
         $this->form_validation->set_rules('description', 'Description', 'trim|required|xss_clean');
         $this->form_validation->set_rules('address', 'Address', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
-        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
+        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|xss_clean');
         $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
         $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
         $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
@@ -1685,8 +1729,7 @@ class Api extends CI_Controller
             return false;
         } else {
             $id = $this->input->post('id', true);
-            $seller_data_id = fetch_details(['user_id' => $id], 'partner_data', 'id,address_proof,national_identity_card,profile,licence_proof');
-
+            $seller_data_id = fetch_details(['user_id' => $id], 'partner_data', 'id,address_proof,id_passport_number,profile,licence_proof,id_passport_number_status,licence_code_status');
             if ((empty($_POST['delivery_orders']) || $_POST['delivery_orders'] == "") && (empty($_POST['self_pickup']) || $_POST['self_pickup'] == "")) {
                 $this->response['error'] = true;
                 $this->response['message'] = "Both order receive type should not be disable.";
@@ -1965,6 +2008,8 @@ class Api extends CI_Controller
                 $restro_data = array(
                     'user_id' => $this->input->post('id', true),
                     'edit_restro_data_id' => $seller_data_id[0]['id'],
+                    'id_passport_number_status' => $seller_data_id[0]['id_passport_number_status'],
+                    'licence_code_status' => $seller_data_id[0]['licence_code_status'],
                     'address_proof' => (!empty($proof_doc)) ? $proof_doc : $seller_data_id[0]['address_proof'],
                     'id_passport_number' => $this->input->post('id_passport_number', true),
                     'profile' => (!empty($profile_doc)) ? $profile_doc : $seller_data_id[0]['profile'],
@@ -2112,10 +2157,6 @@ class Api extends CI_Controller
                         'partner_name' => $this->input->post('partner_name', true),
                         'licence_name' => $this->input->post('licence_name', true), // Company name
                         'licence_code' => $this->input->post('licence_code', true), // Company registration number
-                        'licence_code_status' => $this->input->post('company_registration_verified', true), // Company registration number status
-                        'id_passport_number_status' => $this->input->post('id_passport_verified', true),
-                        'id_passport_number_verification_result' => $this->input->post('id_passport_number_verification_result', true),
-                        'company_registration_number_verification_result' => $this->input->post('company_registration_number_verification_result', true),
                         'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
@@ -2320,6 +2361,46 @@ class Api extends CI_Controller
                 } else {
                     $this->form_validation->set_rules('variant_price', 'Price', 'trim|required|numeric|xss_clean|greater_than_equal_to[' . $this->input->post('variant_special_price') . ']');
                     $this->form_validation->set_rules('variant_special_price', 'Special Price', 'trim|numeric|xss_clean|less_than_equal_to[' . $this->input->post('variant_price') . ']');
+                }
+            }
+        }
+
+        $product_id = $_POST['edit_product_id'];
+        if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists($_POST['partner_id'], $_POST['simple_barcode'], $product_id)) {
+            $this->response['error'] = true;
+            $this->response['csrfName'] = $this->security->get_csrf_token_name();
+            $this->response['csrfHash'] = $this->security->get_csrf_hash();
+            $this->response['message'] = 'Product with barcode ' . $_POST['simple_barcode'] . ' is already added by you.';
+            print_r(json_encode($this->response));
+            return false;
+        }
+
+        if (isset($_POST['variant_barcode']) && is_array($_POST['variant_barcode'])) {
+            $barcodes = $_POST['variant_barcode'];
+
+            $barcodeCounts = array_count_values($barcodes);
+
+            // Check for duplicates
+            foreach ($barcodeCounts as $barcode => $count) {
+                if ($count > 1) {
+                    // Duplicates found
+                    $this->response['error'] = true;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = 'Duplicate barcode ' . $barcode;
+                    print_r(json_encode($this->response));
+                    return false;
+                }
+            }
+
+            foreach ($barcodes as $barcode) {
+                if ($barcode !== '' && check_barcode_exists($_POST['partner_id'], $barcode, $product_id)) {
+                    $this->response['error'] = true;
+                    $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                    $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                    $this->response['message'] = 'Product with barcode ' . $barcode . ' is already added by you.';
+                    print_r(json_encode($this->response));
+                    return false;
                 }
             }
         }
@@ -2902,6 +2983,73 @@ class Api extends CI_Controller
                 return;
             }
         }
+    }
+
+    public function register_user()
+    {
+        $postFields = [
+            'name' => $_POST['name'],
+            'mobile' => $_POST['mobile'],
+            'password' => $_POST['password']
+        ];
+
+        // Prepare cURL request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, base_url('partner/point_of_sale/register_user'));
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
+
+        // Execute cURL request
+        $result = curl_exec($ch);
+        print_r($result);
+        curl_close($ch);
+    }
+
+    public function get_users()
+    {
+        $search = $_POST['search'];
+
+        $url = base_url('partner/point_of_sale/get_users') . '?' . http_build_query(['search' => $search]);
+        $ch = curl_init();
+
+        // Set the URL
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        // Set other cURL options if needed
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        // Execute cURL request
+        $result = curl_exec($ch);
+
+        $result = json_decode($result, true);
+        $this->response['error'] = empty($result) ? true : false;
+        $this->response['total'] = !empty($result) ? count($result) : 0;
+        $this->response['message'] = empty($result) ? 'Users does not exist' : 'Users retrieved successfully';
+        $this->response['data'] = $result;
+
+        print_r(json_encode($this->response));
+
+        curl_close($ch);
+    }
+
+
+    public function place_order()
+    {
+        // Prepare cURL request
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, base_url('app/v1/api/place_order'));
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($_POST));
+
+        // Execute cURL request
+        $result = curl_exec($ch);
+        print_r($result);
+        curl_close($ch);
     }
 
 

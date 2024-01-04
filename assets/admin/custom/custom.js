@@ -5819,71 +5819,68 @@ let marker1; // Define marker1 outside the scope to make it accessible globally
 let userMarker; // Variable to hold the user's marker
 
 function initMap() {
-    // Initialize the map with default location
-    const defaultLocation = { lat: 23.242001, lng: 69.666931 };
     const map = new google.maps.Map(document.getElementById("map"), {
-        center: defaultLocation,
         zoom: 13,
         mapTypeControl: true
     });
     let userLocation = {};
-    
+
     const latitudeInput = $('#city_lat').val();
     const longitudeInput = $('#city_long').val();
-    
-    
+
+
     if (latitudeInput && longitudeInput) {
         userLocation.lat = parseFloat(latitudeInput);
         userLocation.lng = parseFloat(longitudeInput);
-    }else{
-        // Geolocation to get the user's location
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                $('#city_lat').val(position.coords.latitude);
-                $('#city_long').val(position.coords.longitude);
-
-                // Set the map's center to the user's location
-                map.setCenter(userLocation);
-
-                // Add a marker at the user's location
-                userMarker = new google.maps.Marker({
-                    position: userLocation,
-                    map: map,
-                    title: "Your Location"
-                });
-                const geocoder = new google.maps.Geocoder();
-                geocoder.geocode({ 'location': userLocation }, (results, status) => {
-                    if (status === google.maps.GeocoderStatus.OK) {
-                        if (results[0]) {
-                            const formattedAddress = results[0].formatted_address;
-                            if($('#address').val() == ''){
-                            $('#address').val(formattedAddress);
-                            }
-                            // console.log('Address:', formattedAddress);
-                            // Do something with the formatted address here
-                        } else {
-                            console.error('No address found');
-                        }
-                    } else {
-                        console.error('Geocoder failed due to:', status);
-                    }
-                });
-            },
-            (error) => {
-                console.error('Error getting user location:', error);
-            }
-        );
     } else {
-        console.error('Geolocation is not supported by this browser.');
-    }
+        // Geolocation to get the user's location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    $('#city_lat').val(position.coords.latitude);
+                    $('#city_long').val(position.coords.longitude);
+
+                    // Set the map's center to the user's location
+                    map.setCenter(userLocation);
+
+                    // Add a marker at the user's location
+                    userMarker = new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: "Your Location"
+                    });
+                    const geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ 'location': userLocation }, (results, status) => {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                const formattedAddress = results[0].formatted_address;
+                                if ($('#address').val() == '') {
+                                    $('#address').val(formattedAddress);
+                                }
+                                // console.log('Address:', formattedAddress);
+                                // Do something with the formatted address here
+                            } else {
+                                console.error('No address found');
+                            }
+                        } else {
+                            console.error('Geocoder failed due to:', status);
+                        }
+                    });
+                },
+                (error) => {
+                    console.error('Error getting user location:', error);
+                }
+            );
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
     }
 
-    
+
 
     // Function to add a marker at a specific position
     function addMarker(position) {
@@ -7401,7 +7398,7 @@ $("#buy_stock_barcode").on("focusout", function (e) {
 
     }
 });
-$('input[name="simple_barcode"]').on('keypress', function(event) {
+$('input[name="simple_barcode"]').on('keypress', function (event) {
     if (event.which === 13) { // 13 is the key code for Enter
         event.preventDefault();
         return false;

@@ -290,8 +290,8 @@ class Product extends CI_Controller
             $this->form_validation->set_rules('barcode', 'Barcode', 'trim|xss_clean');
             $this->form_validation->set_rules('sku', 'SKU ID', 'trim|xss_clean');
 
-
-            if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists($this->session->userdata('user_id'), $_POST['simple_barcode'])) {
+            $product_id = isset($_POST['edit_product_id']) && !empty($_POST['edit_product_id']) ? $_POST['edit_product_id'] : '';
+            if (isset($_POST['simple_barcode']) && $_POST['simple_barcode'] !== '' && check_barcode_exists(0, $_POST['simple_barcode'], $product_id)) {
                 $this->response['error'] = true;
                 $this->response['csrfName'] = $this->security->get_csrf_token_name();
                 $this->response['csrfHash'] = $this->security->get_csrf_hash();
@@ -319,7 +319,7 @@ class Product extends CI_Controller
                 }
 
                 foreach ($barcodes as $barcode) {
-                    if ($barcode !== '' && check_barcode_exists(0, $barcode)) {
+                    if ($barcode !== '' && check_barcode_exists(0, $barcode, $product_id)) {
                         $this->response['error'] = true;
                         $this->response['csrfName'] = $this->security->get_csrf_token_name();
                         $this->response['csrfHash'] = $this->security->get_csrf_hash();

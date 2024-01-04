@@ -383,7 +383,7 @@ function fetch_product($user_id = NULL, $filter = NULL, $id = NULL, $category_id
     $low_stock_limit = isset($settings['low_stock_limit']) ? $settings['low_stock_limit'] : 5;
     if (isset($filter) && !empty($filter['city_id']) && $filter['city_id'] != "" && $filter['city_id'] != 'NULL' && !empty($filter['latitude']) && $filter['latitude'] != 'NULL' && $filter['longitude'] != 'NULL' && !empty($filter['longitude'])) {
         $max_distance = fetch_details(['id' => $filter['city_id']], "cities", "max_deliverable_distance");
-        $final_distance = (isset($max_distance[0]['max_deliverable_distance'])) ? $max_distance[0]['max_deliverable_distance'] : 5;
+        $final_distance = (isset($max_distance[0]['max_deliverable_distance']) && !empty($max_distance[0]['max_deliverable_distance'])) ? $max_distance[0]['max_deliverable_distance'] : 5;
     }
     if (isset($filter) && !empty($filter['latitude']) && !empty($filter['longitude'])) {
         $city_data = get_cities($filter['city_id'], "id,name,max_deliverable_distance");
@@ -4229,7 +4229,7 @@ function fetch_partners($filter = [], $user_id = null, $limit = NULL, $offset = 
     // print_r($user_id);
     if (isset($filter) && !empty($filter['latitude']) && !empty($filter['longitude'])) {
         $max_distance = fetch_details(['id' => $filter['city_id']], "cities", "max_deliverable_distance");
-        $final_distance = (isset($max_distance[0]['max_deliverable_distance'])) ? $max_distance[0]['max_deliverable_distance'] : 5;
+        $final_distance = (isset($max_distance[0]['max_deliverable_distance']) && !empty($max_distance[0]['max_deliverable_distance'])) ? $max_distance[0]['max_deliverable_distance'] : 5;
     }
     $t = &get_instance();
     $multipleWhere = '';
@@ -4438,6 +4438,7 @@ function fetch_partners($filter = [], $user_id = null, $limit = NULL, $offset = 
         $tempRow['tax_name'] = $row['tax_name'];
         $tempRow['licence_name'] = isset($row['licence_name']) && !empty($row['licence_name']) ? $row['licence_name'] : "";
         $tempRow['licence_code'] = isset($row['licence_code']) && !empty($row['licence_code']) ? $row['licence_code'] : "";
+        $tempRow['id_passport_number'] = isset($row['id_passport_number']) && !empty($row['id_passport_number']) ? $row['id_passport_number'] : "";
         $tempRow['licence_proof'] = isset($licence_proof) ? $licence_proof : [];
         $tempRow['licence_status'] = $row['licence_status'];
         $tempRow['date_added'] = $row['date_added'];
@@ -4629,11 +4630,14 @@ function remove_dine_in_cart($table_id)
     update_details(['status' => 1], ['id' => $table_id], "tables");
 }
 
-function check_barcode_exists($user_id, $barcode)
+function check_barcode_exists($user_id, $barcode,$product_id='')
 {
     $CI = &get_instance();
     // Check product_variants for the barcode associated with the provided partner_id
     $CI->db->where('barcode', $barcode);
+    if(!empty($product_id)){
+        $CI->db->where('product_id !=', $product_id);
+    }
     $CI->db->where('product_id IN (SELECT id FROM products WHERE partner_id = ' . $user_id . ')');
     $query = $CI->db->get('product_variants');
     // echo $CI->db->last_query();

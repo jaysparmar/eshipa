@@ -166,9 +166,14 @@ class Partners extends CI_Controller
 
             $partner_data = fetch_details(['user_id' => $id], 'partner_data', 'id,profile');
             if (!empty($partner_data)) {
-                unlink(FCPATH . $partner_data[0]['profile']);
-                // unlink(FCPATH . $partner_data[0]['national_identity_card']);
-                // unlink(FCPATH . $partner_data[0]['address_proof']);
+                if (!empty($partner_data[0]['profile'])) {
+                    $fileToDelete = FCPATH . $partner_data[0]['profile'];
+                    if (file_exists($fileToDelete)) {
+                        unlink(FCPATH . $partner_data[0]['profile']);
+                        // unlink(FCPATH . $partner_data[0]['national_identity_card']);
+                        // unlink(FCPATH . $partner_data[0]['address_proof']);
+                    }
+                }
             }
 
             /* set restro restro id zero so admin can have access of media */
@@ -284,9 +289,9 @@ class Partners extends CI_Controller
             // validate restro details
             $this->form_validation->set_rules('partner_name', 'Partner Name', 'trim|required|xss_clean');
             $this->form_validation->set_rules('description', 'Description', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('address', 'Address', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean|numeric');
-            $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean|numeric');
+            $this->form_validation->set_rules('address', 'Pickup Address', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|xss_clean|numeric');
+            $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|xss_clean|numeric');
             $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
             $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
             $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
@@ -797,7 +802,7 @@ class Partners extends CI_Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postFields));
         $result = curl_exec($ch);
-        $result = json_decode($result, true);        
+        $result = json_decode($result, true);
 
         if (!isset($result['Status']) || $result['Status'] != 'Success') {
             $this->response['error'] = true;

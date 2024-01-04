@@ -13,6 +13,7 @@ class Partner_model extends CI_Model
 
     function add_partner($data, $profile = [], $timing = [], $tags = [])
     {
+        // print_r($data); return false;
         $data = escape_array($data);
         $profile = (!empty($profile)) ? escape_array($profile) : [];
         $timing = (!empty($timing)) ? escape_array($timing) : [];
@@ -29,8 +30,8 @@ class Partner_model extends CI_Model
             'description' => $data['description'],
             'address' => $data['address'],
             'type' => $data['type'],
-            'tax_name' => $data['tax_name'],
-            'tax_number' => $data['tax_number'],
+            'tax_name' => (isset($data['tax_name']) && $data['tax_name'] != "") ? $data['tax_name'] : "",
+            'tax_number' => (isset($data['tax_number']) && $data['tax_number'] != "") ? $data['tax_number'] : "",
             'account_number' => $data['account_number'],
             'account_name' => $data['account_name'],
             'licence_name' => (isset($data['licence_name']) && !empty($data['licence_name'])) ? $data['licence_name'] : "",
@@ -41,13 +42,19 @@ class Partner_model extends CI_Model
             'licence_code_status' => (isset($data['licence_code_status']) && !empty($data['licence_code_status'])) ? $data['licence_code_status'] :0,
             'id_passport_number_status' => (isset($data['id_passport_number_status']) && !empty($data['id_passport_number_status'])) ? $data['id_passport_number_status'] :0,
             'bank_name' => $data['bank_name'],
-            'cooking_time' => (isset($data['cooking_time']) && $data['cooking_time'] != "") ? $data['permissions'] : null,
+            'cooking_time' => (isset($data['cooking_time']) && $data['cooking_time'] != "") ? $data['cooking_time'] : '',
             'pan_number' => $data['pan_number'],
             'gallery' =>  json_encode($gallery),
             'status' => (isset($data['status']) && $data['status'] != "") ? $data['status'] : 2,
             'permissions' => (isset($data['permissions']) && $data['permissions'] != "") ? json_encode($data['permissions']) : null,
             'slug' => $data['slug']
         ];
+        if(isset($data['id_passport_number_status'])){
+            $partner_data['id_passport_number_status'] = $data['id_passport_number_status'];
+        }
+        if(isset($data['licence_code_status'])){
+            $partner_data['licence_code_status'] = $data['licence_code_status'];
+        }
         if (!empty($data['id_passport_number_verification_result'])) {
             $partner_data['id_passport_number_verification_result'] =  $data['id_passport_number_verification_result'];
         } else {

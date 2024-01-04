@@ -73,8 +73,8 @@ class Login extends CI_Controller
                 $this->form_validation->set_rules('new_confirm', $this->lang->line('change_password_validation_new_password_confirm_label'), 'required');
             }
             if (!isset($_POST['edit_restro'])) {
-                $this->form_validation->set_rules('profile', 'Partner Profile', 'trim|xss_clean');
-                $this->form_validation->set_rules('national_identity_card', 'National Identity Card', 'trim|xss_clean');
+                $this->form_validation->set_rules('profile', 'Profile Picture', 'trim|xss_clean');
+                $this->form_validation->set_rules('id_passport_number', 'ID/Passport Number', 'trim|required|xss_clean');
                 $this->form_validation->set_rules('address_proof', 'Address Proof', 'trim|xss_clean');
             }
             $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean');
@@ -84,14 +84,16 @@ class Login extends CI_Controller
             // validate restro details
             $this->form_validation->set_rules('partner_name', 'Partner Name', 'trim|required|xss_clean');
             $this->form_validation->set_rules('description', 'Description', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('address', 'Address', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
-            $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
+            $this->form_validation->set_rules('address', 'Pickup Address', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|xss_clean');
             $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
             $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
             $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|required|xss_clean');
             $this->form_validation->set_rules('self_pickup', 'Self Pickup', 'trim|xss_clean');
             $this->form_validation->set_rules('delivery_orders', 'Delivery Orders', 'trim|xss_clean');
+            $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
+            $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
 
             // bank details
             $this->form_validation->set_rules('account_number', 'Account Number', 'trim|xss_clean');
@@ -99,6 +101,10 @@ class Login extends CI_Controller
             $this->form_validation->set_rules('bank_code', 'Bank Code', 'trim|xss_clean');
             $this->form_validation->set_rules('bank_name', 'Bank Name', 'trim|xss_clean');
             $this->form_validation->set_rules('pan_number', 'Pan Number', 'trim|xss_clean');
+
+            // licence details
+            $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|xss_clean');
 
             if (!$this->form_validation->run()) {
 
@@ -110,6 +116,8 @@ class Login extends CI_Controller
                 return;
                 exit();
             } else {
+                $id = $_POST['edit_restro'];
+                $seller_data_id = fetch_details(['user_id' => $id], 'partner_data', 'id,address_proof,id_passport_number,profile,licence_proof,id_passport_number_status,licence_code_status');
                 if (!isset($_POST['delivery_orders']) && !isset($_POST['self_pickup'])) {
                     $this->response['error'] = true;
                     $this->response['csrfName'] = $this->security->get_csrf_token_name();
@@ -331,10 +339,15 @@ class Login extends CI_Controller
                         'user_id' => $this->input->post('edit_restro', true),
                         'edit_restro_data_id' => $this->input->post('edit_restro_data_id', true),
                         'address_proof' => (!empty($proof_doc)) ? $proof_doc : $this->input->post('old_address_proof', true),
+                        'id_passport_number' => $this->input->post('id_passport_number', true),
+                        'id_passport_number_status' => $seller_data_id[0]['id_passport_number_status'],
+                        'licence_code_status' => $seller_data_id[0]['licence_code_status'],
                         'national_identity_card' => (!empty($id_card_doc)) ? $id_card_doc : $this->input->post('old_national_identity_card', true),
                         'profile' => (!empty($profile_doc)) ? $profile_doc : $this->input->post('old_profile', true),
                         'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
                         'partner_name' => $this->input->post('partner_name', true),
+                        'licence_name' => $this->input->post('licence_name', true),
+                        'licence_code' => $this->input->post('licence_code', true),
                         'description' => $this->input->post('description', true),
                         'address' => $this->input->post('address', true),
                         'type' => $this->input->post('type', true),

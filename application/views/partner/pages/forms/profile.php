@@ -42,7 +42,7 @@
                                 <h4>Accept Order Types </h4>
                                 <hr>
                                 <div class="form-group">
-                                    <div class=" pt-2 mb-2">
+                                    <div class=" pt-2 mb-2 d-none">
                                         <label for="delivery_orders" class="col-sm-8 form-label">Deliver Orders </label>
                                         <div class="col-sm-1">
                                             <input type="checkbox" name="delivery_orders" <?= (isset($permit['delivery_orders']) && $permit['delivery_orders'] == '1') ? 'Checked' : '' ?> data-bootstrap-switch data-off-color="danger" data-on-color="success">
@@ -146,7 +146,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="address" class="col-sm-3 col-form-label">Address <span class='text-danger text-sm'>*</span></label>
+                                            <label for="address" class="col-sm-3 col-form-label">Pickup Address <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <textarea type="text" class="form-control" id="address" placeholder="Enter Address" name="address"><?= @$fetched_data[0]['address'] ?></textarea>
                                             </div>
@@ -306,7 +306,7 @@
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="licence_name" placeholder="Company Name" name="licence_name" value="<?= (isset($fetched_data[0]['licence_name']) && !empty($fetched_data[0]['licence_name'])) ? output_escaping($fetched_data[0]['licence_name']) : "" ?>">
                                             </div>
-                                            <label for="licence_code" class="col-sm-12 col-form-label">Registration number <span class='text-danger text-sm'>*</span>
+                                            <label for="licence_code" class="col-sm-12 col-form-label">Registration number
                                                 <span class="badge bg-success company-verified <?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] == 1 ? '' : ' d-none' ?>">Verified</span>
 
                                                 <span class="badge bg-danger company-not-verified<?= isset($fetched_data[0]['licence_code_status']) && $fetched_data[0]['licence_code_status'] != 0 ? ' d-none' : '' ?>">Not Verified</span>
@@ -427,7 +427,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group ">
-                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number <span class='text-danger text-sm'>*</span></label>
+                                            <label for="tax_number" class="col-sm-4 col-form-label">Tax Number</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="tax_number" placeholder="Tax Number" name="tax_number" value="<?= @$fetched_data[0]['tax_number'] ?>">
                                             </div>

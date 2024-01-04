@@ -79,9 +79,9 @@ class Auth extends CI_Controller
         // validate restro details
         $this->form_validation->set_rules('partner_name', 'Partner Name', 'trim|required|xss_clean');
         $this->form_validation->set_rules('description', 'Description', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('address', 'Address', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|xss_clean');
-        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|xss_clean');
+        $this->form_validation->set_rules('address', 'Pickup Address', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|xss_clean');
         $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
         $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
         $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');

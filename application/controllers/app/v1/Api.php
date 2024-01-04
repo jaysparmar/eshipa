@@ -90,6 +90,7 @@ header("Content-Type: application/json");
     63. re_order
     64. get_customers
     65. share_wallet_balance
+    66. update_partner - To register as a partner from customer APP
     ---------------------------------------------------------------------------
     ---------------------------------------------------------------------------
 
@@ -186,6 +187,7 @@ class Api extends CI_Controller
         // "app/v1/api/midtrans_wallet_transaction",
         "app/v1/api/midtrans_webhook",
         // "app/v1/api/re_order",
+        "app/v1/api/update_partner",
         // "app/v1/api/test",
     ];
     private  $user_details = [];
@@ -1613,6 +1615,8 @@ class Api extends CI_Controller
         $this->form_validation->set_rules('final_total', 'Final Total', 'trim|required|numeric|xss_clean');
         $this->form_validation->set_rules('promo_code', 'Promo Code', 'trim|xss_clean');
         $this->form_validation->set_rules('order_note', 'Order Note', 'trim|xss_clean');
+        $this->form_validation->set_rules('txn_id', 'Transaction ID', 'trim|xss_clean');
+        $this->form_validation->set_rules('is_pos', 'Is POS', 'trim|xss_clean');
         $this->form_validation->set_rules('delivery_tip', 'Delivery Tip', 'trim|numeric|xss_clean');
         $this->form_validation->set_rules('is_self_pick_up', 'Is Self Pick Up', 'trim|numeric|xss_clean');
 
@@ -2250,7 +2254,7 @@ class Api extends CI_Controller
                     return;
                 }
             }
-            if($is_variant_available_in_cart && $buy_stock==1){
+            if ($is_variant_available_in_cart && $buy_stock == 1) {
                 $current_qty = is_variant_available_in_cart($this->input->post('product_variant_id', true),  $this->input->post('user_id', true), 1);
                 $_POST['qty'] = $current_qty + 1;
             }
@@ -6025,6 +6029,573 @@ class Api extends CI_Controller
                 $this->response['message'] = 'Amount exceeded available balance!';
                 echo json_encode($this->response);
                 return false;
+            }
+        }
+    }
+
+
+    // To register as a partner from customer APP
+    public function update_partner()
+    {
+        /*
+            id:34                                 {partner_id}(pass when update profile)
+        restro details:
+            partner_name:asd   
+            type:1                                {1:veg | 2:non-Veg | 3:Both}
+            profile:file                          // {pass if want to change}
+            status:1                              {1:active | 0: deactive} (when register -> pass status:2 ( Not-Approved))
+            city_id:1  
+            cooking_time:20                       {in minutes}   
+            working_time:[{"day":"Sunday","opening_time":"11:02:00","closing_time":"22:04:00","is_open":1},{"day":"Tuesday","opening_time":"19:20","closing_time":"18:21","is_open":1}]
+            address: restro address
+            address_proof:file                    // {pass if want to change}
+            latitude:123464
+            longitude:234535
+            gallary:multiple images from media    {optional}  
+            description:asd                       {optional}
+            restro_tags:1,2,3                     {optional}  {tag_ids comma saprated}
+
+            delivery_orders:1|0     
+            restro_profile:1|0
+
+        restro owner details
+            name:asd
+            mobile:123456789
+            email:asd@gmail.com
+            password:password               // {pass if restro register}
+            old:12345                       //{if want to change password}
+            new:345234                      //{if want to change password}
+            national_identity_card:file     // {pass if want to change}
+            tax_name:GST
+            tax_number:GSTIN4565
+            account_number:sdfv             {optional}
+            account_name:asd                {optional}
+            bank_code:ASD                   {optional}
+            bank_name:sdf                   {optional}
+            pan_number:ad                   {optional}       
+
+        */
+        if (isset($_POST['id'])) {
+            if (!verify_tokens()) {
+                return false;
+            }
+        }
+        // print_R($_POST);
+        $identity_column = $this->config->item('identity', 'ion_auth');
+        $identity = $this->session->userdata('identity');
+        if ($identity_column == 'email') {
+            $this->form_validation->set_rules('email', 'Email', 'required|xss_clean|trim|valid_email');
+        } else {
+            $this->form_validation->set_rules('mobile', 'Mobile', 'required|xss_clean|trim|numeric');
+        }
+        // validate owner details
+        $this->form_validation->set_rules('name', 'Name', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('email', 'Mail', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|min_length[5]');
+        if (!isset($_POST['id'])) {
+            $this->form_validation->set_rules('password', 'Password', 'trim|required|xss_clean');
+        }
+        if (!empty($_POST['old']) || !empty($_POST['new'])) {
+            $this->form_validation->set_rules('old', $this->lang->line('change_password_validation_old_password_label'), 'required');
+            $this->form_validation->set_rules('new', $this->lang->line('change_password_validation_new_password_label'), 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']');
+        }
+        $this->form_validation->set_rules('working_time', 'Working Days', 'trim|xss_clean');
+        $this->form_validation->set_rules('id_passport_number', 'ID/Passport Number', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('cooking_time', 'cooking_time', 'trim|xss_clean|numeric');
+        $this->form_validation->set_rules('restro_tags', 'Restro Tags', 'trim|xss_clean');
+
+        // validate restro details
+        $this->form_validation->set_rules('partner_name', 'partner Name', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('description', 'Description', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('address', 'Pickup Address', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('latitude', 'Latitude', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('longitude', 'Longitude', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('type', 'Type', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('tax_name', 'Tax Name', 'trim|xss_clean');
+        $this->form_validation->set_rules('tax_number', 'Tax Number', 'trim|xss_clean');
+        $this->form_validation->set_rules('self_pickup', 'Self Pickup', 'trim|xss_clean');
+        $this->form_validation->set_rules('delivery_orders', 'Delivery Orders', 'trim|xss_clean');
+
+        // bank details
+        $this->form_validation->set_rules('account_number', 'Account Number', 'trim|xss_clean');
+        $this->form_validation->set_rules('account_name', 'Account Name', 'trim|xss_clean');
+        $this->form_validation->set_rules('bank_code', 'Bank Code', 'trim|xss_clean');
+        $this->form_validation->set_rules('bank_name', 'Bank Name', 'trim|xss_clean');
+        $this->form_validation->set_rules('pan_number', 'Pan Number', 'trim|xss_clean');
+
+        // licence details
+        $this->form_validation->set_rules('licence_name', 'Company Name', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('licence_code', 'Registration number', 'trim|xss_clean');
+
+        if (!$this->form_validation->run()) {
+            $this->response['error'] = true;
+            $this->response['message'] = strip_tags(validation_errors());
+            print_r(json_encode($this->response));
+            return false;
+        } else {
+            $id = $this->input->post('id', true);
+            $seller_data_id = fetch_details(['user_id' => $id], 'partner_data', 'id,address_proof,id_passport_number,profile,licence_proof,id_passport_number_status,licence_code_status');
+            if ((empty($_POST['delivery_orders']) || $_POST['delivery_orders'] == "") && (empty($_POST['self_pickup']) || $_POST['self_pickup'] == "")) {
+                $this->response['error'] = true;
+                $this->response['message'] = "Both order receive type should not be disable.";
+                print_r(json_encode($this->response));
+                return;
+                exit();
+            }
+            if (!file_exists(FCPATH . RESTRO_DOCUMENTS_PATH)) {
+                mkdir(FCPATH . RESTRO_DOCUMENTS_PATH, 0777);
+            }
+
+            //process licence proof
+
+            $temp_licence_proof = $licence_doc = array();
+            $licence_files = $_FILES;
+            $licence_error = "";
+            $config = [
+                'upload_path' =>  FCPATH . RESTRO_DOCUMENTS_PATH,
+                'allowed_types' => 'jpg|png|jpeg|gif',
+                'max_size' => 8000,
+            ];
+            if (isset($licence_files['licence_proof']) && !empty($licence_files['licence_proof']['name']) && isset($licence_files['licence_proof']['name'])) {
+                $other_image_cnt = count($_FILES['licence_proof']['name']);
+                $other_img = $this->upload;
+                $other_img->initialize($config);
+
+                for ($i = 0; $i < $other_image_cnt; $i++) {
+                    if (!empty($licence_files['licence_proof']['name'][$i])) {
+                        $_FILES['temp_image']['name'] = $licence_files['licence_proof']['name'][$i];
+                        $_FILES['temp_image']['type'] = $licence_files['licence_proof']['type'][$i];
+                        $_FILES['temp_image']['tmp_name'] = $licence_files['licence_proof']['tmp_name'][$i];
+                        $_FILES['temp_image']['error'] = $licence_files['licence_proof']['error'][$i];
+                        $_FILES['temp_image']['size'] = $licence_files['licence_proof']['size'][$i];
+                        if (!$other_img->do_upload('temp_image')) {
+                            $licence_error = 'Images :' . $licence_error . ' ' . $other_img->display_errors();
+                        } else {
+                            $temp_licence_proof = $other_img->data();
+                            resize_review_images($temp_licence_proof, FCPATH . RESTRO_DOCUMENTS_PATH);
+                            $licence_doc[$i]  = RESTRO_DOCUMENTS_PATH . $temp_licence_proof['file_name'];
+                        }
+                    } else {
+                        $_FILES['temp_image']['name'] = $licence_files['licence_proof']['name'][$i];
+                        $_FILES['temp_image']['type'] = $licence_files['licence_proof']['type'][$i];
+                        $_FILES['temp_image']['tmp_name'] = $licence_files['licence_proof']['tmp_name'][$i];
+                        $_FILES['temp_image']['error'] = $licence_files['licence_proof']['error'][$i];
+                        $_FILES['temp_image']['size'] = $licence_files['licence_proof']['size'][$i];
+                        if (!$other_img->do_upload('temp_image')) {
+                            $licence_error = $other_img->display_errors();
+                        }
+                    }
+                }
+                //Deleting Uploaded Images if any overall error occured
+                if ($licence_error != NULL || !$this->form_validation->run()) {
+                    if (isset($licence_doc) && !empty($licence_doc || !$this->form_validation->run())) {
+                        foreach ($licence_doc as $key => $val) {
+                            unlink(FCPATH . RESTRO_DOCUMENTS_PATH . $licence_doc[$key]);
+                        }
+                    }
+                }
+            }
+
+            if ($licence_error != NULL) {
+                $this->response['error'] = true;
+                $this->response['csrfName'] = $this->security->get_csrf_token_name();
+                $this->response['csrfHash'] = $this->security->get_csrf_hash();
+                $this->response['message'] =  $licence_error;
+                print_r(json_encode($this->response));
+                return;
+            }
+
+            //process store logo
+            $temp_array_logo = $profile_doc = array();
+            $logo_files = $_FILES;
+            $profile_error = "";
+            $config = [
+                'upload_path' =>  FCPATH . RESTRO_DOCUMENTS_PATH,
+                'allowed_types' => 'jpg|png|jpeg|gif',
+                'max_size' => 8000,
+            ];
+            if (isset($logo_files['profile']) && !empty($logo_files['profile']['name']) && isset($logo_files['profile']['name'])) {
+                $other_img = $this->upload;
+                $other_img->initialize($config);
+
+                if (isset($_POST['id']) && !empty($_POST['id']) && isset($seller_data_id[0]['profile']) && !empty($seller_data_id[0]['profile'])) {
+                    $old_logo = explode('/', $seller_data_id[0]['profile']);
+                    delete_images(RESTRO_DOCUMENTS_PATH, $old_logo[2]);
+                }
+
+                if (!empty($logo_files['profile']['name'])) {
+
+                    $_FILES['temp_image']['name'] = $logo_files['profile']['name'];
+                    $_FILES['temp_image']['type'] = $logo_files['profile']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $logo_files['profile']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $logo_files['profile']['error'];
+                    $_FILES['temp_image']['size'] = $logo_files['profile']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $profile_error = 'Images :' . $profile_error . ' ' . $other_img->display_errors();
+                    } else {
+                        $temp_array_logo = $other_img->data();
+                        resize_review_images($temp_array_logo, FCPATH . RESTRO_DOCUMENTS_PATH);
+                        $profile_doc  = RESTRO_DOCUMENTS_PATH . $temp_array_logo['file_name'];
+                    }
+                } else {
+                    $_FILES['temp_image']['name'] = $logo_files['profile']['name'];
+                    $_FILES['temp_image']['type'] = $logo_files['profile']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $logo_files['profile']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $logo_files['profile']['error'];
+                    $_FILES['temp_image']['size'] = $logo_files['profile']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $profile_error = $other_img->display_errors();
+                    }
+                }
+                //Deleting Uploaded Images if any overall error occured
+                if ($profile_error != NULL || !$this->form_validation->run()) {
+                    if (isset($profile_doc) && !empty($profile_doc || !$this->form_validation->run())) {
+                        foreach ($profile_doc as $key => $val) {
+                            unlink(FCPATH . RESTRO_DOCUMENTS_PATH . $profile_doc[$key]);
+                        }
+                    }
+                }
+            }
+
+            if ($profile_error != NULL) {
+                $this->response['error'] = true;
+                $this->response['message'] =  $profile_error;
+                print_r(json_encode($this->response));
+                return;
+            }
+
+            //process national_identity_card
+            $temp_array_id_card = $id_card_doc = array();
+            $id_card_files = $_FILES;
+            $id_card_error = "";
+            $config = [
+                'upload_path' =>  FCPATH . RESTRO_DOCUMENTS_PATH,
+                'allowed_types' => 'jpg|png|jpeg|gif',
+                'max_size' => 8000,
+            ];
+            if (isset($id_card_files['national_identity_card']) &&  !empty($id_card_files['national_identity_card']['name']) && isset($id_card_files['national_identity_card']['name'])) {
+                $other_img = $this->upload;
+                $other_img->initialize($config);
+
+                if (isset($_POST['id']) && !empty($_POST['id']) && isset($seller_data_id[0]['national_identity_card']) && !empty($seller_data_id[0]['national_identity_card'])) {
+                    $old_logo = explode('/', $seller_data_id[0]['national_identity_card']);
+                    delete_images(RESTRO_DOCUMENTS_PATH, $old_logo[2]);
+                }
+
+                if (!empty($id_card_files['national_identity_card']['name'])) {
+
+                    $_FILES['temp_image']['name'] = $id_card_files['national_identity_card']['name'];
+                    $_FILES['temp_image']['type'] = $id_card_files['national_identity_card']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $id_card_files['national_identity_card']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $id_card_files['national_identity_card']['error'];
+                    $_FILES['temp_image']['size'] = $id_card_files['national_identity_card']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $id_card_error = 'Images :' . $id_card_error . ' ' . $other_img->display_errors();
+                    } else {
+                        $temp_array_id_card = $other_img->data();
+                        resize_review_images($temp_array_id_card, FCPATH . RESTRO_DOCUMENTS_PATH);
+                        $id_card_doc  = RESTRO_DOCUMENTS_PATH . $temp_array_id_card['file_name'];
+                    }
+                } else {
+                    $_FILES['temp_image']['name'] = $id_card_files['national_identity_card']['name'];
+                    $_FILES['temp_image']['type'] = $id_card_files['national_identity_card']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $id_card_files['national_identity_card']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $id_card_files['national_identity_card']['error'];
+                    $_FILES['temp_image']['size'] = $id_card_files['national_identity_card']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $id_card_error = $other_img->display_errors();
+                    }
+                }
+                //Deleting Uploaded Images if any overall error occured
+                if ($id_card_error != NULL || !$this->form_validation->run()) {
+                    if (isset($id_card_doc) && !empty($id_card_doc || !$this->form_validation->run())) {
+                        foreach ($id_card_doc as $key => $val) {
+                            unlink(FCPATH . RESTRO_DOCUMENTS_PATH . $id_card_doc[$key]);
+                        }
+                    }
+                }
+            }
+
+            if ($id_card_error != NULL) {
+                $this->response['error'] = true;
+                $this->response['message'] =  $id_card_error;
+                print_r(json_encode($this->response));
+                return;
+            }
+
+            //process address_proof
+            $temp_array_proof = $proof_doc = array();
+            $proof_files = $_FILES;
+            $proof_error = "";
+            $config = [
+                'upload_path' =>  FCPATH . RESTRO_DOCUMENTS_PATH,
+                'allowed_types' => 'jpg|png|jpeg|gif',
+                'max_size' => 8000,
+            ];
+            if (isset($proof_files['address_proof']) && !empty($proof_files['address_proof']['name']) && isset($proof_files['address_proof']['name'])) {
+                $other_img = $this->upload;
+                $other_img->initialize($config);
+
+                if (isset($_POST['id']) && !empty($_POST['id']) && isset($seller_data_id[0]['address_proof']) && !empty($seller_data_id[0]['address_proof'])) {
+                    $old_logo = explode('/', $seller_data_id[0]['address_proof']);
+                    delete_images(RESTRO_DOCUMENTS_PATH, $old_logo[2]);
+                }
+
+                if (!empty($proof_files['address_proof']['name'])) {
+
+                    $_FILES['temp_image']['name'] = $proof_files['address_proof']['name'];
+                    $_FILES['temp_image']['type'] = $proof_files['address_proof']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $proof_files['address_proof']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $proof_files['address_proof']['error'];
+                    $_FILES['temp_image']['size'] = $proof_files['address_proof']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $proof_error = 'Images :' . $proof_error . ' ' . $other_img->display_errors();
+                    } else {
+                        $temp_array_proof = $other_img->data();
+                        resize_review_images($temp_array_proof, FCPATH . RESTRO_DOCUMENTS_PATH);
+                        $proof_doc  = RESTRO_DOCUMENTS_PATH . $temp_array_proof['file_name'];
+                    }
+                } else {
+                    $_FILES['temp_image']['name'] = $proof_files['address_proof']['name'];
+                    $_FILES['temp_image']['type'] = $proof_files['address_proof']['type'];
+                    $_FILES['temp_image']['tmp_name'] = $proof_files['address_proof']['tmp_name'];
+                    $_FILES['temp_image']['error'] = $proof_files['address_proof']['error'];
+                    $_FILES['temp_image']['size'] = $proof_files['address_proof']['size'];
+                    if (!$other_img->do_upload('temp_image')) {
+                        $proof_error = $other_img->display_errors();
+                    }
+                }
+                //Deleting Uploaded Images if any overall error occured
+                if ($proof_error != NULL || !$this->form_validation->run()) {
+                    if (isset($proof_doc) && !empty($proof_doc || !$this->form_validation->run())) {
+                        foreach ($proof_doc as $key => $val) {
+                            unlink(FCPATH . RESTRO_DOCUMENTS_PATH . $proof_doc[$key]);
+                        }
+                    }
+                }
+            }
+
+            if ($proof_error != NULL) {
+                $this->response['error'] = true;
+                $this->response['message'] =  $proof_error;
+                print_r(json_encode($this->response));
+                return;
+            }
+
+            // process working hours for restro
+            $work_time = $gallary = [];
+            if (isset($_POST['working_time']) && !empty($_POST['working_time'])) {
+                $working_time = $this->input->post('working_time', true);
+                $work_time = json_decode($working_time, true);
+            }
+            if (isset($_POST['gallary']) && !empty($_POST['gallary'])) {
+                $gallary = explode(",", $this->input->post('gallary', true));
+            }
+
+            if (isset($_POST['id'])) {
+                // if (!edit_unique($this->input->post('email', true), 'users.email.' . $this->input->post('id', true) . '') || !edit_unique($this->input->post('mobile', true), 'users.mobile.' . $this->input->post('id', true) . '')) {
+                //     $response["error"]   = true;
+                //     $response["message"] = "Email or mobile already exists !";
+                //     $response["data"] = array();
+                //     echo json_encode($response);
+                //     return false;
+                // }
+                // process permissions of sellers
+                $permmissions = $permits = array();
+                $permits = get_partner_permission($this->input->post('id', true));
+                $permmissions['customer_privacy'] = (isset($permits->customer_privacy)) ? 1 : 0;
+                $permmissions['view_order_otp'] = (isset($permits->view_order_otp)) ? 1 : 0;
+                $permmissions['assign_rider'] = (isset($permits->assign_rider)) ? 1 : 0;
+                $permmissions['is_email_setting_on'] = (isset($permits->is_email_setting_on)) ? 1 : 0;
+                $permmissions['delivery_orders'] = (isset($_POST['delivery_orders']) && !empty($_POST['delivery_orders'])) ? 1 : 0;
+                $permmissions['self_pickup'] = (isset($_POST['self_pickup']) && !empty($_POST['self_pickup'])) ? 1 : 0;
+
+                $restro_data = array(
+                    'user_id' => $this->input->post('id', true),
+                    'edit_restro_data_id' => $seller_data_id[0]['id'],
+                    'id_passport_number_status' => $seller_data_id[0]['id_passport_number_status'],
+                    'licence_code_status' => $seller_data_id[0]['licence_code_status'],
+                    'address_proof' => (!empty($proof_doc)) ? $proof_doc : $seller_data_id[0]['address_proof'],
+                    'id_passport_number' => $this->input->post('id_passport_number', true),
+                    'profile' => (!empty($profile_doc)) ? $profile_doc : $seller_data_id[0]['profile'],
+                    'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
+                    'partner_name' => $this->input->post('partner_name', true),
+                    'description' => $this->input->post('description', true),
+                    'address' => $this->input->post('address', true),
+                    'type' => $this->input->post('type', true),
+                    'tax_name' => $this->input->post('tax_name', true),
+                    'tax_number' => $this->input->post('tax_number', true),
+                    'account_number' => $this->input->post('account_number', true),
+                    'account_name' => $this->input->post('account_name', true),
+                    'bank_code' => $this->input->post('bank_code', true),
+                    'bank_name' => $this->input->post('bank_name', true),
+                    'bank_code' => $this->input->post('bank_code', true),
+                    'licence_name' => $this->input->post('licence_name', true), // Company name
+                    'licence_code' => $this->input->post('licence_code', true), // // Company registration number
+                    'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
+                    // 'cooking_time' => $this->input->post('cooking_time', true),
+                    'bank_name' => $this->input->post('bank_name', true),
+                    'pan_number' => $this->input->post('pan_number', true),
+                    'gallery' => (isset($gallary) && !empty($gallary)) ? $gallary : NULL,
+                    'status' => $this->input->post('status', true),
+                    'permissions' => $permmissions,
+                    'slug' => create_unique_slug($this->input->post('partner_name', true), 'partner_data')
+                );
+
+                if (!empty($_POST['old']) || !empty($_POST['new'])) {
+                    $identity = ($identity_column == 'mobile') ? 'mobile' : 'email';
+                    $res = fetch_details(['id' => $id], 'users', $identity);
+                    if (!empty($res)) {
+                        if (!$this->ion_auth->change_password($res[0][$identity], $this->input->post('old'), $this->input->post('new'))) {
+
+                            // if the login was un-successful
+                            $response['error'] = true;
+                            $response['message'] = strip_tags($this->ion_auth->errors());
+                            echo json_encode($response);
+                            return;
+                        } else {
+                            $restro_filter['id'] = $id;
+                            $restro_filter['ignore_status'] = true;
+                            $restro_data = fetch_partners($restro_filter);
+                            unset($restro_data['data'][0]['partner_cook_time']);
+
+                            $response['error'] = false;
+                            $response['message'] = 'Password Update Succesfully';
+                            $response['data'] = $restro_data['data'];
+                            echo json_encode($response);
+                            return;
+                        }
+                    } else {
+                        $response['error'] = true;
+                        $response['message'] = 'User not exists';
+                        echo json_encode($response);
+                        return;
+                    }
+                }
+                $profile = array(
+                    'name' => $this->input->post('name', true),
+                    'email' => $this->input->post('email', true),
+                    'mobile' => $this->input->post('mobile', true),
+                    'password' => $this->input->post('password', true),
+                    'latitude' => $this->input->post('latitude', true),
+                    'longitude' => $this->input->post('longitude', true),
+                    'city' => $this->input->post('city_id', true)
+                );
+
+                // process updated tags
+                $tags = array();
+                if (isset($_POST['restro_tags']) && !empty($_POST['restro_tags'])) {
+                    $restro_tags = explode(',', $this->input->post('restro_tags', true));
+                    foreach ($restro_tags as $row) {
+                        $tempRow['partner_id'] = $this->input->post('id', true);
+                        $tempRow['tag_id'] = $row;
+                        $tags[] = $tempRow;
+                    }
+                }
+
+                if ($this->Partner_model->add_partner($restro_data, $profile, $work_time, $tags)) {
+                    $id = $this->input->post('id', true);
+                    $restro_filter['id'] = $id;
+                    $restro_filter['ignore_status'] = true;
+                    $restro_data = fetch_partners($restro_filter);
+                    unset($restro_data['data'][0]['partner_cook_time']);
+
+                    $response['error'] = false;
+                    $response['message'] = 'Partner Update Successfully';
+                    $response['data'] = $restro_data['data'];
+                    echo json_encode($response);
+                    return false;
+                } else {
+                    $this->response['error'] = true;
+                    $this->response['message'] = "Somehting went wrong.Please try again later.";
+                    $this->response['data'] = array();
+                    print_r(json_encode($this->response));
+                    return false;
+                }
+            } else {
+
+                if (!$this->form_validation->is_unique($_POST['mobile'], 'users.mobile') || !$this->form_validation->is_unique($_POST['email'], 'users.email')) {
+                    $response["error"]   = true;
+                    $response["message"] = "Email or mobile already exists !";
+                    $response["data"] = array();
+                    echo json_encode($response);
+                    return false;
+                }
+
+                $identity_column = $this->config->item('identity', 'ion_auth');
+                $email = strtolower($this->input->post('email'));
+                $mobile = $this->input->post('mobile');
+                $identity = ($identity_column == 'mobile') ? $mobile : $email;
+                $password = $this->input->post('password');
+
+                $additional_data = [
+                    'username' => $this->input->post('name', true),
+                    'latitude' => $this->input->post('latitude', true),
+                    'longitude' => $this->input->post('longitude', true),
+                    'city' => $this->input->post('city_id', true)
+                ];
+                // process tags if any
+                $tags = array();
+                if (isset($_POST['restro_tags']) && !empty($_POST['restro_tags'])) {
+                    $restro_tags = explode(',', $this->input->post('restro_tags', true));
+                    $tags = array_map(function ($value) {
+                        $tmp_tag["partner_id"] =  $this->input->post('id', true);
+                        $tmp_tag["tag_id"] = $value;
+                        return $tmp_tag;
+                    }, $restro_tags);
+                }
+
+                $tags = array();
+                $this->ion_auth->register($identity, $password, $email, $additional_data, ['4']);
+                if (update_details(['active' => 1], [$identity_column => $identity], 'users')) {
+                    $user_id = fetch_details(['mobile' => $mobile], 'users', 'id');
+                    if (isset($_POST['gallary']) && !empty($_POST['gallary'])) {
+                        $gallary = explode(",", $this->input->post('gallary', true));
+                    }
+
+                    $data = array(
+                        'user_id' => $user_id[0]['id'],
+                        'address_proof' => (!empty($proof_doc)) ? $proof_doc : null,
+                        'id_passport_number' => $this->input->post('id_passport_number', true),
+                        'profile' => (!empty($profile_doc)) ? $profile_doc : null,
+                        'global_commission' => (isset($_POST['global_commission']) && !empty($_POST['global_commission'])) ? $this->input->post('global_commission', true) : 0,
+                        'partner_name' => $this->input->post('partner_name', true),
+                        'licence_name' => $this->input->post('licence_name', true), // Company name
+                        'licence_code' => $this->input->post('licence_code', true), // Company registration number
+                        'licence_proof' => (!empty($licence_doc)) ?  $licence_doc : [],
+                        'description' => $this->input->post('description', true),
+                        'address' => $this->input->post('address', true),
+                        'type' => $this->input->post('type', true),
+                        'tax_name' => $this->input->post('tax_name', true),
+                        'tax_number' => $this->input->post('tax_number', true),
+                        'account_number' => $this->input->post('account_number', true),
+                        'account_name' => $this->input->post('account_name', true),
+                        'bank_code' => $this->input->post('bank_code', true),
+                        'bank_name' => $this->input->post('bank_name', true),
+                        'pan_number' => $this->input->post('pan_number', true),
+                        // 'cooking_time' => $this->input->post('cooking_time', true),
+                        'gallery' => (isset($_POST['gallery']) && !empty($_POST['gallery'])) ? $this->input->post('gallery', true) : NULL,
+                        'status' => $this->input->post('status', true),
+                        'licence_status' => 1,
+                        'permissions' => $permmissions,
+                        'slug' => create_unique_slug($this->input->post('partner_name', true), 'partner_data')
+                    );
+                    $insert_id = $this->Partner_model->add_partner($data, [], $work_time, $tags);
+                    if (!empty($insert_id)) {
+                        $this->response['error'] = false;
+                        $this->response['message'] = 'Partner Registered Successfully';
+                        print_r(json_encode($this->response));
+                    } else {
+                        $this->response['error'] = true;
+                        $this->response['message'] = "partner data was not Registered";
+                        print_r(json_encode($this->response));
+                    }
+                } else {
+                    $this->response['error'] = true;
+                    $message = (isset($_POST['id'])) ? 'partner not Updated' : 'partner not Registered.';
+                    $this->response['message'] = $message;
+                    print_r(json_encode($this->response));
+                }
             }
         }
     }

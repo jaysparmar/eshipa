@@ -120,7 +120,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="address" class="col-sm-3 col-form-label">Address <span class='text-danger text-sm'>*</span></label>
+                                            <label for="address" class="col-sm-3 col-form-label">Pickup Address <span class='text-danger text-sm'>*</span></label>
                                             <div class="col-sm-10">
                                                 <textarea type="text" class="form-control" id="address" placeholder="Enter Address" name="address"></textarea>
                                             </div>
